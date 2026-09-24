@@ -11,6 +11,8 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("citysavedcanopieskeepplayerdecorations"), wrap(CityVegetationGameTests::citySavedCanopiesKeepPlayerDecorations));
+   helper.register(SurvivingTheAftermath.asResource("citylatecanopiesareremoved"), wrap(CityVegetationGameTests::cityLateCanopiesAreRemoved));
    helper.register(SurvivingTheAftermath.asResource("terraincityfrequencysurvey"), wrap(TerrainPlacementGameTests::terrainCityFrequencySurvey));
    helper.register(SurvivingTheAftermath.asResource("terraincitysettingsandgentleslope"), wrap(TerrainPlacementGameTests::terrainCitySettingsAndGentleSlope));
    helper.register(SurvivingTheAftermath.asResource("terrainfullcityfoundationandtransition"), wrap(TerrainPlacementGameTests::terrainFullCityFoundationAndTransition));
