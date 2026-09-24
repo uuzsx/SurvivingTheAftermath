@@ -14,7 +14,12 @@ import net.neoforged.fml.common.Mod;
 @net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, value = Dist.CLIENT)
 public class ClientForgeEvent {
     @SubscribeEvent
-    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ClientAftermathBars.clear(); }
+    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ClientAftermathBars.clear(); com.pancake.surviving_the_aftermath.client.ClientRaidMusic.clear(); }
+
+    @SubscribeEvent
+    public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
+        com.pancake.surviving_the_aftermath.client.ClientRaidMusic.tick();
+    }
 
     @SubscribeEvent
     public static void netherRaidProgress(CustomizeGuiOverlayEvent.BossEventProgress event) {

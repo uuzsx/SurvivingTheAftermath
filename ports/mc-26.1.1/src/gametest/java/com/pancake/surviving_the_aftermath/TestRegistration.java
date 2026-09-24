@@ -11,6 +11,12 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("defaultwavepiglinshaveweapons"), wrap(Rc4GameTests::defaultWavePiglinsHaveWeapons));
+   helper.register(SurvivingTheAftermath.asResource("configuredequipmentoverridesdefaults"), wrap(Rc4GameTests::configuredEquipmentOverridesDefaults));
+   helper.register(SurvivingTheAftermath.asResource("dungeonmobsdropnolootorexperience"), wrap(Rc4GameTests::dungeonMobsDropNoLootOrExperience));
+   helper.register(SurvivingTheAftermath.asResource("splitmagmacubeskeepdungeonlootpolicy"), wrap(Rc4GameTests::splitMagmaCubesKeepDungeonLootPolicy));
+   helper.register(SurvivingTheAftermath.asResource("buildingmusicstopswhenlastlistenerleaves"), wrap(Rc4GameTests::buildingMusicStopsWhenLastListenerLeaves));
+   helper.register(SurvivingTheAftermath.asResource("musicpacketandspatialasset"), wrap(Rc4GameTests::musicPacketAndSpatialAsset));
    helper.register(SurvivingTheAftermath.asResource("restoredregistryandlanguage"), wrap(ContentGameTests::restoredRegistryAndLanguage));
    helper.register(SurvivingTheAftermath.asResource("restoredfoodconsumption"), wrap(ContentGameTests::restoredFoodConsumption));
    helper.register(SurvivingTheAftermath.asResource("cowardicepricesandlegacytrades"), wrap(ContentGameTests::cowardicePricesAndLegacyTrades));

@@ -35,10 +35,34 @@ public class EntityInfoModule implements IEntityInfoModule {
 
     @Override
     public List<Optional<Entity>> spawnEntity(Level level) {
+        return spawnEntity(level, net.minecraft.core.BlockPos.ZERO);
+    }
+
+    @Override
+    public List<Optional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
         List<Optional<Entity>> arrayList = Lists.newArrayList();
         int amount = amountModule.getSpawnAmount();
         for (int i = 0; i < amount; i++) {
             Entity entity = entityType.create(level);
+            if (entity instanceof net.minecraft.world.entity.Mob mob && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                mob.moveTo(net.minecraft.world.phys.Vec3.atCenterOf(origin));
+                net.neoforged.neoforge.event.EventHooks.finalizeMobSpawn(mob, serverLevel,
+                        serverLevel.getCurrentDifficultyAt(origin), net.minecraft.world.entity.MobSpawnType.EVENT, null);
+                if (mob.isSpawnCancelled()) {
+                    mob.discard();
+                    arrayList.add(Optional.empty());
+                    continue;
+                }
+                // Dungeon piglins are combatants. Vanilla can otherwise create unarmed babies.
+                if (mob instanceof net.minecraft.world.entity.monster.piglin.Piglin piglin) {
+                    piglin.setBaby(false);
+                    if (piglin.getMainHandItem().isEmpty()) {
+                        piglin.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,
+                                new net.minecraft.world.item.ItemStack(serverLevel.getRandom().nextBoolean()
+                                        ? net.minecraft.world.item.Items.GOLDEN_SWORD : net.minecraft.world.item.Items.CROSSBOW));
+                    }
+                }
+            }
             arrayList.add(entity == null ? Optional.empty() : Optional.ofNullable(entity));
         }
         return arrayList;

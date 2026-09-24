@@ -1,0 +1,75 @@
+{
+  "version": "0.0.4-rc.6",
+  "built_from_repository": "https://github.com/uuzsx/SurvivingTheAftermath",
+  "artifacts": [
+    {
+      "minecraft": "1.20.1",
+      "loader": "Forge",
+      "game_test_total": 37,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.20.1-0.0.4-rc.6.jar",
+      "bytes": 3012933,
+      "sha256": "e02221605ffdf0c2f400b4876f85e314f3f5902ded7afaca00a9fae1eca1f326"
+    },
+    {
+      "minecraft": "1.21.1",
+      "loader": "NeoForge",
+      "game_test_total": 38,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.6.jar",
+      "bytes": 3001811,
+      "sha256": "4120a853374eca2701039cc9ee3d2118593cbf70c71585737bf89302e64de08b"
+    },
+    {
+      "minecraft": "1.21.2",
+      "loader": "NeoForge",
+      "game_test_total": 38,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.6.jar",
+      "bytes": 2989171,
+      "sha256": "7aedf84d4ef073516add736b0cdfc95d6a329de225f760af5b335a3300654956"
+    },
+    {
+      "minecraft": "26.1.1",
+      "loader": "NeoForge",
+      "game_test_total": 39,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.6.jar",
+      "bytes": 2993819,
+      "sha256": "ff887b575c4dfdf57c5205642d715725990519ed9a693baee5e82d64384b5297"
+    },
+    {
+      "minecraft": "26.1.2",
+      "loader": "NeoForge",
+      "game_test_total": 39,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.6.jar",
+      "bytes": 3008170,
+      "sha256": "8f82634485803e8f283b0af752e57fb820a98c6b5c361cfb5b1c495f465fef8a"
+    },
+    {
+      "minecraft": "26.2",
+      "loader": "NeoForge",
+      "game_test_total": 39,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.6.jar",
+      "bytes": 2993937,
+      "sha256": "03353a2f3c09f19b8a5abb90ad667fb96e1475a8fbe29777079a4f983855ec8a"
+    },
+    {
+      "minecraft": "26.3",
+      "loader": "NeoForge",
+      "game_test_total": 39,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.6.jar",
+      "bytes": 2993071,
+      "sha256": "d13510ee5656cecf171fdcd3edd0ba1a0d6718a825c14fed3ef2174cd49567b5"
+    }
+  ],
+  "kubejs_tested": [
+    "1.20.1",
+    "1.21.1",
+    "26.1.2"
+  ],
+  "test_notes": "Base runs include one conditional KubeJS test whose body skips when absent; 26.x includes one vanilla test. KubeJS runs execute the script test. Each version passed six actual client decoder seek/end-of-stream cases. No manual graphical client or audible multiplayer playtest."
+}

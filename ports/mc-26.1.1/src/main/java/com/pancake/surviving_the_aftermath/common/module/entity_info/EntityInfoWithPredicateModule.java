@@ -39,8 +39,8 @@ public class EntityInfoWithPredicateModule extends EntityInfoModule {
     }
 
     @Override
-    public List<Optional<Entity>> spawnEntity(Level level) {
-        List<Optional<Entity>> arrayList = super.spawnEntity(level);
+    public List<Optional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
+        List<Optional<Entity>> arrayList = super.spawnEntity(level, origin);
         arrayList.forEach(lazyOptional -> lazyOptional.ifPresent(entity -> {
             if (entity instanceof LivingEntity livingEntity){
                 if (predicateModules.isEmpty()) return;

@@ -14,4 +14,7 @@ public interface IEntityInfoModule extends IModule<IEntityInfoModule> {
     Supplier<Codec<IEntityInfoModule>> CODEC = () -> ModuleRegistry.ENTITY_INFO_REGISTRY.get().getCodec()
             .dispatch("entity_info", IEntityInfoModule::type, IEntityInfoModule::codec);
     List<LazyOptional<Entity>> spawnEntity(Level level);
+    default List<LazyOptional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
+        return spawnEntity(level);
+    }
 }

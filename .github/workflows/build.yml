@@ -50,10 +50,10 @@ jobs:
             ${{ matrix.directory }}/*.gradle
             ${{ matrix.directory }}/gradle.properties
             ${{ matrix.directory }}/gradle/wrapper/gradle-wrapper.properties
-      - name: Build with Gradle
+      - name: Verify gameplay and audio, then build
         run: |
           chmod +x gradlew
-          ./gradlew build --no-daemon --console=plain
+          ./gradlew runGameTestServer clientAudioCheck build --no-daemon --console=plain
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:

@@ -48,16 +48,13 @@ public class EquipmentPredicate implements IPredicateModule {
 
     @Override
     public void apply(LivingEntity livingEntity) {
-        if (livingEntity instanceof Mob mob){
-            if (canDrop){
-                for (var slot : EquipmentSlot.values()) {
-                    mob.setDropChance(slot, 0);
-                }
-            }
-
-            equipment.getWeightedList().getRandomValue(livingEntity.getRandom())
-                    .ifPresent(item -> mob.equipItemIfPossible((net.minecraft.server.level.ServerLevel) mob.level(), item.getDefaultInstance()));
-        }
+        equipment.getWeightedList().getRandomValue(livingEntity.getRandom()).ifPresent(item -> {
+            var stack = item.getDefaultInstance();
+            EquipmentSlot slot = livingEntity.getEquipmentSlotForItem(stack);
+            // This is configured equipment, not an AI pickup (which may reject it or drop the old item).
+            livingEntity.setItemSlot(slot, stack);
+            if (livingEntity instanceof Mob mob) mob.setDropChance(slot, canDrop ? 0.085F : 0.0F);
+        });
     }
 
     public static class Builder {

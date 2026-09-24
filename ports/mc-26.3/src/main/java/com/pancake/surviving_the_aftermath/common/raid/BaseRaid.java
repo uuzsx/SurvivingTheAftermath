@@ -155,7 +155,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
     private void spawnEntities(IEntityInfoModule entityInfoModule) {
         if (players.isEmpty() || isEnd()) return;
-        List<Optional<Entity>> arrayList = entityInfoModule.spawnEntity(level);
+        List<Optional<Entity>> arrayList = entityInfoModule.spawnEntity(level, startPos);
         for (Optional<Entity> lazyOptional : arrayList) {
             lazyOptional.ifPresent(entity -> {
                 if (entity instanceof Mob mob && !isEnd()) {
@@ -349,6 +349,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
     @Override
     public void insertTag(LivingEntity entity){
+        if (entity instanceof Mob mob) com.pancake.surviving_the_aftermath.common.util.RaidMobLoot.mark(mob);
         entity.getPersistentData().put(IDENTIFIER, StringTag.valueOf("enemies"));
         entity.getPersistentData().store("raid_uuid", net.minecraft.core.UUIDUtil.CODEC, this.uuid);
 

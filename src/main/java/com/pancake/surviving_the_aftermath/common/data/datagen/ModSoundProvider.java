@@ -19,6 +19,6 @@ public class ModSoundProvider extends SoundDefinitionsProvider {
 	}
 
 	private void addWithSameName(SoundEvent sound, boolean stream) {
-		add(sound, definition().with(sound(sound.getLocation()).stream(stream)));
+		add(sound, definition().with(sound(sound.getLocation()).stream(stream).attenuationDistance(com.pancake.surviving_the_aftermath.common.util.RaidMusic.RADIUS)));
 	}
 }

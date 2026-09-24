@@ -54,3 +54,20 @@ if (project.hasProperty('withKubeJS')) {
 }
 
 sourceSets.main.resources.exclude '**/.cache/**'
+
+// Exercise Minecraft's client Ogg decoder and late-listener seeking without launching a window.
+tasks.register('clientAudioCheckClasspath', Jar) {
+    dependsOn 'gametestClasses'
+    archiveFileName = 'client-audio-check-classpath.jar'
+    destinationDirectory = layout.buildDirectory.dir('client-audio-check')
+    doFirst {
+        manifest.attributes('Class-Path': sourceSets.gametest.runtimeClasspath.files.collect { it.toURI().toString() }.join(' '))
+    }
+}
+tasks.register('clientAudioCheck', JavaExec) {
+    dependsOn 'gametestClasses', 'clientAudioCheckClasspath'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    classpath = files(tasks.named('clientAudioCheckClasspath').flatMap { it.archiveFile })
+    mainClass = 'com.pancake.surviving_the_aftermath.ClientAudioCheck'
+    maxHeapSize = '512m'
+}
