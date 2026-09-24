@@ -7,7 +7,9 @@
     "MoveControlMixin",
     "PortalShapeMixin",
     "VillagerMixin",
-    "NetherCoreEyeMixin"
+    "NetherCoreEyeMixin",
+    "NoiseGeneratorAccessor",
+    "CityTreeFeatureMixin"
   ],
   "client": [],
   "injectors": {

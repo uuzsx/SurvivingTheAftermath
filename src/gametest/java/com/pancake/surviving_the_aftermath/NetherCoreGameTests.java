@@ -184,6 +184,8 @@ public final class NetherCoreGameTests {
         fixtureStarts.put(city,new net.minecraft.world.level.levelgen.structure.StructureStart(city,candidate,0,
                 new net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer(List.of(piece))));
         chunk.setAllStarts(fixtureStarts);
+        // Loading the fixture can reveal persisted test projectiles from earlier runs.
+        cleanup(h);
         NetherCoreLocator.beginSearch(player,InteractionHand.MAIN_HAND);
         // Forge GameTest advances ticks faster than real time. Drive the server-side queue
         // explicitly while giving the worldgen worker a bounded wall-clock interval.
@@ -193,7 +195,7 @@ public final class NetherCoreGameTests {
             Thread.sleep(2);
         }
         try {
-            check(eyes(h).size()==1 && held.isEmpty(), "Queued search did not transfer exactly one core");
+            check(eyes(h).size()==1 && held.isEmpty(), "Queued search did not transfer exactly one core: eyes="+eyes(h).size()+", original_count="+held.getCount()+", hand_count="+player.getMainHandItem().getCount());
             var eye=eyes(h).get(0);
             for(int i=0;i<90;i++)eye.tick();
             check(drops(h).size()==1,"Background search launch did not return core");
