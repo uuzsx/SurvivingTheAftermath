@@ -70,15 +70,20 @@ public abstract class AbstractStructure extends Structure {
 
     public static class Piece extends TemplateStructurePiece {
         private final boolean grounded;
+        private final boolean cityBlend;
 
         public Piece(StructurePieceType type, StructureTemplateManager structureTemplateManager, ResourceLocation location, BlockPos templatePosition, Rotation rotation) {
             super(type, 0, structureTemplateManager, location, location.toString(), SurfaceStructurePlacement.settings(rotation, true, SurfaceStructurePlacement.groundOffset(location.getPath())), templatePosition);
             this.grounded = true;
+            this.cityBlend = location.getPath().equals("city");
+            refreshBounds();
         }
 
         public Piece(StructurePieceType type, StructureTemplateManager structureManager, CompoundTag tag) {
             super(type, tag, structureManager, (location) -> SurfaceStructurePlacement.settings(Rotation.valueOf(tag.getString("rot")), tag.getBoolean("SurfaceGrounded"), SurfaceStructurePlacement.groundOffset(location.getPath())));
             this.grounded = tag.getBoolean("SurfaceGrounded");
+            this.cityBlend = this.grounded && tag.getBoolean("CityTerrainBlend");
+            refreshBounds();
         }
 
         public Piece(StructurePieceType type, StructurePieceSerializationContext context, CompoundTag tag) {
@@ -90,9 +95,24 @@ public abstract class AbstractStructure extends Structure {
                                 RandomSource random, BoundingBox chunk, ChunkPos chunkPos, BlockPos reference) {
             if (this.grounded) {
                 int offset = SurfaceStructurePlacement.groundOffset(this.makeTemplateLocation().getPath());
-                SurfaceStructurePlacement.support(level, this.boundingBox, chunk, this.templatePosition.getY() - offset);
+                var footprint = this.template.getBoundingBox(this.placeSettings, this.templatePosition);
+                if (this.cityBlend) SurfaceStructurePlacement.gradeCity(level, footprint, chunk, this.templatePosition.getY() - offset);
+                else SurfaceStructurePlacement.support(level, footprint, chunk, this.templatePosition.getY() - offset);
             }
-            super.postProcess(level, structures, generator, random, chunk, chunkPos, reference);
+            try {
+                if (this.template.getBoundingBox(this.placeSettings, this.templatePosition).intersects(chunk)) {
+                    super.postProcess(level, structures, generator, random, chunk, chunkPos, reference);
+                }
+            } finally {
+                // Vanilla replaces boundingBox with the template bounds. Retain the apron for
+                // subsequent chunks, StructureStart references and saved/reloaded pieces.
+                refreshBounds();
+            }
+        }
+
+        private void refreshBounds() {
+            var footprint = this.template.getBoundingBox(this.placeSettings, this.templatePosition);
+            this.boundingBox = this.cityBlend ? SurfaceStructurePlacement.cityTerrainBounds(footprint) : footprint;
         }
 
         @Override
@@ -103,6 +123,7 @@ public abstract class AbstractStructure extends Structure {
             super.addAdditionalSaveData(context, tag);
             tag.putString("rot", this.placeSettings.getRotation().name());
             tag.putBoolean("SurfaceGrounded", this.grounded);
+            tag.putBoolean("CityTerrainBlend", this.cityBlend);
         }
 
         

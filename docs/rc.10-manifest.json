@@ -1,0 +1,290 @@
+{
+  "version": "0.0.4-rc.10",
+  "repository": "https://github.com/uuzsx/SurvivingTheAftermath",
+  "artifacts": [
+    {
+      "minecraft": "1.20.1",
+      "branch": "main",
+      "loader": "Forge 47.2.1",
+      "java": 17,
+      "game_test_total": 48,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.20.1-0.0.4-rc.10.jar",
+      "bytes": 3186536,
+      "sha256": "34e8c502f98c5c19b7c947b0d66393c432fdc3c59e8150490fb502455fbe1729"
+    },
+    {
+      "minecraft": "1.21.1",
+      "branch": "1.21.1",
+      "loader": "NeoForge 21.1.251",
+      "java": 21,
+      "game_test_total": 49,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.10.jar",
+      "bytes": 3177042,
+      "sha256": "c451661775ba42d94cd63f753e868cf55fd05ac958ab0d940b84c51ef3e75ebb"
+    },
+    {
+      "minecraft": "1.21.2",
+      "branch": "1.21.2",
+      "loader": "NeoForge 21.2.1-beta",
+      "java": 21,
+      "game_test_total": 49,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.10.jar",
+      "bytes": 3164380,
+      "sha256": "88ddecddfb29ec5d4d0f78f24456c41501494f9c59e06cd151ba5d61aa21cdfb"
+    },
+    {
+      "minecraft": "26.1.1",
+      "branch": "26.1.1",
+      "loader": "NeoForge 26.1.1.15-beta",
+      "java": 25,
+      "game_test_total": 50,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.10.jar",
+      "bytes": 3169024,
+      "sha256": "aa7157d9447e74c9e9243e29f46209181304f845ab135ae0cd6515c45edca808"
+    },
+    {
+      "minecraft": "26.1.2",
+      "branch": "26.1.2",
+      "loader": "NeoForge 26.1.2.109",
+      "java": 25,
+      "game_test_total": 50,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.10.jar",
+      "bytes": 3183374,
+      "sha256": "3ec237da22899f8d82ceb69eda87acc3e99d3cf99bbcc0669cd5309d7806df28"
+    },
+    {
+      "minecraft": "26.2",
+      "branch": "26.2",
+      "loader": "NeoForge 26.2.0.88",
+      "java": 25,
+      "game_test_total": 50,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.10.jar",
+      "bytes": 3169226,
+      "sha256": "124b785a0a0bce679f2a1a6016d44509e68b716298305ffb05662afa967ff883"
+    },
+    {
+      "minecraft": "26.3",
+      "branch": "26.3",
+      "loader": "NeoForge 26.3.0.16-beta",
+      "java": 25,
+      "game_test_total": 50,
+      "terrain_tests": 8,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.10.jar",
+      "bytes": 3168284,
+      "sha256": "43fd5fa5fcd295510e478e885278262592303c3044c4e76065a387490b3e8ac0"
+    }
+  ],
+  "city_site_surveys": [
+    {
+      "minecraft": "1.20.1",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "1.20.1",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "1.20.1",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    },
+    {
+      "minecraft": "1.21.1",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "1.21.1",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "1.21.1",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    },
+    {
+      "minecraft": "1.21.2",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "1.21.2",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "1.21.2",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    },
+    {
+      "minecraft": "26.1.1",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "26.1.1",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "26.1.1",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    },
+    {
+      "minecraft": "26.1.2",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "26.1.2",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "26.1.2",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    },
+    {
+      "minecraft": "26.2",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "26.2",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "26.2",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    },
+    {
+      "minecraft": "26.3",
+      "seed": 0,
+      "candidate_count": 1,
+      "x": 24,
+      "y": 63,
+      "z": 72,
+      "distance_from_0": 76
+    },
+    {
+      "minecraft": "26.3",
+      "seed": 42,
+      "candidate_count": 26,
+      "x": -1384,
+      "y": 68,
+      "z": -1384,
+      "distance_from_0": 1957
+    },
+    {
+      "minecraft": "26.3",
+      "seed": 20260924,
+      "candidate_count": 1,
+      "x": 120,
+      "y": 69,
+      "z": 200,
+      "distance_from_0": 233
+    }
+  ],
+  "scope": "New structures only. City median elevation, filled foundations and 24-block apron. Spacing 32 / separation 12.",
+  "test_notes": "Base runs conditionally skip one KubeJS test body; 26.x includes one vanilla test. No manual graphical or multiplayer playtest."
+}
