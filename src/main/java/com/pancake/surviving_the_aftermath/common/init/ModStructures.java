@@ -40,7 +40,7 @@ public class ModStructures {
                 GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.BEARD_THIN);
         context.register(CITY, new CityStructure(new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(ModTags.HAS_CITY), Map.of(),
-                GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.BEARD_BOX)));
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION, TerrainAdjustment.NONE)));
         context.register(HOUSE_OF_SAKURA, new HouseOfSakura(new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(ModTags.HAS_HOUSE_OF_SAKURA), Map.of(),
                 GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.BEARD_THIN)));
