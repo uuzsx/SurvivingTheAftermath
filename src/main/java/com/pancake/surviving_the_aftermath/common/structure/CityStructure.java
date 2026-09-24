@@ -75,6 +75,7 @@ public class CityStructure extends AbstractStructure {
 			super.postProcess(level, structureManager, generator, rand, box, chunkPos, pos);
             // The grading apron participates in chunk generation but is not city housing.
             var footprint = this.template.getBoundingBox(this.placeSettings, this.templatePosition);
+            com.pancake.surviving_the_aftermath.common.util.CityRelicDealer.place(level, footprint, box, this.templatePosition.getY());
             int minX = Math.max(footprint.minX(), box.minX()), maxX = Math.min(footprint.maxX(), box.maxX());
             int minZ = Math.max(footprint.minZ(), box.minZ()), maxZ = Math.min(footprint.maxZ(), box.maxZ());
             if (minX > maxX || minZ > maxZ) return;

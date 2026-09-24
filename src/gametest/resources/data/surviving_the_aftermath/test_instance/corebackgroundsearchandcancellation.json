@@ -1,0 +1,1 @@
+{"type": "minecraft:function", "function": "surviving_the_aftermath:corebackgroundsearchandcancellation", "environment": "surviving_the_aftermath:corebackgroundsearchandcancellation", "structure": "surviving_the_aftermath:stability_empty", "max_ticks": 1400, "required": true}

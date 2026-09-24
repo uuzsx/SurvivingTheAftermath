@@ -16,6 +16,12 @@ public class ModLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
+        add("item.surviving_the_aftermath.nether_core.tooltip", "Throw to find a city and its relic dealer. Always falls back intact; reusable without limit.");
+        add("message.surviving_the_aftermath.nether_core.overworld", "Use in the Overworld to seek a relic dealer.");
+        add("message.surviving_the_aftermath.nether_core.searching", "Searching for a suitable city… Keep holding the core.");
+        add("message.surviving_the_aftermath.nether_core.not_found", "No city with a reachable dealer found nearby. Try from another area.");
+        add("message.surviving_the_aftermath.nether_core.city", "The core points toward a city; it will seek a living relic dealer as you approach.");
+        add("message.surviving_the_aftermath.nether_core.dealer", "The core points toward a nearby relic dealer.");
         add("item.surviving_the_aftermath.raw_falukorv", "Raw Falukorv");
         add("item.surviving_the_aftermath.cooked_falukorv", "Cooked Falukorv");
         add("item.surviving_the_aftermath.egg_tart", "Egg Tart");
