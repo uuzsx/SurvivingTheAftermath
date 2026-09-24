@@ -2,23 +2,26 @@ package com.pancake.surviving_the_aftermath.common.event.subscriber;
 
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.client.ClientAftermathBars;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.resources.Identifier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 
 
-@Mod.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, value = Dist.CLIENT)
 public class ClientForgeEvent {
     @SubscribeEvent
-    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ClientAftermathBars.clear(); com.pancake.surviving_the_aftermath.client.ClientRaidMusic.clear(); }
+    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientAftermathBars.clear();
+        com.pancake.surviving_the_aftermath.client.ClientRaidMusic.clear();
+    }
 
     @SubscribeEvent
-    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-        if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) com.pancake.surviving_the_aftermath.client.ClientRaidMusic.tick();
+    public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
+        com.pancake.surviving_the_aftermath.client.ClientRaidMusic.tick();
     }
 
     @SubscribeEvent
@@ -27,7 +30,7 @@ public class ClientForgeEvent {
         var aftermath = ClientAftermathBars.get(bossEvent.getId());
         if (aftermath != null) {
             var graphics = event.getGuiGraphics();
-            ResourceLocation resource = aftermath.texture();
+            Identifier resource = aftermath.texture();
             int[] offset = aftermath.offsets();
 
             if (resource == null || offset == null) {
@@ -42,11 +45,11 @@ public class ClientForgeEvent {
             int barOffset = offset[5];
 
             //渲染进度条框
-            graphics.blit(resource, (graphics.guiWidth() - frameWidth) / 2, event.getY() - 10,
-                    0, frameOffset, frameWidth, frameHeight);
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, resource, (graphics.guiWidth() - frameWidth) / 2, event.getY() - 10,
+                    0, frameOffset, frameWidth, frameHeight, 256, 256);
             //渲染进度条
-            graphics.blit(resource, (graphics.guiWidth() - barWidth) / 2, event.getY() - 10 + barOffset,
-                    0, 0, (int) (barWidth * event.getBossEvent().getProgress()), barHeight);
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, resource, (graphics.guiWidth() - barWidth) / 2, event.getY() - 10 + barOffset,
+                    0, 0, (int) (barWidth * event.getBossEvent().getProgress()), barHeight, 256, 256);
             event.setIncrement(frameHeight);
             event.setCanceled(true);
         }

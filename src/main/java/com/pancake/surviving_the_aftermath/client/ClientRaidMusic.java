@@ -29,7 +29,7 @@ public final class ClientRaidMusic {
             return;
         }
         if (PLAYING.containsKey(packet.id()) || client.level == null
-                || !client.level.dimension().location().equals(packet.dimension())
+                || !client.level.dimension().identifier().equals(packet.dimension())
                 || packet.elapsedTicks() < 0 || packet.elapsedTicks() >= RaidMusic.DURATION_TICKS) return;
         BuildingSong song = new BuildingSong(client.level, packet);
         PLAYING.put(packet.id(), song);

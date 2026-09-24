@@ -11,7 +11,7 @@ import java.util.*;
 public final class SafeSpawn {
     public static boolean placeMob(ServerLevel level, Mob mob, Collection<BlockPos> anchors, BlockPos center, int radius) {
         List<BlockPos> positions = new ArrayList<>(anchors.isEmpty() ? List.of(center) : anchors);
-        Collections.shuffle(positions, new Random(level.random.nextLong()));
+        Collections.shuffle(positions, new Random(level.getRandom().nextLong()));
         int lift = mob instanceof Ghast ? 20 : 0;
         for (int ring = 0; ring <= 8; ring++) {
             for (BlockPos anchor : positions) {
@@ -21,7 +21,7 @@ public final class SafeSpawn {
                         for (int y : new int[]{0, 1, -1, 2, -2}) {
                             BlockPos pos = anchor.offset(x, lift + y, z);
                             if (pos.distSqr(center) >= (double) radius * radius) continue;
-                            mob.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+                            mob.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
                             if (isSafe(level, mob)) return true;
                         }
                     }
@@ -33,7 +33,7 @@ public final class SafeSpawn {
 
     public static boolean isSafe(ServerLevel level, Entity entity) {
         AABB box = entity.getBoundingBox();
-        return box.minY >= level.getMinBuildHeight() && box.maxY < level.getMaxBuildHeight()
+        return box.minY >= level.getMinY() && box.maxY < level.getMaxY() + 1
                 && level.hasChunkAt(BlockPos.containing(box.minX, box.minY, box.minZ))
                 && level.hasChunkAt(BlockPos.containing(box.minX, box.minY, box.maxZ))
                 && level.hasChunkAt(BlockPos.containing(box.maxX, box.minY, box.minZ))

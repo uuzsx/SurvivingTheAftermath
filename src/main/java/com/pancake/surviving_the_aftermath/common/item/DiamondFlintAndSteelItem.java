@@ -39,17 +39,17 @@ public class DiamondFlintAndSteelItem extends FlintAndSteelItem {
                 || !player.mayUseItemAt(pos, context.getClickedFace(), context.getItemInHand())) return InteractionResult.FAIL;
         PortalShape shape = PortalShape.findPortalShape(level, pos, PortalShape::isValid, Direction.Axis.X).orElse(null);
         if (shape == null || !AftermathManager.getInstance().create(new NetherRaid(level, pos), level, pos, player)) {
-            player.displayClientMessage(Component.translatable(UNAVAILABLE), true);
+            player.sendSystemMessage(Component.translatable(UNAVAILABLE), true);
             return InteractionResult.FAIL;
         }
-        shape.createPortalBlocks();
+        shape.createPortalBlocks(level);
         level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
-        context.getItemInHand().hurtAndBreak(1, player, p -> p.broadcastBreakEvent(context.getHand()));
+        context.getItemInHand().hurtAndBreak(1, player, context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND);
         return InteractionResult.CONSUME;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag flag) {
+        tooltip.accept(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
     }
 }

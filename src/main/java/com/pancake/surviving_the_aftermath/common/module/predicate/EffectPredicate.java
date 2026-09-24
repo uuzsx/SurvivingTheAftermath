@@ -5,12 +5,12 @@ import com.mojang.serialization.Codec;
 import com.pancake.surviving_the_aftermath.api.module.IPredicateModule;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.module.weighted.EffectWeightedModule;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
 
@@ -41,23 +41,23 @@ public class EffectPredicate implements IPredicateModule {
 
     @Override
     public void apply(LivingEntity livingEntity) {
-        effects.getWeightedList().getRandomValue(livingEntity.getRandom())
+        effects.getWeightedList().getRandom(livingEntity.getRandom())
                 .ifPresent(livingEntity::addEffect);
     }
 
     public static class Builder {
-        private final List<WeightedEntry.Wrapper<MobEffectInstance>> effectInstances = Lists.newArrayList();
+        private final List<Weighted<MobEffectInstance>> effectInstances = Lists.newArrayList();
 
         public Builder add(MobEffectInstance instance,int weight){
-            effectInstances.add(WeightedEntry.wrap(instance,weight));
+            effectInstances.add(new Weighted<>(instance,weight));
             return this;
         }
-        public Builder add(MobEffect mobEffect, int duration, int amplifier ,int weight){
-            effectInstances.add(WeightedEntry.wrap(new MobEffectInstance(mobEffect,duration,amplifier),weight));
+        public Builder add(net.minecraft.core.Holder<MobEffect> mobEffect, int duration, int amplifier ,int weight){
+            effectInstances.add(new Weighted<>(new MobEffectInstance(mobEffect,duration,amplifier),weight));
             return this;
         }
         public Builder add(String mobEffect, int duration, int amplifier ,int weight){
-            effectInstances.add(WeightedEntry.wrap(new MobEffectInstance(ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.tryParse(mobEffect)),duration,amplifier),weight));
+            effectInstances.add(new Weighted<>(new MobEffectInstance(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.get(Identifier.parse(mobEffect)).orElseThrow(),duration,amplifier),weight));
             return this;
         }
         public EffectPredicate build(){

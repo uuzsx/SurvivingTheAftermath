@@ -7,7 +7,7 @@ import com.pancake.surviving_the_aftermath.common.structure.HouseOfSakura;
 import com.pancake.surviving_the_aftermath.common.structure.NetherRaidStructure;
 import com.pancake.surviving_the_aftermath.common.structure.expansion.*;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -31,7 +31,7 @@ public class ModStructures {
         return ResourceKey.create(Registries.STRUCTURE, SurvivingTheAftermath.asResource(name));
     }
 
-    public static void bootstrap(BootstapContext<Structure> context) {
+    public static void bootstrap(BootstrapContext<Structure> context) {
         Structure.StructureSettings expansionBuildSettings = new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(ModTags.HAS_EXPANSION_BUILD), Map.of(),
                 GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.NONE);

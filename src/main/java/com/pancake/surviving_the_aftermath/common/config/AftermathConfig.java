@@ -1,14 +1,14 @@
 package com.pancake.surviving_the_aftermath.common.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class AftermathConfig {
-    public static final ForgeConfigSpec SPEC;
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    public final static ForgeConfigSpec.BooleanValue enableMobBattleTrackerHighlight;
-    public final static ForgeConfigSpec.BooleanValue enableMobBattleTrackerRestrictedRange;
-    public final static ForgeConfigSpec.BooleanValue enableSpawnPointStructure;
+    public final static ModConfigSpec.BooleanValue enableMobBattleTrackerHighlight;
+    public final static ModConfigSpec.BooleanValue enableMobBattleTrackerRestrictedRange;
+    public final static ModConfigSpec.BooleanValue enableSpawnPointStructure;
 
 
     static {

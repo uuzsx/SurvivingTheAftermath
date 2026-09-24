@@ -29,8 +29,6 @@ public interface AftermathEvents {
 //
     EventHandler MODIFY = GROUP.startup("modify", () -> AftermathModifyEventJS.class);
 
-    static void register() {
-        GROUP.register();
-    }
+
 
 }

@@ -3,14 +3,14 @@ package com.pancake.surviving_the_aftermath.compat.kubejs.event;
 import com.pancake.surviving_the_aftermath.api.IAftermath;
 import com.pancake.surviving_the_aftermath.api.IAftermathEvent;
 import com.pancake.surviving_the_aftermath.api.module.IAftermathModule;
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 import java.util.Set;
 import java.util.UUID;
 
-public class AftermathEventJS extends EventJS implements IAftermathEvent {
+public class AftermathEventJS implements KubeEvent, IAftermathEvent {
     private final IAftermath aftermath;
     private final Set<UUID> players;
     private final ServerLevel level;
@@ -42,7 +42,7 @@ public class AftermathEventJS extends EventJS implements IAftermathEvent {
     }
 
     @Override
-    public EventJS getKubeJS() {
+    public KubeEvent getKubeJS() {
         return this;
     }
 
