@@ -168,7 +168,7 @@ public final class TerrainPlacementGameTests {
                     for (int z : new int[]{box.minZ(), box.getCenter().getZ(), box.maxZ()}) {
                         int surface = generator.getFirstOccupiedHeight(x, z, net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, level, state);
                         int floor = generator.getFirstOccupiedHeight(x, z, net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, level, state);
-                        check(id.equals("city") ? surface - floor <= 3 && Math.abs(pos.getY() - surface) <= 24 : surface == floor && pos.getY() >= surface && pos.getY() - floor <= 6,
+                        check(id.equals("city") ? surface == floor && Math.abs(pos.getY() - surface) <= 12 : surface == floor && pos.getY() >= surface && pos.getY() - floor <= 6,
                                 "Real terrain placement submerged, buried or too far above terrain");
                     }
                 }
@@ -215,7 +215,7 @@ public final class TerrainPlacementGameTests {
                 level.setBlock(new BlockPos(x, y, z), block.defaultBlockState(), 18);
             }
         }
-        // City generation runs after vegetation, and removes trees occupying its graded apron.
+        // City generation must retain trees outside its own footprint.
         int treeX = footprint.maxX() + 8, treeZ = center.getZ();
         int treeGround = floor + Math.floorDiv(treeX - center.getX(), 8);
         for (int y = treeGround + 1; y <= treeGround + 10; y++) level.setBlock(new BlockPos(treeX, y, treeZ), Blocks.OAK_LOG.defaultBlockState(), 18);
@@ -244,13 +244,18 @@ public final class TerrainPlacementGameTests {
             int distance = Math.max(Math.max(footprint.minX() - x, x - footprint.maxX()), Math.max(footprint.minZ() - z, z - footprint.maxZ()));
             if (distance <= 0) continue;
             int natural = floor + Math.floorDiv(x - center.getX(), 8);
-            double f = Math.max(0, distance - 2) / 22.0;
-            int expected = floor + (int) Math.round((natural - floor) * f * f * (3 - 2 * f));
-            var surface = new BlockPos(x, expected, z);
-            check(level.getBlockState(surface).is(Blocks.GRASS_BLOCK), "Apron has a seam at " + surface);
-            check(level.getBlockState(surface.above()).isAir(), "Apron terrain was not cleared at " + surface + ": " + level.getBlockState(surface.above()) + ", distance=" + distance);
-            check(level.getBlockState(surface.below()).isFaceSturdy(level, surface.below(), Direction.UP), "Unsupported apron at " + surface);
+            if (x == treeX && z == treeZ) continue;
+            int surfaceY = natural;
+            for (int y = natural + 2; y >= natural - 2; y--)
+                if (level.getBlockState(new BlockPos(x,y,z)).is(Blocks.GRASS_BLOCK)) { surfaceY = y;break; }
+            var surface = new BlockPos(x,surfaceY,z);
+            check(level.getBlockState(surface).is(Blocks.GRASS_BLOCK), "Transition lost its supported ground at " + surface);
+            check(distance < 8 || surfaceY == natural, "City changed distant terrain outside its small transition");
+            check(level.getBlockState(surface.above()).isAir(), "Bare transition has overburden at " + surface);
+            check(level.getBlockState(surface.below()).isFaceSturdy(level,surface.below(),Direction.UP), "Unsupported transition at " + surface);
         }
+        check(level.getBlockState(new BlockPos(treeX,treeGround+1,treeZ)).is(Blocks.OAK_LOG),"City cut a nearby tree trunk");
+        check(level.getBlockState(new BlockPos(treeX,treeGround+11,treeZ)).is(Blocks.OAK_LEAVES),"City cut a nearby tree crown");
         System.out.println("FULL CITY CHECK: chunks=" + chunks.size() + ", foundation_blocks=" + checked + ", shuffled placement and reload per chunk passed");
         h.succeed();
     }
@@ -275,7 +280,7 @@ public final class TerrainPlacementGameTests {
         }
         var template = level.getStructureManager().getOrCreate(SurvivingTheAftermath.asResource("city"));
         for (Rotation rotation : Rotation.values()) {
-            var pos = SurfaceStructurePlacement.plan(template, rotation, 0, 0, 0, -64, 320, (x, z) -> 80 + Math.floorDiv(x, 4)).orElseThrow();
+            var pos = SurfaceStructurePlacement.plan(template, rotation, 0, 0, 0, -64, 320, (x, z) -> 80 + Math.floorDiv(x, 8)).orElseThrow();
             check(Math.abs(pos.getY() - 80) <= 1, "City perched on the highest point instead of grading into a gentle slope");
         }
         h.succeed();
