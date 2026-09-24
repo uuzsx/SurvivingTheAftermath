@@ -52,11 +52,17 @@ public class CityStructure extends AbstractStructure {
 		public void postProcess(WorldGenLevel level, StructureManager structureManager, ChunkGenerator generator,
 				RandomSource rand, BoundingBox box, ChunkPos chunkPos, BlockPos pos) {
 			super.postProcess(level, structureManager, generator, rand, box, chunkPos, pos);
-			BlockPos spawnPos = new BlockPos(rand.nextInt(box.minX(), box.maxX()), pos.getY(), rand.nextInt(box.minZ(), box.maxZ()));
-			for (int y = spawnPos.getY(); y < box.maxY(); y++) {
-				BlockState state1 = this.getBlock(level, spawnPos.getX(), y, spawnPos.getZ(), box);
-				BlockState state2 = this.getBlock(level, spawnPos.getX(), y + 1, spawnPos.getZ(), box);
-				if (state1.isAir() && state2.isAir()) {
+            // The grading apron participates in chunk generation but is not city housing.
+            var footprint = this.template.getBoundingBox(this.placeSettings, this.templatePosition);
+            int minX = Math.max(footprint.minX(), box.minX()), maxX = Math.min(footprint.maxX(), box.maxX());
+            int minZ = Math.max(footprint.minZ(), box.minZ()), maxZ = Math.min(footprint.maxZ(), box.maxZ());
+            if (minX > maxX || minZ > maxZ) return;
+            BlockPos spawnPos = new BlockPos(rand.nextInt(minX, maxX + 1), this.templatePosition.getY(), rand.nextInt(minZ, maxZ + 1));
+            for (int y = spawnPos.getY() + 1; y < footprint.maxY(); y++) {
+                var feet = new BlockPos(spawnPos.getX(), y, spawnPos.getZ());
+                BlockState state1 = level.getBlockState(feet);
+                BlockState state2 = level.getBlockState(feet.above());
+				if (state1.isAir() && state2.isAir() && level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), net.minecraft.core.Direction.UP)) {
 					Villager villager = net.minecraft.world.entity.EntityTypes.VILLAGER.create(level.getLevel(), net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
 					villager.snapTo(spawnPos.getX(), y, spawnPos.getZ());
 					BuiltInRegistries.VILLAGER_TYPE.getRandom(rand).ifPresent((profession) ->
