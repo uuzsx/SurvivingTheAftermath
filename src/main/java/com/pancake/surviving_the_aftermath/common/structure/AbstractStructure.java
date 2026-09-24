@@ -1,5 +1,6 @@
 package com.pancake.surviving_the_aftermath.common.structure;
 
+import com.pancake.surviving_the_aftermath.common.util.SurfaceStructurePlacement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -8,13 +9,10 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -22,8 +20,6 @@ import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
-import net.minecraft.world.level.levelgen.structure.templatesystem.BlockIgnoreProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 
@@ -37,18 +33,12 @@ public abstract class AbstractStructure extends Structure {
 
     @Override
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-        return onTopOfChunkCenter(context, Heightmap.Types.WORLD_SURFACE_WG, (pieces) -> {
-            ChunkPos chunk = context.chunkPos();
-            WorldgenRandom rand = context.random();
-            int x = chunk.getMinBlockX();
-            int z = chunk.getMinBlockZ();
-            int y = context.chunkGenerator().getFirstOccupiedHeight(
-                    x, z, Heightmap.Types.WORLD_SURFACE_WG,
-                    context.heightAccessor(), context.randomState());
-            BlockPos pos = new BlockPos(x, y, z);
-            Rotation rotation = Rotation.getRandom(rand);
-            pieces.addPiece(new Piece(this.pieceType(), context.structureTemplateManager(), this.location(), pos, rotation));
-        });
+        Rotation rotation = Rotation.getRandom(context.random());
+        var template = context.structureTemplateManager().getOrCreate(this.location());
+        int groundOffset = SurfaceStructurePlacement.groundOffset(this.location().getPath());
+        return SurfaceStructurePlacement.findOrigin(context, template, rotation, groundOffset).map(origin ->
+                new GenerationStub(new BlockPos(context.chunkPos().getMiddleBlockX(), origin.getY(), context.chunkPos().getMiddleBlockZ()),
+                        pieces -> pieces.addPiece(new Piece(this.pieceType(), context.structureTemplateManager(), this.location(), origin, rotation))));
     }
 
 	@Override
@@ -79,17 +69,30 @@ public abstract class AbstractStructure extends Structure {
     public abstract ResourceLocation location();
 
     public static class Piece extends TemplateStructurePiece {
+        private final boolean grounded;
 
         public Piece(StructurePieceType type, StructureTemplateManager structureTemplateManager, ResourceLocation location, BlockPos templatePosition, Rotation rotation) {
-            super(type, 0, structureTemplateManager, location, location.toString(), makeSettings(rotation), templatePosition);
+            super(type, 0, structureTemplateManager, location, location.toString(), SurfaceStructurePlacement.settings(rotation, true, SurfaceStructurePlacement.groundOffset(location.getPath())), templatePosition);
+            this.grounded = true;
         }
 
         public Piece(StructurePieceType type, StructureTemplateManager structureManager, CompoundTag tag) {
-            super(type, tag, structureManager, (location) -> makeSettings(Rotation.valueOf(tag.getString("rot"))));
+            super(type, tag, structureManager, (location) -> SurfaceStructurePlacement.settings(Rotation.valueOf(tag.getString("rot")), tag.getBoolean("SurfaceGrounded"), SurfaceStructurePlacement.groundOffset(location.getPath())));
+            this.grounded = tag.getBoolean("SurfaceGrounded");
         }
 
         public Piece(StructurePieceType type, StructurePieceSerializationContext context, CompoundTag tag) {
             this(type, context.structureTemplateManager(), tag);
+        }
+
+        @Override
+        public void postProcess(WorldGenLevel level, StructureManager structures, ChunkGenerator generator,
+                                RandomSource random, BoundingBox chunk, ChunkPos chunkPos, BlockPos reference) {
+            if (this.grounded) {
+                int offset = SurfaceStructurePlacement.groundOffset(this.makeTemplateLocation().getPath());
+                SurfaceStructurePlacement.support(level, this.boundingBox, chunk, this.templatePosition.getY() - offset);
+            }
+            super.postProcess(level, structures, generator, random, chunk, chunkPos, reference);
         }
 
         @Override
@@ -99,11 +102,9 @@ public abstract class AbstractStructure extends Structure {
         protected void addAdditionalSaveData(StructurePieceSerializationContext context, CompoundTag tag) {
             super.addAdditionalSaveData(context, tag);
             tag.putString("rot", this.placeSettings.getRotation().name());
+            tag.putBoolean("SurfaceGrounded", this.grounded);
         }
 
-        private static StructurePlaceSettings makeSettings(Rotation rotation) {
-            return new StructurePlaceSettings().setRotation(rotation).setMirror(Mirror.NONE).addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR);
-        }
 
     }
 
