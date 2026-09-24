@@ -26,6 +26,16 @@ public class CityStructure extends AbstractStructure {
 		super(settings);
 	}
 
+    @Override
+    protected java.util.Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
+        var candidate = super.findGenerationPoint(context);
+        if (candidate.isEmpty()) return candidate;
+        // Piece bounds already include the full 24-block grading apron.
+        var terrain = candidate.get().getPiecesBuilder().build().calculateBoundingBox();
+        return com.pancake.surviving_the_aftermath.common.util.CityStructureAvoidance.findConflict(context, terrain).isPresent()
+                ? java.util.Optional.empty() : candidate;
+    }
+
 	@Override
 	public StructureType<?> type() {
 		return ModStructureTypes.CITY.get();
