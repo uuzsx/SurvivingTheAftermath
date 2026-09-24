@@ -7,49 +7,21 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
+    name: Build forge-1.20.1
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: forge-1.20.1
-            directory: .
-            java: '17'
-          - target: neoforge-1.21.1
-            directory: ports/mc-1.21.1
-            java: '21'
-          - target: neoforge-1.21.2
-            directory: ports/mc-1.21.2
-            java: '21'
-          - target: neoforge-26.1.1
-            directory: ports/mc-26.1.1
-            java: '25'
-          - target: neoforge-26.1.2
-            directory: ports/mc-26.1.2
-            java: '25'
-          - target: neoforge-26.2
-            directory: ports/mc-26.2
-            java: '25'
-          - target: neoforge-26.3
-            directory: ports/mc-26.3
-            java: '25'
-    defaults:
-      run:
-        working-directory: ${{ matrix.directory }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ matrix.java }}
+          java-version: '17'
           cache: gradle
           cache-dependency-path: |
-            ${{ matrix.directory }}/*.gradle
-            ${{ matrix.directory }}/gradle.properties
-            ${{ matrix.directory }}/gradle/wrapper/gradle-wrapper.properties
+            *.gradle
+            gradle.properties
+            gradle/wrapper/gradle-wrapper.properties
       - name: Verify gameplay and audio, then build
         run: |
           chmod +x gradlew
@@ -57,6 +29,6 @@ jobs:
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: SurvivingTheAftermath-${{ matrix.target }}
-          path: ${{ matrix.directory }}/build/libs/*.jar
+          name: SurvivingTheAftermath-forge-1.20.1
+          path: build/libs/*.jar
           if-no-files-found: error
