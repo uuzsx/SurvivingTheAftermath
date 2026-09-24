@@ -11,6 +11,9 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("skippedblockskeepworldstate"), wrap(StairTransformationGameTests::skippedBlocksKeepWorldState));
+   helper.register(SurvivingTheAftermath.asResource("convertedstairskeepproperties"), wrap(StairTransformationGameTests::convertedStairsKeepProperties));
+   helper.register(SurvivingTheAftermath.asResource("mixedwaveskeepstairgeometry"), wrap(StairTransformationGameTests::mixedWavesKeepStairGeometry));
    helper.register(SurvivingTheAftermath.asResource("defaultwavepiglinshaveweapons"), wrap(Rc4GameTests::defaultWavePiglinsHaveWeapons));
    helper.register(SurvivingTheAftermath.asResource("configuredequipmentoverridesdefaults"), wrap(Rc4GameTests::configuredEquipmentOverridesDefaults));
    helper.register(SurvivingTheAftermath.asResource("dungeonmobsdropnolootorexperience"), wrap(Rc4GameTests::dungeonMobsDropNoLootOrExperience));

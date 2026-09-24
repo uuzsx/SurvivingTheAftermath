@@ -11,6 +11,9 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("skippedblockskeepworldstate"), wrap(StairTransformationGameTests::skippedBlocksKeepWorldState));
+   helper.register(SurvivingTheAftermath.asResource("convertedstairskeepproperties"), wrap(StairTransformationGameTests::convertedStairsKeepProperties));
+   helper.register(SurvivingTheAftermath.asResource("mixedwaveskeepstairgeometry"), wrap(StairTransformationGameTests::mixedWavesKeepStairGeometry));
    helper.register(SurvivingTheAftermath.asResource("restoredregistryandlanguage"), wrap(ContentGameTests::restoredRegistryAndLanguage));
    helper.register(SurvivingTheAftermath.asResource("restoredfoodconsumption"), wrap(ContentGameTests::restoredFoodConsumption));
    helper.register(SurvivingTheAftermath.asResource("cowardicepricesandlegacytrades"), wrap(ContentGameTests::cowardicePricesAndLegacyTrades));

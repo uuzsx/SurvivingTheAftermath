@@ -1,6 +1,5 @@
 package com.pancake.surviving_the_aftermath.common.raid;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pancake.surviving_the_aftermath.api.AftermathState;
@@ -23,21 +22,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.monster.cubemob.Slime;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import net.minecraft.world.level.portal.PortalShape;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class NetherRaid extends BaseRaid {
@@ -154,34 +146,7 @@ public class NetherRaid extends BaseRaid {
             template.ifPresent(t -> {
                 if (start.getPieces().get(0) instanceof TemplateStructurePiece piece) {
                     BlockPos pos = piece.templatePosition();
-                    StructurePlaceSettings settings = new StructurePlaceSettings().setRotation(piece.getRotation()).setMirror(Mirror.NONE)
-                            .addProcessor(new BlockIgnoreProcessor(ImmutableList.of(Blocks.AIR, Blocks.STRUCTURE_BLOCK, Blocks.NETHER_PORTAL, Blocks.OBSIDIAN)))
-                            .addProcessor(new StructureProcessor() {
-
-                                @Override
-                                @NotNull
-                                public com.mojang.serialization.MapCodec<? extends StructureProcessor> codec() {
-                                    return com.mojang.serialization.MapCodec.unit(this);
-                                }
-
-                                @Override
-                                public StructureTemplate.StructureBlockInfo process(@NotNull LevelReader levelReader,
-                                                                                    @NotNull BlockPos p_74141_,
-                                                                                    @NotNull BlockPos p_74142_,
-                                                                                    @NotNull StructureTemplate.StructureBlockInfo blockInfo,
-                                                                                    @NotNull StructureTemplate.StructureBlockInfo relativeBlockInfo,
-                                                                                    @NotNull StructurePlaceSettings p_74145_,
-                                                                                    @Nullable StructureTemplate template) {
-                                    if (levelReader.getBlockState(relativeBlockInfo.pos()).is(Blocks.OBSIDIAN)
-                                            || levelReader.getBlockState(relativeBlockInfo.pos()).is(Blocks.NETHER_PORTAL)
-                                            || level.getRandom().nextFloat() < 0.9) {
-                                        return new StructureTemplate.StructureBlockInfo(relativeBlockInfo.pos(),
-                                                levelReader.getBlockState(relativeBlockInfo.pos()), relativeBlockInfo.nbt());
-                                    } else {
-                                        return relativeBlockInfo;
-                                    }
-                                }
-                            });
+                    StructurePlaceSettings settings = com.pancake.surviving_the_aftermath.common.util.RaidStructureTransformation.settings(piece.getRotation(), this.level.getRandom());
                     t.placeInWorld(this.level, pos, pos, settings, this.level.getRandom(), 2);
                 }
             });
