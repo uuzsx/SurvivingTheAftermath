@@ -10,7 +10,7 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
 使用钻石打火石开启 11 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 
-当前分支 **`26.2`** 对应 **Minecraft 26.2 / NeoForge 26.2.0.88 / Java 25**，模组版本为 **0.0.4-rc.15**。
+当前分支 **`26.2`** 对应 **Minecraft 26.2 / NeoForge 26.2.0.88 / Java 25**，模组版本为 **0.0.4-rc.16**。
 每个版本都在自己的分支根目录独立构建；默认分支 `main` 为 1.20.1。
 
 ## 版本与分支
@@ -33,6 +33,8 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 - 胜利音乐以建筑中心为声源，在 48 格内随距离衰减。成功重新激活，或最后一名玩家离开范围时停止；回来不会续播。
 
 ## 更新记录
+
+rc.16 下界核心可右键投掷寻找城市与遗物商人，必定完整返还并可无限使用；新城市固定安排一名遗物商人。见 [下界核心寻路功能](docs/NETHER-CORE-rc.16.md)。
 
 rc.15 缩小城市整地范围，保护周围水体、树木和建筑，保留活树树冠并清除孤叶；严格选址时尝试附近合适陆地。见 [城市边界与地形保护](docs/CITY-BOUNDARY-rc.15.md)。
 
