@@ -14,4 +14,7 @@ public interface IEntityInfoModule extends IModule<IEntityInfoModule> {
     Supplier<Codec<IEntityInfoModule>> CODEC = () -> ModuleRegistry.ENTITY_INFO_REGISTRY.byNameCodec()
             .dispatch("entity_info", IEntityInfoModule::type, value -> com.pancake.surviving_the_aftermath.common.util.CodecUtils.mapCodec(value.codec()));
     List<Optional<Entity>> spawnEntity(Level level);
+    default List<Optional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
+        return spawnEntity(level);
+    }
 }

@@ -76,19 +76,8 @@ public class RaidEventSubscriber {
     @SubscribeEvent
     public static void onRaidVictory(AftermathEvent.Victory event) {
         if (!(event.getAftermath() instanceof NetherRaid)) return;
-        event.getLevel().playSound(null, event.getAftermath().getStartPos(),
-                ModSoundEvents.ORCHELIAS_VOX.get(), SoundSource.NEUTRAL, 3.0F, 1.0F);
+        com.pancake.surviving_the_aftermath.common.util.RaidMusic.start(event.getLevel(),
+                event.getAftermath().getStartPos(), event.getAftermath().getUUID());
     }
 
-    @SubscribeEvent
-    public static void joinRaid(EntityJoinLevelEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof MagmaCube magmaCube) {
-            AftermathManager.getInstance().getAftermathMap().values().stream()
-                    .filter(aftermath -> aftermath instanceof NetherRaid)
-                    .map(aftermath -> (NetherRaid) aftermath)
-                    .filter(raid -> raid.level == entity.level())
-                    .forEach(raid -> { if (raid.join(entity)) raid.insertTag(magmaCube); });
-        }
-    }
 }

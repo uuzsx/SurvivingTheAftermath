@@ -54,11 +54,10 @@ public class DungeonLifecycleGameTests {
 
     public static final class Sounds {
         final ServerLevel level;
-        int music, horns;
+        int horns;
         Sounds(ServerLevel level) { this.level = level; }
         @SubscribeEvent public void sound(PlayLevelSoundEvent.AtPosition event) {
             if (event.getLevel() != level || event.getSound() == null) return;
-            if (event.getSound().value() == ModSoundEvents.ORCHELIAS_VOX.get()) music++;
             if (event.getSound().value() == SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).value()) horns++;
         }
     }
@@ -67,6 +66,9 @@ public class DungeonLifecycleGameTests {
     public static void eachWaveTransformsBeforeSpawningAndVictoryRewardsImmediately(GameTestHelper h) {
         int[] transforms = {0}, rewards = {0};
         Sounds sounds = new Sounds(h.getLevel());
+        var listener = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "music_timing"));
+        listener.snapTo(h.absolutePos(new BlockPos(5, 2, 5)).getCenter());
+        h.getLevel().addNewPlayer(listener);
         var raid = new NetherRaid(AftermathState.ONGOING, module(), Set.of(UUID.randomUUID()), 0f,
                 h.absolutePos(new BlockPos(5, 2, 5)), 0, 3, Set.of(), Set.of(), -1, 0, List.of()) {
             @Override public void updatePlayers() {}
@@ -87,12 +89,16 @@ public class DungeonLifecycleGameTests {
             raid.getEnemies().clear(); raid.tick();
             check(transforms[0] == 2 && sounds.horns == 2 && raid.getCurrentWave() == 1, "Second wave did not transform");
             raid.getEnemies().clear(); raid.tick();
-            check(sounds.music == 1 && rewards[0] == 1 && raid.state == AftermathState.CELEBRATING,
+            check(RaidMusic.playbackId(raid.level, raid.getStartPos()).filter(raid.getUUID()::equals).isPresent() && rewards[0] == 1 && raid.state == AftermathState.CELEBRATING,
                     "Victory did not play one song and issue the first reward in the same tick");
             raid.tick(); raid.tick(); raid.tick();
-            check(raid.isEnd() && rewards[0] == 3 && sounds.music == 1 && transforms[0] == 2,
+            check(raid.isEnd() && rewards[0] == 3 && RaidMusic.playbackId(raid.level, raid.getStartPos()).filter(raid.getUUID()::equals).isPresent() && transforms[0] == 2,
                     "Reward completion, music count, or final transformation incorrect");
-        } finally { raid.end(); NeoForge.EVENT_BUS.unregister(sounds); }
+        } finally {
+            RaidMusic.stop(h.getLevel(), raid.getStartPos());
+            h.getLevel().removePlayerImmediately(listener, Entity.RemovalReason.DISCARDED);
+            raid.end(); NeoForge.EVENT_BUS.unregister(sounds);
+        }
         h.succeed();
     }
 
@@ -148,7 +154,7 @@ public class DungeonLifecycleGameTests {
     }
 
     /** Register a small real structure footprint, restoring all chunk metadata afterwards. */
-    private static AutoCloseable arena(GameTestHelper h) {
+    static AutoCloseable arena(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
         var structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.NETHER_RAID).value();
@@ -235,9 +241,11 @@ public class DungeonLifecycleGameTests {
                     "Repeated activation created another battle or consumed durability");
             AftermathEventUtil.victory(raid, raid.getPlayers(), level);
             raid.tick();
-            check(sounds.music == 1 && raid.getRewardTime() == 2 && !raid.isEnd(), "Victory/reward phase incorrect");
+            check(RaidMusic.playbackId(raid.level, raid.getStartPos()).filter(raid.getUUID()::equals).isPresent() && raid.getRewardTime() == 2 && !raid.isEnd(), "Victory/reward phase incorrect");
             check(ignite(player, tool, pos, Direction.UP) == InteractionResult.FAIL && tool.getDamageValue() == 1,
                     "Portal accepted another challenge while issuing rewards");
+
+            check(RaidMusic.playbackId(level, pos).filter(raid.getUUID()::equals).isPresent(), "Rejected reactivation stopped the song");
 
             // Save while rewarding and reload: no extra music, no lost portal ownership.
             UUID id = raid.getUUID();
@@ -248,13 +256,14 @@ public class DungeonLifecycleGameTests {
             NetherRaid loaded = (NetherRaid) MANAGER.getAftermath(id).orElseThrow();
             check(loaded.getPortalBlocks().equals(plane), "Portal plane lost on save/load");
             loaded.tick(); loaded.tick();
-            check(loaded.isEnd() && sounds.music == 1, "Reload repeated victory song or failed to finish");
+            check(loaded.isEnd() && RaidMusic.playbackId(raid.level, raid.getStartPos()).filter(raid.getUUID()::equals).isPresent(), "Reload repeated victory song or failed to finish");
             check(plane.stream().noneMatch(p -> level.getBlockState(p).is(Blocks.NETHER_PORTAL))
                     && level.getBlockState(pos.below()).is(Blocks.OBSIDIAN), "Reward completion did not close portal safely");
             check(level.getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(5)).size() == 3, "Wrong number of reward drops");
             // Do not tick the manager: even before END is removed, immediate reuse must work.
             check(ignite(player, tool, pos.below(), Direction.UP).consumesAction() && tool.getDamageValue() == 2,
                     "Could not immediately restart after rewards");
+            check(RaidMusic.playbackId(level, pos).isEmpty(), "Successful reactivation kept the victory song playing");
             var repeated = MANAGER.getAftermathMap().values().stream().filter(a -> !oldBattles.contains(a.getUUID()) && !a.isEnd()).findFirst().orElseThrow();
             ((NetherRaid) repeated).end();
 
@@ -275,6 +284,7 @@ public class DungeonLifecycleGameTests {
             MANAGER.getAftermathMap().values().stream().filter(a -> !oldBattles.contains(a.getUUID())).toList().forEach(a -> {
                 ((NetherRaid) a).end(); a.getTrackers().forEach(ITracker::unregister); MANAGER.getAftermathMap().remove(a.getUUID());
             });
+            RaidMusic.stop(level, pos);
             NeoForge.EVENT_BUS.unregister(sounds);
             modules.removeAll(key); modules.putAll(key, oldModules);
             level.removePlayerImmediately(player, Entity.RemovalReason.DISCARDED);

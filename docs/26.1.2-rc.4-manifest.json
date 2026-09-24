@@ -1,0 +1,14 @@
+{
+  "minecraft": "26.1.2",
+  "neoforge": "26.1.2.109",
+  "java": 25,
+  "version": "0.0.4-rc.4",
+  "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.4.jar",
+  "sha256": "e445d316f29f3c17d0995460e046bf09bba080f04875739f8609cbeb5e81e2f4",
+  "gametest_total": 33,
+  "mod_tests": 32,
+  "core_skipped_mod_tests": 1,
+  "kubejs_tested": "26.1.2-8.0.6",
+  "client_audio_check": "passed",
+  "music_radius_blocks": 48
+}

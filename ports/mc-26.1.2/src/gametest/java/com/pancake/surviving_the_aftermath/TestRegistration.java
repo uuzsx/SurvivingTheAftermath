@@ -11,6 +11,12 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("defaultwavepiglinshaveweapons"), wrap(Rc4GameTests::defaultWavePiglinsHaveWeapons));
+   helper.register(SurvivingTheAftermath.asResource("configuredequipmentoverridesdefaults"), wrap(Rc4GameTests::configuredEquipmentOverridesDefaults));
+   helper.register(SurvivingTheAftermath.asResource("dungeonmobsdropnolootorexperience"), wrap(Rc4GameTests::dungeonMobsDropNoLootOrExperience));
+   helper.register(SurvivingTheAftermath.asResource("splitmagmacubeskeepdungeonlootpolicy"), wrap(Rc4GameTests::splitMagmaCubesKeepDungeonLootPolicy));
+   helper.register(SurvivingTheAftermath.asResource("buildingmusicstopswhenlastlistenerleaves"), wrap(Rc4GameTests::buildingMusicStopsWhenLastListenerLeaves));
+   helper.register(SurvivingTheAftermath.asResource("musicpacketandspatialasset"), wrap(Rc4GameTests::musicPacketAndSpatialAsset));
    helper.register(SurvivingTheAftermath.asResource("attachmentserializationroundtrip"), wrap(StabilityGameTests::attachmentSerializationRoundTrip));
    helper.register(SurvivingTheAftermath.asResource("eachwavetransformsbeforespawningandvictoryrewardsimmediately"), wrap(DungeonLifecycleGameTests::eachWaveTransformsBeforeSpawningAndVictoryRewardsImmediately));
    helper.register(SurvivingTheAftermath.asResource("diamondreciperequiresbothingredients"), wrap(DungeonLifecycleGameTests::diamondRecipeRequiresBothIngredients));

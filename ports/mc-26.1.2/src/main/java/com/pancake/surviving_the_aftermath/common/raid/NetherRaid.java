@@ -96,6 +96,8 @@ public class NetherRaid extends BaseRaid {
                 .relative(shape.survivingTheAftermath$getRightDir(), shape.survivingTheAftermath$getWidth() - 1);
         BlockPos.betweenClosed(bottomLeft, topRight).forEach(pos -> portalBlocks.add(pos.immutable()));
         super.init();
+        // A successful new challenge stops the previous victory song; a rejected activation does not.
+        if (!isEnd()) com.pancake.surviving_the_aftermath.common.util.RaidMusic.stop(level, startPos);
     }
 
     @Override
@@ -132,9 +134,6 @@ public class NetherRaid extends BaseRaid {
         }
         if (mob instanceof Hoglin hoglin) {
             hoglin.setImmuneToZombification(true);
-        }
-        if (mob instanceof Slime slime) {
-            slime.finalizeSpawn(level, level.getCurrentDifficultyAt(slime.blockPosition()), EntitySpawnReason.EVENT, null);
         }
         super.setMobSpawn(level, mob);
     }
