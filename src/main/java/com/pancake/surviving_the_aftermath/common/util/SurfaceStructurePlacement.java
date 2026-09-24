@@ -21,6 +21,13 @@ public final class SurfaceStructurePlacement {
     private SurfaceStructurePlacement() {}
     public static final int INVALID_GROUND = Integer.MIN_VALUE;
 
+    public static final int CITY_BLEND_RADIUS = 24;
+
+    public static BoundingBox cityTerrainBounds(BoundingBox box) {
+        return new BoundingBox(box.minX() - CITY_BLEND_RADIUS, box.minY(), box.minZ() - CITY_BLEND_RADIUS,
+                box.maxX() + CITY_BLEND_RADIUS, box.maxY(), box.maxZ() + CITY_BLEND_RADIUS);
+    }
+
     public static int groundOffset(String template) {
         // These templates start with objects resting above the soil, rather than an authored ground layer.
         return template.startsWith("wagon_cargo") || template.equals("logs") || template.equals("cobblestone_pile") ? 1 : 0;
@@ -45,11 +52,13 @@ public final class SurfaceStructurePlacement {
                             context.heightAccessor(), context.randomState());
                     int floor = generator.getFirstOccupiedHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG,
                             context.heightAccessor(), context.randomState());
-                    return surface == floor ? floor : INVALID_GROUND;
+                    // A shallow stream can be bridged by the city's solid foundation; oceans cannot.
+                    boolean city = template.getSize().getX() * template.getSize().getZ() >= 4096;
+                    return surface == floor || (city && surface - floor <= 3) ? surface : INVALID_GROUND;
                 });
     }
 
-    /** Checks the rotated footprint and entrance border. Large cities use a four-block grid to bound noise-generation cost. */
+    /** Checks the rotated footprint and entrance border. Large cities use an eight-block grid to bound noise-generation cost. */
     public static Optional<BlockPos> plan(StructureTemplate template, Rotation rotation, int centerX, int centerZ,
                                           int groundOffset, int minY, int maxY, ToIntBiFunction<Integer, Integer> ground) {
         var size = template.getSize();
@@ -59,11 +68,12 @@ public final class SurfaceStructurePlacement {
         var anchor = new BlockPos(centerX - Math.floorDiv(local.minX() + local.maxX(), 2), 0,
                 centerZ - Math.floorDiv(local.minZ() + local.maxZ(), 2));
         var bounds = template.getBoundingBox(settings, anchor);
-        int relief = Math.min(size.getX() * size.getZ() >= 4096 ? 12 : 6, Math.max(1, size.getY() - 1));
+        boolean city = size.getX() * size.getZ() >= 4096;
+        int relief = city ? 24 : Math.min(6, Math.max(1, size.getY() - 1));
         int lowest = Integer.MAX_VALUE, highest = Integer.MIN_VALUE;
         Map<Long, Integer> sampled = new HashMap<>();
         // Cheap early rejection of oceans and steep hills before querying the finer footprint grid.
-        int resolution = size.getX() * size.getZ() >= 4096 ? 4 : size.getX() * size.getZ() >= 256 ? 2 : 1;
+        int resolution = city ? 8 : size.getX() * size.getZ() >= 256 ? 2 : 1;
         for (int step : new int[]{8, resolution}) {
             for (int x : samples(bounds.minX() - 2, bounds.maxX() + 2, centerX, step)) {
                 for (int z : samples(bounds.minZ() - 2, bounds.maxZ() + 2, centerZ, step)) {
@@ -77,8 +87,9 @@ public final class SurfaceStructurePlacement {
                 }
             }
         }
-        // Keep entrances above the surrounding terrain; small gaps are supported during placement.
-        return Optional.of(new BlockPos(anchor.getX(), highest + groundOffset, anchor.getZ()));
+        // Cities are graded into the site instead of perched on its highest corner.
+        int elevation = city ? sampled.values().stream().sorted().skip(sampled.size() / 2).findFirst().orElseThrow() : highest;
+        return Optional.of(new BlockPos(anchor.getX(), elevation + groundOffset, anchor.getZ()));
     }
 
     private static java.util.SortedSet<Integer> samples(int min, int max, int center, int step) {
@@ -119,17 +130,67 @@ public final class SurfaceStructurePlacement {
                     cursor.set(x, y, z);
                     if (!level.getBlockState(cursor).hasBlockEntity()) level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
                 }
-                for (int y = groundY; y >= lowerBound; y--) {
-                    cursor.set(x, y, z);
-                    var state = level.getBlockState(cursor);
-                    if (state.getFluidState().isEmpty() && !state.is(BlockTags.LEAVES) && !state.is(BlockTags.LOGS)
-                            && state.isFaceSturdy(level, cursor, Direction.UP)) break;
-                    // Do not overwrite containers or other block entities if another structure overlaps.
-                    if (state.hasBlockEntity()) break;
-                    var fill = y == groundY ? Blocks.GRASS_BLOCK : groundY - y < 4 ? Blocks.DIRT : Blocks.STONE;
-                    level.setBlock(cursor, fill.defaultBlockState(), 2);
-                }
+                fillFoundation(level, cursor, x, z, groundY, lowerBound);
             }
         }
     }
+
+    private static boolean solidSupport(LevelReader level, BlockPos pos) {
+        var state = level.getBlockState(pos);
+        return state.getFluidState().isEmpty() && !state.is(BlockTags.LEAVES) && !state.is(BlockTags.LOGS)
+                && state.isFaceSturdy(level, pos, Direction.UP);
+    }
+
+    private static void fillFoundation(WorldGenLevel level, BlockPos.MutableBlockPos cursor,
+                                       int x, int z, int groundY, int lowerBound) {
+        int solidRun = 0;
+        for (int y = groundY; y >= lowerBound; y--) {
+            cursor.set(x, y, z);
+            var state = level.getBlockState(cursor);
+            if (state.hasBlockEntity()) break;
+            if (solidSupport(level, cursor)) {
+                // A dirt/stone cap is NOT proof of support. Inspect the shallow 32-block band
+                // and only terminate in a continuous solid base below it, preserving deep caves.
+                if (++solidRun >= 4 && y <= groundY - 32) break;
+                continue;
+            }
+            solidRun = 0;
+            var fill = y == groundY ? Blocks.GRASS_BLOCK : groundY - y < 4 ? Blocks.DIRT : Blocks.STONE;
+            level.setBlock(cursor, fill.defaultBlockState(), 2);
+        }
+    }
+
+    /** Entire footprint plus an explicit apron; each column depends only on its own original terrain. */
+    public static void gradeCity(WorldGenLevel level, BoundingBox footprint, BoundingBox chunk, int groundY) {
+        var area = cityTerrainBounds(footprint);
+        int lowerBound = Math.max(level.getMinY(), chunk.minY());
+        if (groundY < lowerBound || groundY > chunk.maxY()) return;
+        var cursor = new BlockPos.MutableBlockPos();
+        for (int x = Math.max(area.minX(), chunk.minX()); x <= Math.min(area.maxX(), chunk.maxX()); x++) {
+            for (int z = Math.max(area.minZ(), chunk.minZ()); z <= Math.min(area.maxZ(), chunk.maxZ()); z++) {
+                int distance = Math.max(Math.max(footprint.minX() - x, x - footprint.maxX()),
+                        Math.max(footprint.minZ() - z, z - footprint.maxZ()));
+                int top = Math.min(chunk.maxY(), level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 1);
+                int naturalY = top;
+                while (naturalY > lowerBound) {
+                    cursor.set(x, naturalY, z);
+                    if (solidSupport(level, cursor)) break;
+                    naturalY--;
+                }
+                // Preserve the untouched outside edge, including vegetation.
+                if (distance >= CITY_BLEND_RADIUS) continue;
+                double fraction = Math.max(0, distance - 2) / (double) (CITY_BLEND_RADIUS - 2);
+                double blend = fraction * fraction * (3 - 2 * fraction);
+                int targetY = groundY + (int) Math.round((naturalY - groundY) * blend);
+                for (int y = targetY + 1; y <= top; y++) {
+                    cursor.set(x, y, z);
+                    if (!level.getBlockState(cursor).hasBlockEntity()) level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
+                }
+                fillFoundation(level, cursor, x, z, targetY, lowerBound);
+                cursor.set(x, targetY, z);
+                if (!level.getBlockState(cursor).hasBlockEntity()) level.setBlock(cursor, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+            }
+        }
+    }
+
 }
