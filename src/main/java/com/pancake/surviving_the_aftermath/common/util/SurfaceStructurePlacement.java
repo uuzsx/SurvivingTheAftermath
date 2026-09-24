@@ -162,12 +162,19 @@ public final class SurfaceStructurePlacement {
 
     /** Entire footprint plus an explicit apron; each column depends only on its own original terrain. */
     public static void gradeCity(WorldGenLevel level, BoundingBox footprint, BoundingBox chunk, int groundY) {
+        gradeCity(level, footprint, chunk, groundY, java.util.List.of());
+    }
+
+    public static void gradeCity(WorldGenLevel level, BoundingBox footprint, BoundingBox chunk, int groundY,
+                                 java.util.List<BoundingBox> protectedBuildings) {
         var area = cityTerrainBounds(footprint);
         int lowerBound = Math.max(level.getMinBuildHeight(), chunk.minY());
         if (groundY < lowerBound || groundY > chunk.maxY()) return;
         var cursor = new BlockPos.MutableBlockPos();
         for (int x = Math.max(area.minX(), chunk.minX()); x <= Math.min(area.maxX(), chunk.maxX()); x++) {
             for (int z = Math.max(area.minZ(), chunk.minZ()); z <= Math.min(area.maxZ(), chunk.maxZ()); z++) {
+                // Preserve the entire building column, including doors and hollow rooms.
+                if (CityStructureAvoidance.protectedColumn(protectedBuildings, x, z)) continue;
                 int distance = Math.max(Math.max(footprint.minX() - x, x - footprint.maxX()),
                         Math.max(footprint.minZ() - z, z - footprint.maxZ()));
                 int top = Math.min(chunk.maxY(), level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 1);
