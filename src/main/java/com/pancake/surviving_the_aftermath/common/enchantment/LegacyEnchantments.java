@@ -47,6 +47,22 @@ public final class LegacyEnchantments {
         event.setAmount(event.getAmount() + bonus);
     }
 
+    // Complete the original hit before vanilla applies health loss and death protection.
+    // Post-damage setHealth/die bypasses the normal death-protection pipeline.
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
+    public static void execute(LivingDamageEvent.Pre event) {
+        var player = meleePlayer(event.getSource());
+        var target = event.getEntity();
+        if (player == null || !target.isAlive()) return;
+        int rank = level(player.getMainHandItem(), "execute");
+        float threshold = switch (rank) { case 1 -> .01F; case 2 -> .03F; case 3 -> .05F; default -> 0; };
+        // NeoForge applies absorption AFTER Pre; fully absorbed hits must not execute.
+        float healthDamage = Math.max(0, event.getNewDamage() - target.getAbsorptionAmount());
+        if (rank > 0 && healthDamage > 0 && (target.getHealth() - healthDamage) / target.getMaxHealth() < threshold) {
+            event.setNewDamage(Math.max(event.getNewDamage(), target.getHealth() + target.getAbsorptionAmount()));
+        }
+    }
+
     @SubscribeEvent
     public static void afterDamage(LivingDamageEvent.Post event) {
         if (event.getHealthDamage() <= 0) return;
@@ -54,15 +70,6 @@ public final class LegacyEnchantments {
             player.heal(event.getHealthDamage() * .05F * level(player.getMainHandItem(), "bloodthirsty"));
         }
         var target = event.getEntity();
-        if (meleePlayer(event.getSource()) != null && target.isAlive()) {
-            int rank = level(meleePlayer(event.getSource()).getMainHandItem(), "execute");
-            float threshold = switch (rank) { case 1 -> .01F; case 2 -> .03F; case 3 -> .05F; default -> 0; };
-            if (target.getHealth() / target.getMaxHealth() < threshold) {
-                // Keep the killing player's damage source and normal death events, including raid no-loot policy.
-                target.setHealth(0);
-                target.die(event.getSource());
-            }
-        }
         if (target instanceof Player player && event.getSource().getEntity() instanceof LivingEntity attacker && attacker != player) {
             int rank = 0;
             for (var slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)) rank = Math.max(rank, level(player.getItemBySlot(slot), "counter_attack"));
