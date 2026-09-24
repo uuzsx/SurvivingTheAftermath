@@ -46,9 +46,6 @@ public final class LegacyEnchantments {
     @SubscribeEvent
     public static void afterDamage(LivingDamageEvent event) {
         if (event.getAmount() <= 0) return;
-        if (event.getSource().getEntity() instanceof Player player) {
-            player.heal(event.getAmount() * .05F * level(player.getMainHandItem(), "bloodthirsty"));
-        }
         var target = event.getEntity();
         if (meleePlayer(event.getSource()) != null && target.isAlive()) {
             int rank = level(meleePlayer(event.getSource()).getMainHandItem(), "execute");
@@ -57,6 +54,10 @@ public final class LegacyEnchantments {
                 // Keep the killing player's damage source and normal death events, including raid no-loot policy.
                 event.setAmount(Math.max(event.getAmount(), target.getHealth()));
             }
+        }
+        // Settle healing after Execute has finalized the health damage.
+        if (event.getSource().getEntity() instanceof Player player) {
+            player.heal(event.getAmount() * .05F * level(player.getMainHandItem(), "bloodthirsty"));
         }
         if (target instanceof Player player && event.getSource().getEntity() instanceof LivingEntity attacker && attacker != player) {
             int rank = 0;
