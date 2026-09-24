@@ -78,14 +78,14 @@ public abstract class AbstractStructure extends Structure {
         private final boolean cityBlend;
 
         public Piece(StructurePieceType type, StructureTemplateManager structureTemplateManager, Identifier location, BlockPos templatePosition, Rotation rotation) {
-            super(type, 0, structureTemplateManager, location, location.toString(), SurfaceStructurePlacement.settings(rotation, true, SurfaceStructurePlacement.groundOffset(location.getPath())), templatePosition);
+            super(type, 0, structureTemplateManager, location, location.toString(), SurfaceStructurePlacement.settings(rotation, true, SurfaceStructurePlacement.groundOffset(location.getPath()), location.getPath().equals("city") ? structureTemplateManager.getOrCreate(location) : null), templatePosition);
             this.grounded = true;
             this.cityBlend = location.getPath().equals("city");
             refreshBounds();
         }
 
         public Piece(StructurePieceType type, StructureTemplateManager structureManager, CompoundTag tag) {
-            super(type, tag, structureManager, (location) -> SurfaceStructurePlacement.settings(Rotation.valueOf(tag.getStringOr("rot", "")), tag.getBooleanOr("SurfaceGrounded", false), SurfaceStructurePlacement.groundOffset(location.getPath())));
+            super(type, tag, structureManager, (location) -> SurfaceStructurePlacement.settings(Rotation.valueOf(tag.getStringOr("rot", "")), tag.getBooleanOr("SurfaceGrounded", false), SurfaceStructurePlacement.groundOffset(location.getPath()), location.getPath().equals("city") ? structureManager.getOrCreate(location) : null));
             this.grounded = tag.getBooleanOr("SurfaceGrounded", false);
             this.cityBlend = this.grounded && tag.getBooleanOr("CityTerrainBlend", false);
             refreshBounds();

@@ -57,9 +57,15 @@ public final class RelicGenerationGameTests {
         var climate=randomState.createClimateSampler(net.minecraft.world.level.levelgen.densityfunction.SamplerContext.EMPTY_UNCACHED);
         var city=lookup.lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.CITY).value();
         var placement=(RandomSpreadStructurePlacement)lookup.lookupOrThrow(Registries.STRUCTURE_SET).getOrThrow(ModStructureSets.CITY_SET).value().placement();
-        var candidate=placement.getPotentialStructureChunk(seed,0,0);
-        var context=new Structure.GenerationContext(lookup,generator,source,climate,randomState,manager,seed,candidate,level,b->b.is(ModTags.HAS_CITY));
-        var stub=city.findValidGenerationPoint(context).orElseThrow();
+        ChunkPos candidate=null;Structure.GenerationStub stub=null;
+        search: for(int radius=0;radius<=4;radius++)for(int rx=-radius;rx<=radius;rx++)for(int rz=-radius;rz<=radius;rz++) {
+            if(Math.max(Math.abs(rx),Math.abs(rz))!=radius)continue;
+            var proposed=placement.getPotentialStructureChunk(seed,rx*placement.spacing(),rz*placement.spacing());
+        var context=new Structure.GenerationContext(lookup,generator,source,climate,randomState,manager,seed,proposed,level,b->b.is(ModTags.HAS_CITY));
+            var found=city.findValidGenerationPoint(context);
+            if(found.isPresent()){candidate=proposed;stub=found.get();break search;}
+        }
+        check(stub!=null,"No suitable dry city site found in the generation survey");
         var pieces=stub.getPiecesBuilder().build();
         check(pieces.pieces().size()==1 && pieces.pieces().get(0) instanceof com.pancake.surviving_the_aftermath.common.structure.CityStructure.Piece,
                 "Fresh natural city uses generic piece and skips villager population");

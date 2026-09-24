@@ -11,6 +11,9 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("cityboundarykeepswatertreesandbuildings"), wrap(CityBoundaryGameTests::cityBoundaryKeepsWaterTreesAndBuildings));
+   helper.register(SurvivingTheAftermath.asResource("citytemplateairkeepsoverhangingtree"), wrap(CityBoundaryGameTests::cityTemplateAirKeepsOverhangingTree));
+   helper.register(SurvivingTheAftermath.asResource("citycleanupkeepslivecrownsandremovesorphans"), wrap(CityBoundaryGameTests::cityCleanupKeepsLiveCrownsAndRemovesOrphans));
    helper.register(SurvivingTheAftermath.asResource("relicdealerregistryandtexture"), wrap(RelicGenerationGameTests::relicDealerRegistryAndTexture));
    helper.register(SurvivingTheAftermath.asResource("naturalcitycreatesrelicdealers"), wrap(RelicGenerationGameTests::naturalCityCreatesRelicDealers));
    helper.register(SurvivingTheAftermath.asResource("enchantmentbooksworkinanvil"), wrap(EnchantmentAuditGameTests::enchantmentBooksWorkInAnvil));

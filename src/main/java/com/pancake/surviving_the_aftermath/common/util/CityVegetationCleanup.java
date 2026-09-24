@@ -79,7 +79,7 @@ public final class CityVegetationCleanup {
                         int distance = Math.max(Math.max(footprint.minX() - x, x - footprint.maxX()),
                                 Math.max(footprint.minZ() - z, z - footprint.maxZ()));
                         // This edge is deliberately untouched by gradeCity, including its trees.
-                        if (distance >= SurfaceStructurePlacement.CITY_BLEND_RADIUS) continue;
+                        if (distance > 7) continue;
                         int top = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, x & 15, z & 15);
                         for (int y = minY; y <= top; y++) {
                             cursor.set(x, y, z);
@@ -87,6 +87,7 @@ public final class CityVegetationCleanup {
                             if (!state.is(BlockTags.LEAVES) || state.hasBlockEntity()) continue;
                             // Player-placed decorative leaves must survive loading/reloading.
                             if (state.hasProperty(BlockStateProperties.PERSISTENT) && state.getValue(BlockStateProperties.PERSISTENT)) continue;
+                            if (CityTerrainProtection.externalTree(level, cursor, footprint)) continue;
                             // No drops. Neighbor updates also let orphaned foliage at the outside
                             // edge recalculate its normal leaf distance, without clearing the forest.
                             level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 3);
