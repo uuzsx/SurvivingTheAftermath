@@ -189,7 +189,11 @@ public final class TerrainPlacementGameTests {
         check(area.getXSpan() == 128 && area.getZSpan() == 128, "City apron missing from structure references");
         // Finish all neighboring world generation before establishing a deterministic fixture.
         for (int cx = (area.minX() >> 4) - 2; cx <= (area.maxX() >> 4) + 2; cx++) {
-            for (int cz = (area.minZ() >> 4) - 2; cz <= (area.maxZ() >> 4) + 2; cz++) level.getChunk(cx, cz);
+            for (int cz = (area.minZ() >> 4) - 2; cz <= (area.maxZ() >> 4) + 2; cz++) {
+                // This fixture replaces the terrain. Discard natural/reused-world structure
+                // references too; registered-building protection has its own fixture.
+                level.getChunk(cx, cz).setAllReferences(new java.util.HashMap<>());
+            }
         }
         // Sloping natural ground with a grass/stone shell above a 10-block-deep cavity.
         for (int x = area.minX(); x <= area.maxX(); x++) for (int z = area.minZ(); z <= area.maxZ(); z++) {
