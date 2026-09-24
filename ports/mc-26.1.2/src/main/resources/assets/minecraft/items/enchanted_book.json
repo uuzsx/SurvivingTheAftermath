@@ -1,0 +1,283 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "minecraft:stored_enchantments",
+    "cases": [
+      {
+        "when": {
+          "surviving_the_aftermath:counter_attack": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/counter_attack"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:counter_attack": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/counter_attack"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:counter_attack": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/counter_attack"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:bloodthirsty": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/bloodthirsty"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:bloodthirsty": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/bloodthirsty"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:bloodthirsty": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/bloodthirsty"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:clean_water": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/clean_water"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:clean_water": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/clean_water"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:clean_water": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/clean_water"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:clean_water": 4
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/clean_water"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:life_tree": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/life_tree"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:life_tree": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/life_tree"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:life_tree": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/life_tree"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:life_tree": 4
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/life_tree"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:devoured": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/devoured"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:devoured": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/devoured"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:devoured": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/devoured"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:devoured": 4
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/devoured"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:frantic": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/frantic"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:execute": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/execute"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:execute": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/execute"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:execute": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/execute"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:moon": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/moon"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:moon": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/moon"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:moon": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/moon"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:moon": 4
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/moon"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:sun": 1
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/sun"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:sun": 2
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/sun"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:sun": 3
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/sun"
+        }
+      },
+      {
+        "when": {
+          "surviving_the_aftermath:sun": 4
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "surviving_the_aftermath:item/sun"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/enchanted_book"
+    }
+  }
+}

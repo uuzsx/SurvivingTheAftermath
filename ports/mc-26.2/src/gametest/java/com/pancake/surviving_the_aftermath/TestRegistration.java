@@ -11,6 +11,12 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("restoredregistryandlanguage"), wrap(ContentGameTests::restoredRegistryAndLanguage));
+   helper.register(SurvivingTheAftermath.asResource("restoredfoodconsumption"), wrap(ContentGameTests::restoredFoodConsumption));
+   helper.register(SurvivingTheAftermath.asResource("cowardicepricesandlegacytrades"), wrap(ContentGameTests::cowardicePricesAndLegacyTrades));
+   helper.register(SurvivingTheAftermath.asResource("restoreddiscinjukebox"), wrap(ContentGameTests::restoredDiscInJukebox));
+   helper.register(SurvivingTheAftermath.asResource("restoredcombatenchantments"), wrap(ContentGameTests::restoredCombatEnchantments));
+   helper.register(SurvivingTheAftermath.asResource("restoredgrowthenchantments"), wrap(ContentGameTests::restoredGrowthEnchantments));
    helper.register(SurvivingTheAftermath.asResource("attachmentserializationroundtrip"), wrap(StabilityGameTests::attachmentSerializationRoundTrip));
    helper.register(SurvivingTheAftermath.asResource("eachwavetransformsbeforespawningandvictoryrewardsimmediately"), wrap(DungeonLifecycleGameTests::eachWaveTransformsBeforeSpawningAndVictoryRewardsImmediately));
    helper.register(SurvivingTheAftermath.asResource("diamondreciperequiresbothingredients"), wrap(DungeonLifecycleGameTests::diamondRecipeRequiresBothIngredients));

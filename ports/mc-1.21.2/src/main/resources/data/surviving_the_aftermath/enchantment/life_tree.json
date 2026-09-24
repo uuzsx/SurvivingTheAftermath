@@ -1,0 +1,21 @@
+{
+  "description": {
+    "translate": "enchantment.surviving_the_aftermath.life_tree"
+  },
+  "supported_items": "#minecraft:enchantable/armor",
+  "weight": 2,
+  "max_level": 4,
+  "min_cost": {
+    "base": 15,
+    "per_level_above_first": 9
+  },
+  "max_cost": {
+    "base": 61,
+    "per_level_above_first": 10
+  },
+  "anvil_cost": 4,
+  "slots": [
+    "armor"
+  ],
+  "effects": {}
+}

@@ -63,6 +63,9 @@ public class CityStructure extends AbstractStructure {
 							villager.setVillagerData(villager.getVillagerData().withType(profession)));
 					BuiltInRegistries.VILLAGER_PROFESSION.getRandom(rand).ifPresent((profession) ->
 							villager.setVillagerData(villager.getVillagerData().withProfession(profession)));
+                    // No workstation existed in the original design. Keep generated relic dealers from
+                    // immediately losing their authored profession before the first trade.
+                    if (villager.getVillagerData().profession().value() == com.pancake.surviving_the_aftermath.common.init.ModVillagers.RELIC_DEALER.get()) villager.setVillagerXp(1);
 					level.addFreshEntity(villager);
 					break;
 				}

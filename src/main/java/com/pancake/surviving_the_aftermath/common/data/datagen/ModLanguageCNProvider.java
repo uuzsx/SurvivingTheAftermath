@@ -16,30 +16,34 @@ public class ModLanguageCNProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        add("item.surviving_the_aftermath.raw_falukorv", "生的法伦香肠");
+        add("item.surviving_the_aftermath.cooked_falukorv", "熟的法伦香肠");
+        add("item.surviving_the_aftermath.egg_tart", "蛋挞");
+        add("item.surviving_the_aftermath.stack_of_egg_tarts", "蛋挞堆");
+        add("item.surviving_the_aftermath.hamburger", "汉堡");
+        add("item.surviving_the_aftermath.tianjin_pancake", "煎饼果子");
+        add("item.surviving_the_aftermath.nether_core", "下界核心");
+        add("item.surviving_the_aftermath.music_disk_orchelias_vox", "音乐唱片");
+        add("enchantment.surviving_the_aftermath.counter_attack", "反击");
+        add("enchantment.surviving_the_aftermath.bloodthirsty", "渴血");
+        add("enchantment.surviving_the_aftermath.clean_water", "净水");
+        add("enchantment.surviving_the_aftermath.life_tree", "树灵");
+        add("enchantment.surviving_the_aftermath.devoured", "吞噬");
+        add("enchantment.surviving_the_aftermath.frantic", "癫狂");
+        add("enchantment.surviving_the_aftermath.execute", "处决");
+        add("enchantment.surviving_the_aftermath.ranger", "游侠");
+        add("enchantment.surviving_the_aftermath.moon", "皎月");
+        add("enchantment.surviving_the_aftermath.sun", "烈阳");
+        add("effect.surviving_the_aftermath.cowardice", "懦弱");
+        add("entity.minecraft.villager.surviving_the_aftermath.relic_dealer", "遗物商人");
+        add("entity.minecraft.villager.relic_dealer", "遗物商人");
+        add("item.surviving_the_aftermath.music_disk_orchelias_vox.desc", "Hagali - Orchelia's vox (offvocal ver_)");
+
         add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "钻石打火石");
         add(DiamondFlintAndSteelItem.TOOLTIP, "用于激活副本门，每次激活消耗 1 点耐久。");
         add(DiamondFlintAndSteelItem.REQUIRED, "此副本需要使用钻石打火石激活。");
         add(DiamondFlintAndSteelItem.UNAVAILABLE, "无法激活：请检查门框、挑战条件，或等待当前挑战发奖结束。");
         add("itemGroup." + SurvivingTheAftermath.MOD_ID, "劫后余生");
-//        add(ModItems.RAW_FALUKORV.get(), "生的法伦香肠");
-//        add(ModItems.COOKED_FALUKORV.get(), "熟的法伦香肠");
-//        add(ModItems.EGG_TART.get(), "蛋挞");
-//        add(ModItems.STACK_OF_EGG_TARTS.get(), "蛋挞堆");
-//        add(ModItems.HAMBURGER.get(), "汉堡");
-//        add(ModItems.TIANJIN_PANCAKE.get(), "煎饼果子");
-//        add(ModItems.NETHER_CORE.get(), "下界核心");
-//        add(ModItems.MUSIC_DISK_ORCHELIAS_VOX.get(), "音乐唱片");
-//        add(ModMobEffects.COWARDICE.get(),"懦弱");
-//        add(ModEnchantments.COUNTER_ATTACK.get(), "反击");
-//        add(ModEnchantments.BLOODTHIRSTY.get(), "渴血");
-//        add(ModEnchantments.CLEAN_WATER.get(), "净水");
-//        add(ModEnchantments.LIFE_TREE.get(), "树灵");
-//        add(ModEnchantments.DEVOURED.get(), "吞噬");
-//        add(ModEnchantments.FRANTIC.get(), "癫狂");
-//        add(ModEnchantments.EXECUTE.get(), "处决");
-//        add(ModEnchantments.RANGER.get(), "游侠");
-//        add(ModEnchantments.MOON.get(), "皎月");
-//        add(ModEnchantments.SUN.get(), "烈阳");
         add(RaidEventSubscriber.NETHER_RAID_START, "你感受到空气愈发炎热......");
         add(RaidEventSubscriber.NETHER_RAID_VICTORY, "望着最后一颗火星熄灭，你感觉它们不会再回来了，暂时......");
         add(RaidPlayerBattleTracker.PLAYER_BATTLE_ESCAPE, "请勿战斗过程逃跑，否则你将付出代价，倒计时开始......%s");

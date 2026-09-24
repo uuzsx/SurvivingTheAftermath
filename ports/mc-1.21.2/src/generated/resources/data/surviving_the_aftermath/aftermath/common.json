@@ -29,6 +29,10 @@
     {
       "data": "minecraft:netherite_scrap",
       "weight": 2
+    },
+    {
+      "data": "surviving_the_aftermath:nether_core",
+      "weight": 1
     }
   ],
   "waves": [

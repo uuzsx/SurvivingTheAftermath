@@ -1,0 +1,21 @@
+{
+  "description": {
+    "translate": "enchantment.surviving_the_aftermath.ranger"
+  },
+  "supported_items": "#minecraft:enchantable/bow",
+  "weight": 2,
+  "max_level": 1,
+  "min_cost": {
+    "base": 12,
+    "per_level_above_first": 20
+  },
+  "max_cost": {
+    "base": 62,
+    "per_level_above_first": 20
+  },
+  "anvil_cost": 4,
+  "slots": [
+    "mainhand"
+  ],
+  "effects": {}
+}

@@ -6,10 +6,10 @@
   "refmap": "surviving_the_aftermath.refmap.json",
   "mixins": [
     "MoveControlMixin",
-    "PortalShapeMixin"
+    "PortalShapeMixin",
+    "VillagerMixin"
   ],
-  "client": [
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

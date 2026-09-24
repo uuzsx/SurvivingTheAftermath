@@ -16,31 +16,34 @@ public class ModLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
+        add("item.surviving_the_aftermath.raw_falukorv", "Raw Falukorv");
+        add("item.surviving_the_aftermath.cooked_falukorv", "Cooked Falukorv");
+        add("item.surviving_the_aftermath.egg_tart", "Egg Tart");
+        add("item.surviving_the_aftermath.stack_of_egg_tarts", "Stack of Egg Tarts");
+        add("item.surviving_the_aftermath.hamburger", "Hamburger");
+        add("item.surviving_the_aftermath.tianjin_pancake", "Tianjin Pancake");
+        add("item.surviving_the_aftermath.nether_core", "Nether Core");
+        add("item.surviving_the_aftermath.music_disk_orchelias_vox", "Music Disc");
+        add("enchantment.surviving_the_aftermath.counter_attack", "Counter Attack");
+        add("enchantment.surviving_the_aftermath.bloodthirsty", "Bloodthirsty");
+        add("enchantment.surviving_the_aftermath.clean_water", "Clean Water");
+        add("enchantment.surviving_the_aftermath.life_tree", "Life Tree");
+        add("enchantment.surviving_the_aftermath.devoured", "Devoured");
+        add("enchantment.surviving_the_aftermath.frantic", "Frantic");
+        add("enchantment.surviving_the_aftermath.execute", "Execute");
+        add("enchantment.surviving_the_aftermath.ranger", "Ranger");
+        add("enchantment.surviving_the_aftermath.moon", "Moon");
+        add("enchantment.surviving_the_aftermath.sun", "Sun");
+        add("effect.surviving_the_aftermath.cowardice", "Cowardice");
+        add("entity.minecraft.villager.surviving_the_aftermath.relic_dealer", "Relic Dealer");
+        add("entity.minecraft.villager.relic_dealer", "Relic Dealer");
+        add("item.surviving_the_aftermath.music_disk_orchelias_vox.desc", "Hagali - Orchelia's vox (offvocal ver_)");
+
 		add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "Diamond Flint and Steel");
 		add(DiamondFlintAndSteelItem.TOOLTIP, "Activates dungeon portals. Uses 1 durability per activation.");
 		add(DiamondFlintAndSteelItem.REQUIRED, "This dungeon requires Diamond Flint and Steel.");
 		add(DiamondFlintAndSteelItem.UNAVAILABLE, "Cannot activate: check the portal frame, challenge conditions, or an unfinished challenge.");
 		add("itemGroup." + SurvivingTheAftermath.MOD_ID, "Surviving the Aftermath");
-//		add(ModItems.RAW_FALUKORV.get(), "Raw Falukorv");
-//		add(ModItems.EGG_TART.get(), "Egg Tart");
-//		add(ModItems.STACK_OF_EGG_TARTS.get(), "Stack of Egg Tart");
-//		add(ModItems.HAMBURGER.get(), "Hamburger");
-//		add(ModItems.TIANJIN_PANCAKE.get(), "Tianjin Pancake");
-//		add(ModItems.NETHER_CORE.get(), "Nether Core");
-//		add(ModItems.MUSIC_DISK_ORCHELIAS_VOX.get(), "Music Disc");
-//		add(ModItems.MUSIC_DISK_ORCHELIAS_VOX.get().getDescriptionId() + ".desc",
-//				"Hagali - Orchelia's vox (offvocal ver_)");
-//		add(ModMobEffects.COWARDICE.get(),"Cowardice");
-//		add(ModEnchantments.COUNTER_ATTACK.get(), "Counter Attack");
-//		add(ModEnchantments.BLOODTHIRSTY.get(), "Bloodthirsty");
-//		add(ModEnchantments.CLEAN_WATER.get(), "Clean Water");
-//		add(ModEnchantments.LIFE_TREE.get(), "Life Tree");
-//		add(ModEnchantments.DEVOURED.get(), "Devoured");
-//		add(ModEnchantments.FRANTIC.get(), "Frantic");
-//		add(ModEnchantments.EXECUTE.get(), "Execute");
-//		add(ModEnchantments.RANGER.get(), "Ranger");
-//		add(ModEnchantments.MOON.get(), "Moon");
-//		add(ModEnchantments.SUN.get(), "Sun");
 
 		add(RaidEventSubscriber.NETHER_RAID_START, "You feel the air getting hotter .....");
 		add(RaidEventSubscriber.NETHER_RAID_VICTORY, "Looking at the last Mars extinguished, you feel they will not come back, temporarily......");

@@ -31,6 +31,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .add(Items.EMERALD,20)
                 .add(Items.ENCHANTED_GOLDEN_APPLE,2)
                 .add(Items.NETHERITE_SCRAP,2)
+                .add(com.pancake.surviving_the_aftermath.common.init.ModItems.NETHER_CORE.get(),1)
                 .build();
 
         ItemWeightedModule goldenEquipment = new ItemWeightedModule.Builder()

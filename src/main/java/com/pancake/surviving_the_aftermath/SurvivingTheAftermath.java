@@ -32,6 +32,9 @@ public class SurvivingTheAftermath {
         ModMobEffects.MOB_EFFECTS.register(bus);
         ModSoundEvents.SOUND_EVENTS.register(bus);
         ModItems.ITEMS.register(bus);
+        ModTabs.TABS.register(bus);
+        ModEnchantments.ENCHANTMENTS.register(bus);
+        ModVillagers.VILLAGER_PROFESSIONS.register(bus);
 
         ModStructurePieceTypes.STRUCTURE_PIECE_TYPES.register(bus);
         ModStructureTypes.STRUCTURE_TYPES.register(bus);

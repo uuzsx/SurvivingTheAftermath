@@ -1,0 +1,64 @@
+{
+  "version": "0.0.4-rc.5",
+  "historical_content_commit": "a076be80c87209d41e68029355bdfae7629a4b38",
+  "built_from_repository": "https://github.com/uuzsx/SurvivingTheAftermath",
+  "artifacts": [
+    {
+      "minecraft": "1.20.1",
+      "loader": "Forge",
+      "game_test_total": 31,
+      "file": "SurvivingTheAftermath-1.20.1-0.0.4-rc.5.jar",
+      "bytes": 3779088,
+      "sha256": "fba12021f8fc7b5cfeed05baff10a152ceaabb58c7380a56c9a674c915068658"
+    },
+    {
+      "minecraft": "1.21.1",
+      "loader": "NeoForge",
+      "game_test_total": 32,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.5.jar",
+      "bytes": 3768941,
+      "sha256": "935547f7bde490e1f3bac2f7e1bdc33c62f8b31e847c1b512734f05c2cbb268c"
+    },
+    {
+      "minecraft": "1.21.2",
+      "loader": "NeoForge",
+      "game_test_total": 32,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.5.jar",
+      "bytes": 3756414,
+      "sha256": "004b15a2f734bc97b6ae7d807497301c8795b948c37b495a9fab1e58df09de63"
+    },
+    {
+      "minecraft": "26.1.1",
+      "loader": "NeoForge",
+      "game_test_total": 33,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.5.jar",
+      "bytes": 3760993,
+      "sha256": "94ac3b5d42e1b6177a92048a6026469f70b450ae060a769aafaa960b8f056413"
+    },
+    {
+      "minecraft": "26.1.2",
+      "loader": "NeoForge",
+      "game_test_total": 39,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.5.jar",
+      "bytes": 3008170,
+      "sha256": "0b79652464eca45cd66303e86d521cc042e6c2aeaabf0b8d0da2952f4bcbde84"
+    },
+    {
+      "minecraft": "26.2",
+      "loader": "NeoForge",
+      "game_test_total": 33,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.5.jar",
+      "bytes": 3761120,
+      "sha256": "017fbaf231766b29f98fec6a8537d03b185b14bd1998be2dcc89421a2d5b762c"
+    },
+    {
+      "minecraft": "26.3",
+      "loader": "NeoForge",
+      "game_test_total": 33,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.5.jar",
+      "bytes": 3760263,
+      "sha256": "9696b9bbfe90183c74240d1ca02b9133f978c474d1a0fd5f1820988ada378ec7"
+    }
+  ],
+  "test_notes": "Core runs include one conditional KubeJS test whose body skips when absent; 26.x includes one vanilla test. 26.1.2 also passed 39 tests with KubeJS and the actual client audio decoder. No manual client visual/audio playtest."
+}

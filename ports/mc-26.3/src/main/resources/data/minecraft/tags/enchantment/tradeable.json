@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "surviving_the_aftermath:counter_attack",
+    "surviving_the_aftermath:bloodthirsty",
+    "surviving_the_aftermath:clean_water",
+    "surviving_the_aftermath:life_tree",
+    "surviving_the_aftermath:devoured",
+    "surviving_the_aftermath:frantic",
+    "surviving_the_aftermath:execute",
+    "surviving_the_aftermath:ranger",
+    "surviving_the_aftermath:moon",
+    "surviving_the_aftermath:sun"
+  ]
+}
