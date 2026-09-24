@@ -11,6 +11,12 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("enchantmentbooksworkinanvil"), wrap(EnchantmentAuditGameTests::enchantmentBooksWorkInAnvil));
+   helper.register(SurvivingTheAftermath.asResource("enchantmentexecuterespectstotems"), wrap(EnchantmentAuditGameTests::enchantmentExecuteRespectsTotems));
+   helper.register(SurvivingTheAftermath.asResource("enchantmentequipmentandgrowthlifecycle"), wrap(EnchantmentAuditGameTests::enchantmentEquipmentAndGrowthLifecycle));
+   helper.register(SurvivingTheAftermath.asResource("enchantmentrangeractualbowticks"), wrap(EnchantmentAuditGameTests::enchantmentRangerActualBowTicks));
+   helper.register(SurvivingTheAftermath.asResource("enchantmentcombatlevelsandconditions"), wrap(EnchantmentAuditGameTests::enchantmentCombatLevelsAndConditions));
+   helper.register(SurvivingTheAftermath.asResource("enchantmentrelicbookpool"), wrap(EnchantmentAuditGameTests::enchantmentRelicBookPool));
    helper.register(SurvivingTheAftermath.asResource("citygradingpreservesregisteredbuilding"), wrap(CityAvoidanceGameTests::cityGradingPreservesRegisteredBuilding));
    helper.register(SurvivingTheAftermath.asResource("cityrejectsvillagecollision"), wrap(CityAvoidanceGameTests::cityRejectsVillageCollision));
    helper.register(SurvivingTheAftermath.asResource("citysavedcanopieskeepplayerdecorations"), wrap(CityVegetationGameTests::citySavedCanopiesKeepPlayerDecorations));
