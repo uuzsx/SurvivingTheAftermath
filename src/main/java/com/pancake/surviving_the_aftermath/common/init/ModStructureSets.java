@@ -32,7 +32,7 @@ public class ModStructureSets {
         int[] wagonCargoSalt = new int[]{0, 1365330241, 161766032, 1733648479, 2081980804, 418595573, 947847921};
         int[] burntSalt = new int[] {0, 104706480, 705540248, 1838764692, 1669956657, 1334899266, 2119656745};
         context.register(CITY_SET, new StructureSet(context.lookup(Registries.STRUCTURE).getOrThrow(CITY),
-                new RandomSpreadStructurePlacement(32, 12, RandomSpreadType.LINEAR, 2057068235)));
+                new RandomSpreadStructurePlacement(24, 12, RandomSpreadType.LINEAR, 2057068235)));
         context.register(HOUSE_OF_SAKURA_SET, new StructureSet(context.lookup(Registries.STRUCTURE).getOrThrow(HOUSE_OF_SAKURA),
                 new RandomSpreadStructurePlacement(80, 40, RandomSpreadType.LINEAR, 1712650656)));
         context.register(NETHER_RAID_SET, new StructureSet(context.lookup(Registries.STRUCTURE).getOrThrow(NETHER_RAID),

@@ -160,7 +160,11 @@ public final class NetherCoreGameTests {
     @GameTest(template = "stability_empty", batch = "corebackgroundsearchandcancellation", timeoutTicks = 1400)
     public static void coreBackgroundSearchAndCancellation(GameTestHelper h) throws Exception {
         cleanup(h);var player=player(h);
-        var held=namedCore();player.setItemInHand(InteractionHand.MAIN_HAND,held);
+        var held=namedCore();
+        String requestName="background_"+UUID.randomUUID();held.setHoverName(Component.literal(requestName));
+        java.util.function.Supplier<List<EyeOfEnder>> launched=()->eyes(h).stream()
+                .filter(e->e.getItem().getHoverName().getString().equals(requestName)).toList();
+        player.setItemInHand(InteractionHand.MAIN_HAND,held);
         // Exercise the production queue directly because GameTest disables structure generation.
         NetherCoreLocator.beginSearch(player,InteractionHand.MAIN_HAND);
         NetherCoreLocator.beginSearch(player,InteractionHand.MAIN_HAND);
@@ -183,19 +187,21 @@ public final class NetherCoreGameTests {
         fixtureStarts.put(city,new net.minecraft.world.level.levelgen.structure.StructureStart(city,candidate,0,
                 new net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer(List.of(piece))));
         chunk.setAllStarts(fixtureStarts);
+        // Loading the fixture can reveal persisted test projectiles from earlier runs.
+        cleanup(h);
         NetherCoreLocator.beginSearch(player,InteractionHand.MAIN_HAND);
         // Forge GameTest advances ticks faster than real time. Drive the server-side queue
         // explicitly while giving the worldgen worker a bounded wall-clock interval.
         long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(50);
-        while(eyes(h).isEmpty() && System.nanoTime()<deadline) {
+        while(launched.get().isEmpty() && System.nanoTime()<deadline) {
             NetherCoreLocator.tick(h.getLevel());
             Thread.sleep(2);
         }
         try {
-            check(eyes(h).size()==1 && held.isEmpty(), "Queued search did not transfer exactly one core");
-            var eye=eyes(h).get(0);
+            check(launched.get().size()==1 && held.isEmpty(), "Queued search did not transfer exactly one core: owned_eyes="+launched.get().size()+", all_eyes="+eyes(h).size()+", creative="+player.getAbilities().instabuild+", original_count="+held.getCount()+", hand_count="+player.getMainHandItem().getCount());
+            var eye=launched.get().get(0);
             for(int i=0;i<90;i++)eye.tick();
-            check(drops(h).size()==1,"Background search launch did not return core");
+            check(drops(h).stream().filter(d->d.getItem().getHoverName().getString().equals(requestName)).count()==1,"Background search launch did not return core");
             System.out.println("CORE SEARCH CHECK: background city lookup launches once; duplicate requests and changing hands conserve cores");
             h.succeed();
         } finally { player.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);NetherCoreLocator.tick(h.getLevel());cleanup(h);chunk.setAllStarts(originalStarts);h.getLevel().setChunkForced(cx,cz,false); }

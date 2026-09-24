@@ -9,7 +9,9 @@
     "PortalShapeMixin",
     "VillagerMixin",
     "SlimeMixin",
-    "NetherCoreEyeMixin"
+    "NetherCoreEyeMixin",
+    "NoiseGeneratorAccessor",
+    "CityTreeFeatureMixin"
   ],
   "client": [],
   "injectors": {
