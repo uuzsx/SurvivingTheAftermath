@@ -103,6 +103,9 @@ public final class RelicGenerationGameTests {
             residents=level.getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class,entityArea);
             dealers=residents.stream().filter(v->v.getVillagerData().getProfession()==ModVillagers.RELIC_DEALER.get()).toList();
             System.out.println("RELIC POPULATION SAMPLE: sample="+sample+", residents="+residents.size()+", relic_dealers="+dealers.size());
+            check(dealers.stream().filter(d -> d.getTags().contains("aftermath_city_dealer")).count() == 1, "Each newly generated city must contain exactly one designated relic dealer");
+            check(sample == 0, "Designated merchant required a random population retry");
+            System.out.println("CORE CITY MERCHANT CHECK: exactly one designated trader in the first natural city population");
             if(!dealers.isEmpty())break;
         }
         check(!residents.isEmpty(),"Natural city placement created no residents");
