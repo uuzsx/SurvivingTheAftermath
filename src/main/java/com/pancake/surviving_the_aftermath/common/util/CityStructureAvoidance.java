@@ -105,7 +105,7 @@ public final class CityStructureAvoidance {
     /** Also protects actual saved starts when old cities or changed datapacks are encountered. */
     public static List<BoundingBox> protectedBuildings(StructureManager structures, ChunkPos chunk, int groundY) {
         var boxes = new ArrayList<BoundingBox>();
-        for (var start : structures.startsForStructure(chunk.getMinBlockX() >> 4, chunk.getMinBlockZ() >> 4, s -> !(s instanceof CityStructure))) {
+        for (var start : structures.startsForStructure(chunk.getMinBlockX() >> 4, chunk.getMinBlockZ() >> 4, CityStructureAvoidance::surface)) {
             if (start.isValid() && start.getBoundingBox().maxY() >= groundY - FOUNDATION_DEPTH) {
                 boxes.add(start.getBoundingBox());
             }

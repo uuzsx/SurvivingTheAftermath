@@ -259,7 +259,7 @@ public final class TerrainPlacementGameTests {
                 .getOrThrow(com.pancake.surviving_the_aftermath.common.init.ModStructureSets.CITY_SET).value();
         check(set.placement() instanceof net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement, "Wrong city distribution");
         var spread = (net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement) set.placement();
-        check(spread.spacing() == 32 && spread.separation() == 12, "City density data did not update");
+        check(spread.spacing() == 24 && spread.separation() == 12, "City density data did not update");
         var city = lookup.lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
                 .getOrThrow(com.pancake.surviving_the_aftermath.common.init.ModStructures.CITY).value();
         check(city.step() == net.minecraft.world.level.levelgen.GenerationStep.Decoration.TOP_LAYER_MODIFICATION, "City must clear forest vegetation after it generates");
