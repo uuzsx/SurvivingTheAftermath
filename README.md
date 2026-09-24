@@ -10,7 +10,7 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
 使用钻石打火石开启 11 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 
-当前分支 **`main`** 对应 **Minecraft 1.20.1 / Forge 47.2.1 / Java 17**，模组版本为 **0.0.4-rc.8**。
+当前分支 **`main`** 对应 **Minecraft 1.20.1 / Forge 47.2.1 / Java 17**，模组版本为 **0.0.4-rc.9**。
 每个版本都在自己的分支根目录独立构建；默认分支 `main` 为 1.20.1。
 
 ## 版本与分支
@@ -33,6 +33,8 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 - 胜利音乐以建筑中心为声源，在 48 格内随距离衰减。成功重新激活，或最后一名玩家离开范围时停止；回来不会续播。
 
 ## 更新记录
+
+rc.9 修复城市、副本及全部地表结构的悬空与地形掩埋：按占地选址、补齐地基、清理内部空间，并保存跨区块一致的放置规则。仅影响新生成的结构。见 [地形修复与验证](docs/TERRAIN-rc.9.md)。
 
 rc.8 恢复原发布页 Logo 和简介，作者统一为 sxuuz，补全 MIT 许可与新仓库链接，并将七个版本整理成独立分支。保留 rc.7 的全部代码与玩法修复。
 

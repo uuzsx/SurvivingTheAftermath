@@ -34,10 +34,10 @@ public class ModStructures {
     public static void bootstrap(BootstapContext<Structure> context) {
         Structure.StructureSettings expansionBuildSettings = new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(ModTags.HAS_EXPANSION_BUILD), Map.of(),
-                GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.NONE);
+                GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.BEARD_THIN);
         Structure.StructureSettings burntStructureSettings = new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(ModTags.HAS_BURNT_STRUCTURE), Map.of(),
-                GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.NONE);
+                GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.BEARD_THIN);
         context.register(CITY, new CityStructure(new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(ModTags.HAS_CITY), Map.of(),
                 GenerationStep.Decoration.SURFACE_STRUCTURES, TerrainAdjustment.BEARD_BOX)));

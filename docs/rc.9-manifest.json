@@ -1,0 +1,99 @@
+{
+  "version": "0.0.4-rc.9",
+  "repository": "https://github.com/uuzsx/SurvivingTheAftermath",
+  "artifacts": [
+    {
+      "minecraft": "1.20.1",
+      "branch": "main",
+      "loader": "Forge 47.2.1",
+      "java": 17,
+      "game_test_total": 45,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.20.1-0.0.4-rc.9.jar",
+      "bytes": 3184255,
+      "sha256": "d2acb93aae148527208d38534f0467294a1904ca94d6fd11aa36894668f1e182"
+    },
+    {
+      "minecraft": "1.21.1",
+      "branch": "1.21.1",
+      "loader": "NeoForge 21.1.251",
+      "java": 21,
+      "game_test_total": 46,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.9.jar",
+      "bytes": 3174735,
+      "sha256": "546dc1ebe8608d2aa395090243253b3dc3fd54cd6040f1754f6f8b5059bbdcfb"
+    },
+    {
+      "minecraft": "1.21.2",
+      "branch": "1.21.2",
+      "loader": "NeoForge 21.2.1-beta",
+      "java": 21,
+      "game_test_total": 46,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.9.jar",
+      "bytes": 3162080,
+      "sha256": "183fea93affc9ff2bb8461a51f90a54bb32f03777dbbe84dd599793d1f2ad024"
+    },
+    {
+      "minecraft": "26.1.1",
+      "branch": "26.1.1",
+      "loader": "NeoForge 26.1.1.15-beta",
+      "java": 25,
+      "game_test_total": 47,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.9.jar",
+      "bytes": 3166717,
+      "sha256": "70083568b089fa02b3b8bf03befbb2ed808282f66554e63fcd63369d44a5baca"
+    },
+    {
+      "minecraft": "26.1.2",
+      "branch": "26.1.2",
+      "loader": "NeoForge 26.1.2.109",
+      "java": 25,
+      "game_test_total": 47,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.9.jar",
+      "bytes": 3181067,
+      "sha256": "d55b24ffaf0007c7d53bafb2c9849bff1e75d294a1542933f86fbde19a71951b"
+    },
+    {
+      "minecraft": "26.2",
+      "branch": "26.2",
+      "loader": "NeoForge 26.2.0.88",
+      "java": 25,
+      "game_test_total": 47,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.9.jar",
+      "bytes": 3166916,
+      "sha256": "ba40394db4a9f61b1e9387cc6a784187a51dee6759b7c903aba62772f5e6f01b"
+    },
+    {
+      "minecraft": "26.3",
+      "branch": "26.3",
+      "loader": "NeoForge 26.3.0.16-beta",
+      "java": 25,
+      "game_test_total": 47,
+      "terrain_tests": 5,
+      "template_rotation_cases": 88,
+      "client_audio_cases": 6,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.9.jar",
+      "bytes": 3165979,
+      "sha256": "78be0a66e60e61c0e56ac60ec7d89cc17ca36ee2a718ae94a5f5c5b3cc49d777"
+    }
+  ],
+  "scope": "Newly generated structures only; existing saved structures retain their placement. Adaptive terrain sampling with per-column placement repair.",
+  "test_notes": "Base runs conditionally skip one KubeJS test body; 26.x includes one vanilla test. No manual graphical or multiplayer playtest."
+}
