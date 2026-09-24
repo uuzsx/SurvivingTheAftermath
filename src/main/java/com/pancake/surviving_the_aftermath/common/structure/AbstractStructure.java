@@ -96,7 +96,8 @@ public abstract class AbstractStructure extends Structure {
             if (this.grounded) {
                 int offset = SurfaceStructurePlacement.groundOffset(this.makeTemplateLocation().getPath());
                 var footprint = this.template.getBoundingBox(this.placeSettings, this.templatePosition);
-                if (this.cityBlend) SurfaceStructurePlacement.gradeCity(level, footprint, chunk, this.templatePosition.getY() - offset);
+                if (this.cityBlend) SurfaceStructurePlacement.gradeCity(level, footprint, chunk, this.templatePosition.getY() - offset,
+                        com.pancake.surviving_the_aftermath.common.util.CityStructureAvoidance.protectedBuildings(structures, chunkPos, this.templatePosition.getY() - offset));
                 else SurfaceStructurePlacement.support(level, footprint, chunk, this.templatePosition.getY() - offset);
             }
             try {
