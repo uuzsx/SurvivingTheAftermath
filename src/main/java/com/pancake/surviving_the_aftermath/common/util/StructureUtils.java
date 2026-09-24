@@ -23,7 +23,7 @@ public class StructureUtils {
         List<BlockPos> blockPosList = Lists.newArrayList();
         ResourceKey<Structure> key = RegistryUtil.keyStructure(location.toString());
         StructureStart start = serverLevel.structureManager()
-                .getStructureAt(pos, Objects.requireNonNull(serverLevel.registryAccess().registryOrThrow(Registries.STRUCTURE).get(key)));
+                .getStructureAt(pos, Objects.requireNonNull(serverLevel.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(key).value()));
         if (start != StructureStart.INVALID_START && !start.getPieces().isEmpty()) {
             start.getPieces().forEach(piece -> {
                 if (piece instanceof TemplateStructurePiece templateStructurePiece) {
@@ -37,7 +37,7 @@ public class StructureUtils {
     public static void handleDataMarker(ServerLevel serverLevel, BlockPos pos, ResourceLocation location,MetadataHandler metadataHandler) {
         ResourceKey<Structure> key = RegistryUtil.keyStructure(location.toString());
         StructureStart start = serverLevel.structureManager()
-                .getStructureAt(pos, Objects.requireNonNull(serverLevel.registryAccess().registryOrThrow(Registries.STRUCTURE).get(key)));
+                .getStructureAt(pos, Objects.requireNonNull(serverLevel.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(key).value()));
         if (start != StructureStart.INVALID_START && !start.getPieces().isEmpty()) {
             start.getPieces().forEach(piece -> {
                 if (piece instanceof TemplateStructurePiece templateStructurePiece) {

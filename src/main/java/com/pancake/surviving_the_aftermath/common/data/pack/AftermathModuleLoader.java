@@ -20,14 +20,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class AftermathModuleLoader extends SimpleJsonResourceReloadListener {
+public class AftermathModuleLoader extends SimpleJsonResourceReloadListener<JsonElement> {
     public static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .create();
     public static final Multimap<ResourceLocation, IAftermathModule> AFTERMATH_MODULE_MAP = ArrayListMultimap.create();
 
     public AftermathModuleLoader() {
-        super(GSON, "aftermath");
+        super(com.mojang.serialization.Codec.PASSTHROUGH.xmap(d -> d.convert(JsonOps.INSTANCE).getValue(), j -> new com.mojang.serialization.Dynamic<>(JsonOps.INSTANCE, j)), "aftermath");
     }
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> jsonElementMap, @NotNull ResourceManager manager, @NotNull ProfilerFiller filler) {

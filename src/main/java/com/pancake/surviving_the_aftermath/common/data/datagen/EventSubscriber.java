@@ -4,8 +4,8 @@ import com.pancake.surviving_the_aftermath.common.data.datagen.raid.RaidModulePr
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,7 +20,7 @@ public class EventSubscriber {
 		generator.addProvider(event.includeServer(), new ModTagProviders.ModStructureTagsProvider(output, provider, existingFileHelper));
 		generator.addProvider(event.includeServer(), new RaidModuleProvider(output));
 		generator.addProvider(event.includeServer(), new RegistryDataGenerator(output, provider));
-		generator.addProvider(event.includeServer(), new ModRecipeProvider(output));
+		generator.addProvider(event.includeServer(), new ModRecipeProvider(output, provider));
 		generator.addProvider(event.includeClient(), new ModItemModelProvider(output, existingFileHelper));
 
 		generator.addProvider(event.includeClient(), new ModLanguageCNProvider(output));

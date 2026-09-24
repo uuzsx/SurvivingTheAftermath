@@ -1,7 +1,10 @@
 {
   "pack": {
-    "description": "surviving_the_aftermath resources",
-    "pack_format": 15,
-    "forge:server_data_pack_format": 12
+    "description": "Surviving the Aftermath resources",
+    "pack_format": 57,
+    "supported_formats": {
+      "min_inclusive": 42,
+      "max_inclusive": 57
+    }
   }
 }

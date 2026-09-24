@@ -7,7 +7,7 @@ import com.pancake.surviving_the_aftermath.common.util.CodecUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class EffectWeightedModule extends BaseWeightedModule<MobEffectInstance> 
             return this;
         }
         public Builder add(String effect, int duration, int amplifier, int weight){
-            effects.add(WeightedEntry.wrap(new MobEffectInstance(ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.tryParse(effect)), duration, amplifier), weight));
+            effects.add(WeightedEntry.wrap(new MobEffectInstance(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(effect)).orElseThrow(), duration, amplifier), weight));
             return this;
         }
 

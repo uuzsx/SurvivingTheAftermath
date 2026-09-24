@@ -10,7 +10,7 @@ import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
 
@@ -52,12 +52,12 @@ public class EffectPredicate implements IPredicateModule {
             effectInstances.add(WeightedEntry.wrap(instance,weight));
             return this;
         }
-        public Builder add(MobEffect mobEffect, int duration, int amplifier ,int weight){
+        public Builder add(net.minecraft.core.Holder<MobEffect> mobEffect, int duration, int amplifier ,int weight){
             effectInstances.add(WeightedEntry.wrap(new MobEffectInstance(mobEffect,duration,amplifier),weight));
             return this;
         }
         public Builder add(String mobEffect, int duration, int amplifier ,int weight){
-            effectInstances.add(WeightedEntry.wrap(new MobEffectInstance(ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.tryParse(mobEffect)),duration,amplifier),weight));
+            effectInstances.add(WeightedEntry.wrap(new MobEffectInstance(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(mobEffect)).orElseThrow(),duration,amplifier),weight));
             return this;
         }
         public EffectPredicate build(){

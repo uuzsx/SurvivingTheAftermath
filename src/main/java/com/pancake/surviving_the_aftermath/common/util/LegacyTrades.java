@@ -4,6 +4,7 @@ import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.init.*;
 import com.pancake.surviving_the_aftermath.common.enchantment.LegacyEnchantments;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.*;
@@ -19,16 +20,18 @@ public final class LegacyTrades {
             // The old pool had one listing; two draws therefore yielded one book offer.
             var names = LegacyEnchantments.NAMES;
             String name = names.get(villager.getRandom().nextInt(names.size()));
-            var enchantment = ModEnchantments.get(name);
-            int rank = 1 + villager.getRandom().nextInt(enchantment.getMaxLevel());
+            var enchantment = villager.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+                    .getOrThrow(net.minecraft.resources.ResourceKey.create(Registries.ENCHANTMENT, SurvivingTheAftermath.asResource(name)));
+            int rank = 1 + villager.getRandom().nextInt(enchantment.value().getMaxLevel());
             int cost = Math.min(64, 2 + villager.getRandom().nextInt(5 + rank * 10) + 3 * rank);
-            ItemStack book = net.minecraft.world.item.EnchantedBookItem.createForEnchantment(new net.minecraft.world.item.enchantment.EnchantmentInstance(enchantment, rank));
-            villager.getOffers().add(new MerchantOffer(new ItemStack(ModItems.NETHER_CORE.get(), cost), new ItemStack(Items.BOOK), book, 12, 30, .2F));
+            ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
+            book.enchant(enchantment, rank);
+            villager.getOffers().add(new MerchantOffer(new ItemCost(ModItems.NETHER_CORE.get(), cost), Optional.of(new ItemCost(Items.BOOK)), book, 12, 30, .2F));
         } else if (level == 4 || level == 5) {
             var id = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
-            if (id != null && id.equals(new net.minecraft.resources.ResourceLocation("butcher"))) {
+            if (id != null && id.equals(net.minecraft.resources.ResourceLocation.withDefaultNamespace("butcher"))) {
                 addFood(villager, level, ModItems.RAW_FALUKORV.get());
-            } else if (id != null && id.equals(new net.minecraft.resources.ResourceLocation("farmer"))) {
+            } else if (id != null && id.equals(net.minecraft.resources.ResourceLocation.withDefaultNamespace("farmer"))) {
                 Item[] foods = {ModItems.RAW_FALUKORV.get(), ModItems.COOKED_FALUKORV.get(), ModItems.EGG_TART.get(),
                         ModItems.STACK_OF_EGG_TARTS.get(), ModItems.HAMBURGER.get(), ModItems.TIANJIN_PANCAKE.get()};
                 // Restore a food listing without replacing or removing vanilla trades.
@@ -37,7 +40,7 @@ public final class LegacyTrades {
         }
     }
     private static void addFood(Villager villager, int level, Item item) {
-        var cost = level == 4 ? new ItemStack(Items.EMERALD, 2) : new ItemStack(Items.DIAMOND);
+        var cost = level == 4 ? new ItemCost(Items.EMERALD, 2) : new ItemCost(Items.DIAMOND);
         villager.getOffers().add(new MerchantOffer(cost, new ItemStack(item), 12, 30, 1.0F));
     }
 }

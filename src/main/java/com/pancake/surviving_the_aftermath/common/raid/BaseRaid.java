@@ -37,7 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -155,8 +155,8 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
     private void spawnEntities(IEntityInfoModule entityInfoModule) {
         if (players.isEmpty() || isEnd()) return;
-        List<LazyOptional<Entity>> arrayList = entityInfoModule.spawnEntity(level, startPos);
-        for (LazyOptional<Entity> lazyOptional : arrayList) {
+        List<Optional<Entity>> arrayList = entityInfoModule.spawnEntity(level, startPos);
+        for (Optional<Entity> lazyOptional : arrayList) {
             lazyOptional.ifPresent(entity -> {
                 if (entity instanceof Mob mob && !isEnd()) {
                     setMobSpawn(level,mob);

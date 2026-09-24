@@ -57,7 +57,7 @@ public class CityStructure extends AbstractStructure {
 				BlockState state1 = this.getBlock(level, spawnPos.getX(), y, spawnPos.getZ(), box);
 				BlockState state2 = this.getBlock(level, spawnPos.getX(), y + 1, spawnPos.getZ(), box);
 				if (state1.isAir() && state2.isAir()) {
-					Villager villager = EntityType.VILLAGER.create(level.getLevel());
+					Villager villager = EntityType.VILLAGER.create(level.getLevel(), net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
 					villager.moveTo(spawnPos.getX(), y, spawnPos.getZ());
 					BuiltInRegistries.VILLAGER_TYPE.getRandom(rand).ifPresent((profession) ->
 							villager.setVillagerData(villager.getVillagerData().setType(profession.value())));

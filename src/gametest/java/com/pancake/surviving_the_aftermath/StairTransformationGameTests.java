@@ -13,8 +13,8 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import java.util.List;
 
-@net.minecraftforge.gametest.GameTestHolder(SurvivingTheAftermath.MOD_ID)
-@net.minecraftforge.gametest.PrefixGameTestTemplate(false)
+@net.neoforged.neoforge.gametest.GameTestHolder(SurvivingTheAftermath.MOD_ID)
+@net.neoforged.neoforge.gametest.PrefixGameTestTemplate(false)
 public final class StairTransformationGameTests {
     private static void check(boolean value, String message) {
         if (!value) throw new GameTestAssertException(message);

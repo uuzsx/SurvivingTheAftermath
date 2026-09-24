@@ -16,8 +16,8 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public interface IAftermath extends IModule<IAftermath> {
-    Supplier<Codec<IAftermath>> CODEC = () -> ModuleRegistry.AFTERMATH_REGISTRY.get().getCodec()
-            .dispatch("aftermath", IAftermath::type, IAftermath::codec);
+    Supplier<Codec<IAftermath>> CODEC = () -> ModuleRegistry.AFTERMATH_REGISTRY.byNameCodec()
+            .dispatch("aftermath", IAftermath::type, value -> com.pancake.surviving_the_aftermath.common.util.CodecUtils.mapCodec(value.codec()));
     ResourceLocation getRegistryName();
     ResourceLocation getBarsResource();
 

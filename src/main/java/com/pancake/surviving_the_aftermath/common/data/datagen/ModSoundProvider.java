@@ -4,8 +4,8 @@ import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.init.ModSoundEvents;
 import net.minecraft.data.PackOutput;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.SoundDefinitionsProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
 public class ModSoundProvider extends SoundDefinitionsProvider {
 
@@ -19,6 +19,6 @@ public class ModSoundProvider extends SoundDefinitionsProvider {
 	}
 
 	private void addWithSameName(SoundEvent sound, boolean stream) {
-		add(sound, definition().with(sound(sound.getLocation()).stream(stream).attenuationDistance(com.pancake.surviving_the_aftermath.common.util.RaidMusic.RADIUS)));
+		add(sound, definition().with(sound(sound.location()).stream(stream).attenuationDistance(com.pancake.surviving_the_aftermath.common.util.RaidMusic.RADIUS)));
 	}
 }

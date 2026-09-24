@@ -32,7 +32,7 @@ public class StructureConditionModule extends LevelConditionModule{
         if (level instanceof ServerLevel serverLevel){
             ResourceKey<Structure> key = getResourceKey();
             return serverLevel.structureManager().getAllStructuresAt(pos)
-                    .containsKey(level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(key));
+                    .containsKey(level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(key).value());
         }
         return false;
     }

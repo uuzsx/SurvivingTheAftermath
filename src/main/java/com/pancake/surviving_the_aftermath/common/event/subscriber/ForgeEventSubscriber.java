@@ -12,22 +12,23 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.ServerLevelData;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.level.LevelEvent.CreateSpawnPosition;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.level.LevelEvent.CreateSpawnPosition;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.EventBusSubscriber.Bus;
 
 
-@EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = Bus.FORGE)
+@EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = Bus.GAME)
 public class ForgeEventSubscriber {
 	@SubscribeEvent
 	public static void changeSpawn(CreateSpawnPosition event) {
 		if (event.getLevel() instanceof ServerLevel level) {
 			ServerLevelData settings = event.getSettings();
 			BlockPos pos = level.findNearestMapStructure(ModTags.NETHER_RAID,
-					new BlockPos(settings.getXSpawn(), settings.getYSpawn(), settings.getZSpawn()), 100, false);
+					settings.getSpawnPos(), 100, false);
 			if (pos != null && AftermathConfig.enableSpawnPointStructure.get()) {
 				settings.setSpawn(new BlockPos(pos.getX(), level.getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX(), pos.getZ()), pos.getZ()), 0);
 				event.setCanceled(true);
@@ -35,9 +36,9 @@ public class ForgeEventSubscriber {
 		}
 	}
 	@SubscribeEvent
-	public static void onTickLevelTick(TickEvent.LevelTickEvent event) {
-		Level level = event.level;
-		if (event.phase == TickEvent.Phase.END && !level.isClientSide()) {
+	public static void onTickLevelTick(LevelTickEvent.Post event) {
+		Level level = event.getLevel();
+		if (!level.isClientSide()) {
 			AftermathCap.get(level).ifPresent(AftermathCap::tick);
 		}
 	}
@@ -48,7 +49,7 @@ public class ForgeEventSubscriber {
     }
 
     @SubscribeEvent
-    public static void clearStaleBattleState(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
+    public static void clearStaleBattleState(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent event) {
         var entity = event.getEntity();
         if (event.getLevel().isClientSide() || !entity.getPersistentData().hasUUID("raid_uuid")) return;
         var id = entity.getPersistentData().getUUID("raid_uuid");

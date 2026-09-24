@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.minecraft.world.item.Items;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,15 +20,15 @@ import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 
 
 
-@Mod.EventBusSubscriber
+@net.neoforged.fml.common.EventBusSubscriber
 public class RaidEventSubscriber {
     @SubscribeEvent
     public static void onIgnition(PlayerInteractEvent.RightClickBlock event) {
@@ -70,7 +70,7 @@ public class RaidEventSubscriber {
             if (player != null) player.displayClientMessage(Component.translatable(NETHER_RAID_START), true);
         });
         event.getLevel().playSound(null, event.getAftermath().getStartPos(),
-                SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(), SoundSource.NEUTRAL, 3.0F, 1.0F);
+                SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).value(), SoundSource.NEUTRAL, 3.0F, 1.0F);
     }
 
     @SubscribeEvent

@@ -50,7 +50,7 @@ public abstract class AbstractStructure extends Structure {
             pieces.addPiece(new Piece(this.pieceType(), context.structureTemplateManager(), this.location(), pos, rotation));
         });
     }
-    
+
 	@Override
 	public void afterPlace(WorldGenLevel pLevel, StructureManager pStructureManager, ChunkGenerator pChunkGenerator,
 			RandomSource pRandom, BoundingBox pBoundingBox, ChunkPos pChunkPos, PiecesContainer pPieces) {
@@ -63,7 +63,7 @@ public abstract class AbstractStructure extends Structure {
                 for (var info : templatePiece.template().filterBlocks(templatePiece.templatePosition(), settings, block)) {
                     if (!pBoundingBox.isInside(info.pos()) || !pLevel.getBlockState(info.pos()).is(block)) continue;
                     if (pLevel.getBlockEntity(info.pos()) instanceof RandomizableContainerBlockEntity chest
-                            && !chest.saveWithoutMetadata().contains("LootTable") && chest.isEmpty()) {
+                            && !chest.saveWithoutMetadata(pLevel.registryAccess()).contains("LootTable") && chest.isEmpty()) {
                         chest.setLootTable(BuiltInLootTables.DESERT_PYRAMID, pRandom.nextLong());
                     }
                 }
@@ -104,7 +104,7 @@ public abstract class AbstractStructure extends Structure {
         private static StructurePlaceSettings makeSettings(Rotation rotation) {
             return new StructurePlaceSettings().setRotation(rotation).setMirror(Mirror.NONE).addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR);
         }
-        
+
     }
-    
+
 }

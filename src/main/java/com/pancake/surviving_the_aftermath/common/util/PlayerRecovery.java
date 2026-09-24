@@ -8,17 +8,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 import java.util.*;
 
-@Mod.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID)
+@net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID)
 public final class PlayerRecovery extends SavedData {
     private static final String KEY = "aftermath_spectator_recovery";
     private final Map<UUID, Integer> pending = new HashMap<>();
     private static PlayerRecovery get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(PlayerRecovery::load, PlayerRecovery::new, KEY);
+        return server.overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(PlayerRecovery::new, (tag, provider) -> load(tag), null), KEY);
     }
     private static PlayerRecovery load(CompoundTag tag) {
         PlayerRecovery data = new PlayerRecovery();
@@ -28,7 +28,7 @@ public final class PlayerRecovery extends SavedData {
         }
         return data;
     }
-    @Override public CompoundTag save(CompoundTag tag) {
+    @Override public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         pending.forEach((id, mode) -> tag.putInt(id.toString(), mode));
         return tag;
     }

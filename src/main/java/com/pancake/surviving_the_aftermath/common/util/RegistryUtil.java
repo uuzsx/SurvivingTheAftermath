@@ -8,7 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -16,19 +16,19 @@ import java.util.Objects;
 public class RegistryUtil {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static EntityType<?> getEntityTypeFromRegistryName(String registryName) {
-        EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(registryName));
+        EntityType<?> entityType = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.tryParse(registryName));
         if (entityType == null) {
             LOGGER.error("Entity with registry name {} does not exist!", registryName);
         }
         return entityType;
     }
     public static ResourceLocation getRegistryNameFromEntityType(EntityType<?> entityType) {
-        return ForgeRegistries.ENTITY_TYPES.getKey(entityType);
+        return net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
     }
 
 
     public static Block getBlockFromRegistryName(String registryName) {
-        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(registryName));
+        Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(ResourceLocation.tryParse(registryName));
         if (block == null) {
             LOGGER.error("Block with registry name {} does not exist!", registryName);
         }
@@ -36,11 +36,11 @@ public class RegistryUtil {
     }
 
     public static ResourceLocation getRegistryNameFromBlock(Block block) {
-        return ForgeRegistries.BLOCKS.getKey(block);
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
     }
 
     public static Item getItemFromRegistryName(String registryName) {
-        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(registryName));
+        Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(registryName));
         if (item == null) {
             LOGGER.error("Item with registry name {} does not exist!", registryName);
         }
@@ -48,7 +48,7 @@ public class RegistryUtil {
     }
 
     public static ResourceLocation getRegistryNameFromItem(Item item) {
-        return ForgeRegistries.ITEMS.getKey(item);
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item);
     }
 
     public static ResourceKey<Structure> keyStructure(String name) {

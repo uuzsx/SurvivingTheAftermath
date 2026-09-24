@@ -25,13 +25,13 @@ public abstract class BaseWeightedModule<T> implements IWeightedModule<T> {
 
     @Override
     public void remove(T t) {
-        this.list.removeIf(wrapper -> wrapper.getData().equals(t));
+        this.list.removeIf(wrapper -> wrapper.data().equals(t));
     }
 
     @Override
     public SimpleWeightedRandomList<T> getWeightedList() {
         SimpleWeightedRandomList.Builder<T> builder = SimpleWeightedRandomList.builder();
-        this.list.forEach(build -> builder.add(build.getData(), build.getWeight().asInt()));
+        this.list.forEach(build -> builder.add(build.data(), build.getWeight().asInt()));
         return builder.build();
     }
 

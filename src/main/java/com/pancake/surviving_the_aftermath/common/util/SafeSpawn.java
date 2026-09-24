@@ -33,7 +33,7 @@ public final class SafeSpawn {
 
     public static boolean isSafe(ServerLevel level, Entity entity) {
         AABB box = entity.getBoundingBox();
-        return box.minY >= level.getMinBuildHeight() && box.maxY < level.getMaxBuildHeight()
+        return box.minY >= level.getMinY() && box.maxY < level.getMaxY() + 1
                 && level.hasChunkAt(BlockPos.containing(box.minX, box.minY, box.minZ))
                 && level.hasChunkAt(BlockPos.containing(box.minX, box.minY, box.maxZ))
                 && level.hasChunkAt(BlockPos.containing(box.maxX, box.minY, box.minZ))

@@ -25,7 +25,7 @@ public abstract class MoveControlMixin {
     private void setWantedPosition(double p_24984_, double p_24985_, double p_24986_, double p_24987_, CallbackInfo ci) {
         CompoundTag persistentData = getMob().getPersistentData();
         if (persistentData.contains("restricted_range")) {
-            BlockPos restrictedRange = NbtUtils.readBlockPos((CompoundTag) persistentData.get("restricted_range"));
+            BlockPos restrictedRange = NbtUtils.readBlockPos(persistentData, "restricted_range").orElse(getMob().blockPosition());
             setWantedX(restrictedRange.getX());
             setWantedY(restrictedRange.getY());
             setWantedZ(restrictedRange.getZ());

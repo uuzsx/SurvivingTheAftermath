@@ -1,51 +1,62 @@
-# Surviving the Aftermath
+# 劫后余生 · Surviving the Aftermath
 
-Mod by Sxuuz and Vemerion!
+<img src="src/main/resources/surviving_the_aftermath.png" alt="劫后余生 Logo" width="200" />
 
-劫后余生：副本挑战与波次战斗模组。当前维护仓库为 [uuzsx/SurvivingTheAftermath](https://github.com/uuzsx/SurvivingTheAftermath)。
+作者：**sxuuz** · GitHub：[@uuzsx](https://github.com/uuzsx)
 
-## 版本与源码
+This Mod supplements the vanilla raid content and adds related API to expand more adventure content.
+Explore ruined structures and cities, face the Nether Raid, and discover powerful enchantments.
 
-每一行都是独立的 Gradle 工程；构建前进入对应目录。
+劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
+使用钻石打火石开启 11 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 
-| Minecraft | 加载器 / 验证版本 | Java | 源码目录 | 模组版本 |
-| --- | --- | --- | --- | --- |
-| 1.20.1 | Forge 47.2.1 | 17 | 仓库根目录 | 0.0.4-rc.7 |
-| 1.21.1 | NeoForge 21.1.251 | 21 | [ports/mc-1.21.1](ports/mc-1.21.1) | 0.0.4-rc.7 |
-| 1.21.2 | NeoForge 21.2.1-beta | 21 | [ports/mc-1.21.2](ports/mc-1.21.2) | 0.0.4-rc.7 |
-| 26.1.1 | NeoForge 26.1.1.15-beta | 25 | [ports/mc-26.1.1](ports/mc-26.1.1) | 0.0.4-rc.7 |
-| 26.1.2 | NeoForge 26.1.2.109 | 25 | [ports/mc-26.1.2](ports/mc-26.1.2) | 0.0.4-rc.7 |
-| 26.2 | NeoForge 26.2.0.88 | 25 | [ports/mc-26.2](ports/mc-26.2) | 0.0.4-rc.7 |
-| 26.3 | NeoForge 26.3.0.16-beta | 25 | [ports/mc-26.3](ports/mc-26.3) | 0.0.4-rc.7 |
+当前分支 **`1.21.2`** 对应 **Minecraft 1.21.2 / NeoForge 21.2.1-beta / Java 21**，模组版本为 **0.0.4-rc.8**。
+每个版本都在自己的分支根目录独立构建；默认分支 `main` 为 1.20.1。
 
-## 本次更新
+## 版本与分支
 
-rc.7 修复逐波变形时楼梯反复转向：保留朝向、上下半部、拐角和含水状态，同时继续正常替换下界材质。新增实际模板放置测试覆盖四种建筑旋转及连续 11 轮变形。见 [楼梯修复与验证说明](docs/ALL-VERSIONS-rc.7.md)。
+| Minecraft | 加载器 / 验证版本 | Java | 分支 |
+| --- | --- | --- | --- |
+| 1.20.1 | Forge 47.2.1 | 17 | [main](https://github.com/uuzsx/SurvivingTheAftermath/tree/main) |
+| 1.21.1 | NeoForge 21.1.251 | 21 | [1.21.1](https://github.com/uuzsx/SurvivingTheAftermath/tree/1.21.1) |
+| 1.21.2 | NeoForge 21.2.1-beta | 21 | [1.21.2](https://github.com/uuzsx/SurvivingTheAftermath/tree/1.21.2) |
+| 26.1.1 | NeoForge 26.1.1.15-beta | 25 | [26.1.1](https://github.com/uuzsx/SurvivingTheAftermath/tree/26.1.1) |
+| 26.1.2 | NeoForge 26.1.2.109 | 25 | [26.1.2](https://github.com/uuzsx/SurvivingTheAftermath/tree/26.1.2) |
+| 26.2 | NeoForge 26.2.0.88 | 25 | [26.2](https://github.com/uuzsx/SurvivingTheAftermath/tree/26.2) |
+| 26.3 | NeoForge 26.3.0.16-beta | 25 | [26.3](https://github.com/uuzsx/SurvivingTheAftermath/tree/26.3) |
 
-rc.6 将猪灵装备、副本怪物无掉落和无经验、建筑中心音乐这批修复同步到全部七个目标，并逐版运行游戏测试和客户端音频解码检查。成功重新激活或最后一名玩家离开播放范围时停歌；离开后返回不会续播。详见 [全版本修复说明](docs/ALL-VERSIONS-rc.6.md)。
+## 游玩
 
-同时保留 rc.5 恢复的 8 个物品、10 种附魔、遗物商人、食物效果与交易，以及懦弱的翻译和涨价行为。原代码中的未完成设计见 [内容核对清单](docs/CONTENT-AUDIT-rc.5.md)。
+- 使用 **1 个燧石 + 1 个钻石**无序合成钻石打火石，激活副本；首次与重复挑战都需要它。
+- 每波开始时，建筑部分方块变为下界材质，楼梯保留朝向、上下半部、拐角和含水状态。
+- 副本怪物不掉落物品和经验；胜利时播放音乐并开始发奖，发奖结束后可再次激活。
+- 胜利音乐以建筑中心为声源，在 48 格内随距离衰减。成功重新激活，或最后一名玩家离开范围时停止；回来不会续播。
 
-- 修复实体卡墙生成、战斗保存与恢复、观战玩家恢复、奖励计时、事件取消及装饰木桶战利品等问题。
-- 新增钻石打火石，采用作者提供的贴图；配方为 **1 个燧石 + 1 个钻石**，无序合成。首次和重复挑战都使用该道具。
-- 每波开始变形；胜利时播放一次音乐并开始发奖；发奖完成关门，立即允许再次激活，音乐自然结束。
+## 更新记录
 
-完整说明见 [1.20.1 修复记录](STABILITY.md)、[NeoForge 移植说明](ports/mc-1.21.1/PORTING.md) 和 [验证记录](docs/VALIDATION.md)。
+rc.8 恢复原发布页 Logo 和简介，作者统一为 sxuuz，补全 MIT 许可与新仓库链接，并将七个版本整理成独立分支。保留 rc.7 的全部代码与玩法修复。
 
-## 构建
+- [rc.7 楼梯变形修复](docs/ALL-VERSIONS-rc.7.md)
+- [rc.6 猪灵装备、掉落及空间音乐](docs/ALL-VERSIONS-rc.6.md)
+- [rc.5 物品、附魔、效果与交易恢复](docs/CONTENT-AUDIT-rc.5.md)
+- [稳定性修复历史](STABILITY.md) · [历史验证记录](docs/VALIDATION.md)
+- [rc.8 分支与模组信息说明](docs/BRANCHES-rc.8.md) · [本次验证结果](docs/VALIDATION-rc.8.md)
 
-安装表中对应 Java 版本，在目标工程目录运行：
+## 构建与验证
+
+安装 Java 21，在当前分支根目录运行：
 
 ```powershell
-.\gradlew.bat build
+.\gradlew.bat runGameTestServer clientAudioCheck build
 ```
 
-Linux/macOS 使用 `./gradlew build`。输出位于该工程的 `build/libs/`。GitHub Actions 配置按七个目标分别执行游戏测试、音频解码检查，构建并上传 JAR。
+Linux/macOS 使用 `./gradlew runGameTestServer clientAudioCheck build`。JAR 输出在 `build/libs/`。
+GitHub Actions 对每个分支分别执行 GameTest、客户端音频解码检查和构建。
 
-数据生成与服务端回归测试的运行方式见各版本说明。六个 NeoForge JAR 分别适用于各自的 Minecraft 版本；同一个实例只安装对应的一个 JAR。
+本版本暂未提供 KubeJS 联动；副本及 JSON 数据包功能无需 KubeJS。
 
-## KubeJS 与验证范围
+自动检查不代替图形客户端实玩、真人联机和整合包兼容性验证。各 Minecraft 版本请安装对应 JAR。
 
-KubeJS 为可选依赖。Forge 1.20.1、NeoForge 1.21.1 和 26.1.2 包含并验证了脚本联动；另外四个移植版保留副本及 JSON 数据包功能，暂未提供 KubeJS 联动。
+## 许可
 
-本地构建与服务端 GameTest 已通过，具体数量及条件跳过项见验证记录。候选版尚未完成图形客户端完整游玩、真实多人联机、整合包兼容性及旧 Forge 存档跨版本迁移测试。
+采用 [MIT License](LICENSE.txt)。发行包包含完整许可及原有版权声明。

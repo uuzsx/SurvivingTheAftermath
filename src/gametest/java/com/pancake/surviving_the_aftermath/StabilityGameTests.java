@@ -34,12 +34,12 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.gametest.*;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.gametest.*;
 import java.util.*;
 
 @GameTestHolder(SurvivingTheAftermath.MOD_ID)
@@ -75,8 +75,11 @@ public class StabilityGameTests {
     public static final class Canceller {
         final UUID id;
         Canceller(UUID id) { this.id = id; }
-        @SubscribeEvent public void cancel(AftermathEvent event) {
-            if (event.getAftermath().getUUID().equals(id) && event.isCancelable()) event.setCanceled(true);
+        @SubscribeEvent public void start(AftermathEvent.Start event) { cancel(event); }
+        @SubscribeEvent public void ready(AftermathEvent.Ready event) { cancel(event); }
+        @SubscribeEvent public void celebrating(AftermathEvent.Celebrating event) { cancel(event); }
+        private void cancel(AftermathEvent event) {
+            if (event.getAftermath().getUUID().equals(id) && event instanceof net.neoforged.bus.api.ICancellableEvent cancellable) cancellable.setCanceled(true);
         }
     }
     @GameTest(template = "stability_empty")
@@ -84,7 +87,7 @@ public class StabilityGameTests {
         for (AftermathState state : List.of(AftermathState.START, AftermathState.READY, AftermathState.VICTORY)) {
             BaseRaid raid = raid(h);
             Canceller cancel = new Canceller(raid.getUUID());
-            MinecraftForge.EVENT_BUS.register(cancel);
+            NeoForge.EVENT_BUS.register(cancel);
             try {
                 if (state == AftermathState.START) {
                     check(!MANAGER.create(raid, h.getLevel(), raid.getStartPos(), null), "Cancelled Start registered encounter");
@@ -93,7 +96,7 @@ public class StabilityGameTests {
                     raid.tick();
                 }
                 check(raid.isEnd(), "Cancelled lifecycle continued: " + state);
-            } finally { MinecraftForge.EVENT_BUS.unregister(cancel); raid.end(); }
+            } finally { NeoForge.EVENT_BUS.unregister(cancel); raid.end(); }
         }
         h.succeed();
     }
@@ -137,7 +140,7 @@ public class StabilityGameTests {
             RaidPlayerBattleTracker restored = (RaidPlayerBattleTracker) loaded.getTrackers().get(0);
             check(restored.getDeathMap().get(player) == 2, "UUID-keyed death map lost");
             UUID joined = UUID.randomUUID();
-            MinecraftForge.EVENT_BUS.post(new AftermathEvent.Ongoing(loaded, Set.of(joined), h.getLevel()));
+            NeoForge.EVENT_BUS.post(new AftermathEvent.Ongoing(loaded, Set.of(joined), h.getLevel()));
             check(restored.getPlayers().contains(joined), "Loaded tracker not rebound or registered");
             loaded.tick();
             check(loaded.getEnemies().contains(enemy), "Unloaded enemy treated as dead");
@@ -174,7 +177,7 @@ public class StabilityGameTests {
         BlockPos center = h.absolutePos(new BlockPos(8, 2, 8));
         for (BlockPos p : BlockPos.betweenClosed(center.offset(-1, 0, -1), center.offset(1, 4, 1))) level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
         for (EntityType<? extends Mob> type : List.of(EntityType.HOGLIN, EntityType.MAGMA_CUBE, EntityType.GHAST)) {
-            Mob mob = type.create(level);
+            Mob mob = type.create(level, net.minecraft.world.entity.EntitySpawnReason.EVENT);
             if (mob instanceof MagmaCube magma) magma.setSize(4, true);
             check(SafeSpawn.placeMob(level, mob, Set.of(center), center, 50), "No safe candidate found for " + type);
             check(SafeSpawn.isSafe(level, mob), "Body intersects blocks for " + type);
@@ -182,21 +185,21 @@ public class StabilityGameTests {
         }
         // A fully obstructed search must fail instead of placing an embedded entity.
         BlockPos blocked = h.absolutePos(new BlockPos(8, 2, 8));
-        check(!SafeSpawn.placeMob(level, EntityType.HOGLIN.create(level), Set.of(blocked), blocked, 1), "Blocked spawn accepted");
+        check(!SafeSpawn.placeMob(level, EntityType.HOGLIN.create(level, net.minecraft.world.entity.EntitySpawnReason.EVENT), Set.of(blocked), blocked, 1), "Blocked spawn accepted");
         h.succeed();
     }
 
     @GameTest(template = "stability_empty")
     public static void movementRestrictedOnlyOutsideArena(GameTestHelper h) {
         BaseRaid raid = raid(h); MANAGER.getAftermathMap().put(raid.getUUID(), raid);
-        var mob = EntityType.GHAST.create(h.getLevel()); raid.insertTag(mob);
+        var mob = EntityType.GHAST.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.EVENT); raid.insertTag(mob);
         var tracker = new RaidMobBattleTracker(); tracker.setUUID(raid.getUUID());
         try {
             mob.moveTo(raid.getStartPos().getX(), raid.getStartPos().getY(), raid.getStartPos().getZ());
-            tracker.onLivingRestrictedRange(new LivingEvent.LivingTickEvent(mob));
+            tracker.onLivingRestrictedRange(new EntityTickEvent.Post(mob));
             check(!mob.getPersistentData().contains("restricted_range"), "In-arena movement overridden");
             mob.moveTo(raid.getStartPos().getX() + 55, raid.getStartPos().getY(), raid.getStartPos().getZ());
-            tracker.onLivingRestrictedRange(new LivingEvent.LivingTickEvent(mob));
+            tracker.onLivingRestrictedRange(new EntityTickEvent.Post(mob));
             check(mob.getPersistentData().contains("restricted_range"), "Escaped mob not restricted");
         } finally { MANAGER.getAftermathMap().remove(raid.getUUID()); }
         h.succeed();
@@ -207,7 +210,7 @@ public class StabilityGameTests {
         BaseRaid raid = raid(h);
         var mobs = new ArrayList<Mob>();
         for (boolean original : List.of(false, true)) {
-            var mob = EntityType.ZOMBIE.create(h.getLevel());
+            var mob = EntityType.ZOMBIE.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.EVENT);
             mob.moveTo(h.absolutePos(new BlockPos(original ? 4 : 2, 2, 2)).getCenter());
             h.getLevel().addFreshEntity(mob);
             raid.insertTag(mob); mob.setGlowingTag(original); BattleEntityState.highlight(mob);
@@ -252,12 +255,12 @@ public class StabilityGameTests {
         var template = level.getStructureManager().getOrCreate(id);
         template.fillFromWorld(level, origin, new Vec3i(5, 1, 1), false, Blocks.STRUCTURE_VOID);
         var piece = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), level.getStructureManager(), id, origin, Rotation.NONE);
-        var city = level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ModStructures.CITY);
+        var city = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.CITY).value();
         city.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random,
                 BoundingBox.fromCorners(origin, origin.offset(5, 1, 1)), new ChunkPos(origin), new PiecesContainer(List.of(piece)));
-        check(!level.getBlockEntity(origin).saveWithoutMetadata().contains("LootTable"), "Decorative barrel gained treasure");
-        check(level.getBlockEntity(origin.east(2)).saveWithoutMetadata().getString("LootTable").equals(BuiltInLootTables.DESERT_PYRAMID.toString()), "Treasure chest lost fallback");
-        check(authored.saveWithoutMetadata().getString("LootTable").equals(BuiltInLootTables.SIMPLE_DUNGEON.toString()), "Authored loot table overwritten");
+        check(!level.getBlockEntity(origin).saveWithoutMetadata(level.registryAccess()).contains("LootTable"), "Decorative barrel gained treasure");
+        check(level.getBlockEntity(origin.east(2)).saveWithoutMetadata(level.registryAccess()).getString("LootTable").equals(BuiltInLootTables.DESERT_PYRAMID.location().toString()), "Treasure chest lost fallback");
+        check(authored.saveWithoutMetadata(level.registryAccess()).getString("LootTable").equals(BuiltInLootTables.SIMPLE_DUNGEON.location().toString()), "Authored loot table overwritten");
         h.succeed();
     }
 
@@ -342,10 +345,10 @@ public class StabilityGameTests {
             Set<UUID> ids = Set.of(first.getUUID(), second.getUUID(), survivor.getUUID());
             raid.getPlayers().addAll(ids);
             tracker.updatePlayer(new AftermathEvent.Ongoing(raid, ids, level));
-            tracker.onDeath(new net.minecraftforge.event.entity.living.LivingDeathEvent(first, level.damageSources().generic()));
+            tracker.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(first, level.damageSources().generic()));
             tracker.onPlayerRespawn(new PlayerEvent.PlayerRespawnEvent(first, false));
             check(first.isSpectator(), "Dead teammate did not spectate survivor");
-            tracker.onDeath(new net.minecraftforge.event.entity.living.LivingDeathEvent(second, level.damageSources().generic()));
+            tracker.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(second, level.damageSources().generic()));
             tracker.onPlayerRespawn(new PlayerEvent.PlayerRespawnEvent(second, false));
             check(second.isSpectator(), "Second dead teammate did not spectate");
             check(tracker.getSpectatorMap().values().stream().mapToInt(Set::size).sum() == 2, "Watcher set overwritten");
@@ -368,7 +371,7 @@ public class StabilityGameTests {
 
     @GameTest(template = "stability_empty")
     public static void kubeJsLifecycleCancellation(GameTestHelper h) {
-        if (net.minecraftforge.fml.ModList.get().isLoaded("kubejs")) {
+        if (net.neoforged.fml.ModList.get().isLoaded("kubejs")) {
             for (String phase : List.of("start", "ready", "celebrating")) {
                 var module = module(); module.setName("regression_cancel_" + phase);
                 BaseRaid raid = new BaseRaid(module, h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)));
@@ -403,15 +406,38 @@ public class StabilityGameTests {
         player.moveTo(raid.getStartPos().getX() + 150, raid.getStartPos().getY(), raid.getStartPos().getZ());
         var tracker = new RaidPlayerBattleTracker(); tracker.setUUID(raid.getUUID());
         tracker.getEscapeMap().put(player.getUUID(), level.getGameTime() - 101);
-        var tick = new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END, player);
+        var tick = new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player);
         try {
             tracker.onPlayerEscape(tick);
             check(!tracker.getEscapeMap().containsKey(player.getUUID()), "Escape queue removed battle UUID instead of player UUID");
-            check(player.hasEffect(ModMobEffects.COWARDICE.get()), "Escape effect was not applied");
-            player.removeEffect(ModMobEffects.COWARDICE.get());
+            check(player.hasEffect(ModMobEffects.COWARDICE), "Escape effect was not applied");
+            player.removeEffect(ModMobEffects.COWARDICE);
             tracker.onPlayerEscape(tick);
-            check(!player.hasEffect(ModMobEffects.COWARDICE.get()), "Penalty kept being reapplied");
+            check(!player.hasEffect(ModMobEffects.COWARDICE), "Penalty kept being reapplied");
         } finally { raid.end(); MANAGER.getAftermathMap().remove(raid.getUUID()); }
+        h.succeed();
+    }
+    @GameTest(template = "stability_empty")
+    public static void attachmentSerializationRoundTrip(GameTestHelper h) {
+        var source = new net.neoforged.neoforge.attachment.AttachmentHolder.AsField(h.getLevel());
+        var stageType = com.pancake.surviving_the_aftermath.common.init.ModCapability.STAGE_CAP;
+        source.getData(stageType).getStages().add("regression_saved_stage");
+        source.getData(com.pancake.surviving_the_aftermath.common.init.ModCapability.AFTERMATH_CAP);
+        var original = raid(h);
+        var id = original.getUUID();
+        MANAGER.getAftermathMap().put(id, original);
+
+        var saved = source.serializeAttachments(h.getLevel().registryAccess());
+        check(saved != null && !saved.isEmpty(), "Attachment serializer produced no data");
+        original.end(); MANAGER.tick();
+        var restored = new net.neoforged.neoforge.attachment.AttachmentHolder.AsField(h.getLevel());
+        restored.deserializeInternal(h.getLevel().registryAccess(), saved);
+
+        var loaded = (BaseRaid) MANAGER.getAftermath(id).orElseThrow(() -> new IllegalStateException("Battle lost by NeoForge attachment deserialization"));
+        try {
+            check(restored.getData(stageType).getStages().contains("regression_saved_stage"), "Progression stage lost by NeoForge attachment deserialization");
+            check(loaded.getUUID().equals(id), "Attachment changed battle identity");
+        } finally { loaded.end(); MANAGER.tick(); }
         h.succeed();
     }
 }

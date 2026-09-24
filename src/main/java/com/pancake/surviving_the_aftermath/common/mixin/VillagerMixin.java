@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class VillagerMixin {
     @Inject(method = "updateSpecialPrices", at = @At("RETURN"))
     private void aftermath$cowardicePrices(Player player, CallbackInfo ci) {
-        if (player.hasEffect(ModMobEffects.COWARDICE.get())) {
+        if (player.hasEffect(ModMobEffects.COWARDICE)) {
             var villager = (Villager) (Object) this;
             for (var offer : villager.getOffers()) {
                 // Preserve the historical 36.25% penalty (both effect levels), minimum one item.

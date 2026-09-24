@@ -48,7 +48,7 @@ public class AttributePredicate implements IPredicateModule {
                 .ifPresent(attributeInfo -> {
                     AttributeInstance instance = livingEntity.getAttribute(attributeInfo.attribute());
                     if (instance != null) {
-                        UUID uuid = attributeInfo.attributeModifier().getId();
+                        net.minecraft.resources.ResourceLocation uuid = attributeInfo.attributeModifier().id();
                         if (instance.getModifier(uuid) != null){
                             instance.removeModifier(uuid);
                         }
@@ -64,7 +64,7 @@ public class AttributePredicate implements IPredicateModule {
             attributes.add(WeightedEntry.wrap(instance,weight));
             return this;
         }
-        public Builder add(Attribute attribute, AttributeModifier modifier, int weight){
+        public Builder add(net.minecraft.core.Holder<Attribute> attribute, AttributeModifier modifier, int weight){
             attributes.add(WeightedEntry.wrap(new AttributeWeightedModule.AttributeInfo(attribute,modifier),weight));
             return this;
         }

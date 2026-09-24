@@ -7,7 +7,7 @@ import com.pancake.surviving_the_aftermath.common.init.ModuleRegistry;
 import java.util.function.Supplier;
 
 public interface IConditionModule extends IModule<IConditionModule> {
-    Supplier<Codec<IConditionModule>> CODEC = () -> ModuleRegistry.CONDITION_REGISTRY.get().getCodec()
-            .dispatch("condition", IConditionModule::type, IConditionModule::codec);
+    Supplier<Codec<IConditionModule>> CODEC = () -> ModuleRegistry.CONDITION_REGISTRY.byNameCodec()
+            .dispatch("condition", IConditionModule::type, value -> com.pancake.surviving_the_aftermath.common.util.CodecUtils.mapCodec(value.codec()));
 
 }

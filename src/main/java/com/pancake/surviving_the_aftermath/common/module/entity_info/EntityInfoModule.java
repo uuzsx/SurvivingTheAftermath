@@ -11,7 +11,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -34,23 +34,23 @@ public class EntityInfoModule implements IEntityInfoModule {
     }
 
     @Override
-    public List<LazyOptional<Entity>> spawnEntity(Level level) {
+    public List<Optional<Entity>> spawnEntity(Level level) {
         return spawnEntity(level, net.minecraft.core.BlockPos.ZERO);
     }
 
     @Override
-    public List<LazyOptional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
-        List<LazyOptional<Entity>> arrayList = Lists.newArrayList();
+    public List<Optional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
+        List<Optional<Entity>> arrayList = Lists.newArrayList();
         int amount = amountModule.getSpawnAmount();
         for (int i = 0; i < amount; i++) {
-            Entity entity = entityType.create(level);
+            Entity entity = entityType.create(level, net.minecraft.world.entity.EntitySpawnReason.EVENT);
             if (entity instanceof net.minecraft.world.entity.Mob mob && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 mob.moveTo(net.minecraft.world.phys.Vec3.atCenterOf(origin));
-                net.minecraftforge.event.ForgeEventFactory.onFinalizeSpawn(mob, serverLevel,
-                        serverLevel.getCurrentDifficultyAt(origin), net.minecraft.world.entity.MobSpawnType.EVENT, null, null);
+                net.neoforged.neoforge.event.EventHooks.finalizeMobSpawn(mob, serverLevel,
+                        serverLevel.getCurrentDifficultyAt(origin), net.minecraft.world.entity.EntitySpawnReason.EVENT, null);
                 if (mob.isSpawnCancelled()) {
                     mob.discard();
-                    arrayList.add(LazyOptional.empty());
+                    arrayList.add(Optional.empty());
                     continue;
                 }
                 // Dungeon piglins are combatants. Vanilla can otherwise create unarmed babies.
@@ -63,7 +63,7 @@ public class EntityInfoModule implements IEntityInfoModule {
                     }
                 }
             }
-            arrayList.add(entity == null ? LazyOptional.empty() : LazyOptional.of(() -> entity));
+            arrayList.add(entity == null ? Optional.empty() : Optional.ofNullable(entity));
         }
         return arrayList;
     }
