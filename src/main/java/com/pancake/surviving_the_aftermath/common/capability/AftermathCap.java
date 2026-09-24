@@ -9,22 +9,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class AftermathCap implements INBTSerializable<CompoundTag> {
+public class AftermathCap {
     private static final AftermathManager AFTERMATH_MANAGER = AftermathManager.getInstance();
     private final ServerLevel level;
 
     public AftermathCap(ServerLevel level) { this.level = level;}
 
-    @Override
     public CompoundTag serializeNBT() {
         CompoundTag compoundTag = new CompoundTag();
         AFTERMATH_MANAGER.getAftermathMap().forEach((uuid, aftermath) ->
@@ -36,10 +32,9 @@ public class AftermathCap implements INBTSerializable<CompoundTag> {
         return compoundTag;
     }
 
-    @Override
     public void deserializeNBT(CompoundTag compoundTag) {
-        for (String uuid : compoundTag.getAllKeys()) {
-            CompoundTag tag = compoundTag.getCompound(uuid);
+        for (String uuid : compoundTag.keySet()) {
+            CompoundTag tag = compoundTag.getCompoundOrEmpty(uuid);
             try {
                 AFTERMATH_MANAGER.create(level, UUID.fromString(uuid), tag);
             } catch (IllegalArgumentException exception) {
@@ -48,35 +43,13 @@ public class AftermathCap implements INBTSerializable<CompoundTag> {
         }
     }
 
-    public static LazyOptional<AftermathCap> get(Level level) {
-        return level.getCapability(ModCapability.AFTERMATH_CAP);
+    public static Optional<AftermathCap> get(Level level) {
+        return level instanceof ServerLevel && level.dimension() == Level.OVERWORLD
+                ? Optional.of(level.getData(ModCapability.AFTERMATH_CAP)) : Optional.empty();
     }
 
     public void tick() {
         AFTERMATH_MANAGER.tick();
     }
 
-    public static class Provider implements ICapabilitySerializable<CompoundTag> {
-        private final LazyOptional<AftermathCap> instance;
-
-        public Provider(ServerLevel level) {
-            instance = LazyOptional.of(() -> new AftermathCap(level));
-        }
-
-
-        @Override
-        public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            return ModCapability.AFTERMATH_CAP.orEmpty(cap, instance);
-        }
-
-        @Override
-        public CompoundTag serializeNBT() {
-            return instance.orElseThrow(() -> new IllegalArgumentException("LazyOptional cannot be empty!")).serializeNBT();
-        }
-
-        @Override
-        public void deserializeNBT(CompoundTag nbt) {
-            instance.orElseThrow(() -> new IllegalArgumentException("LazyOptional cannot be empty!")).deserializeNBT(nbt);
-        }
-    }
 }

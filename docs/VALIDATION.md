@@ -30,7 +30,7 @@
 
 Forge 1.20.1：在仓库根目录使用 Java 17，按 [STABILITY.md](../STABILITY.md) 运行。
 
-NeoForge：进入 `ports/mc-<版本>`，使用表中 Java 版本，分两次调用：
+NeoForge：切换到对应 Minecraft 版本分支，在根目录使用表中 Java 版本，分两次调用：
 
 ```powershell
 .\gradlew.bat runData

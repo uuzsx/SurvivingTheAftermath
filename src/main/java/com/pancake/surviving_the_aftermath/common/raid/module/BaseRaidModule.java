@@ -11,7 +11,7 @@ import com.pancake.surviving_the_aftermath.api.module.IEntityInfoModule;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.module.weighted.ItemWeightedModule;
 import com.pancake.surviving_the_aftermath.common.raid.api.IRaidModule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class BaseRaidModule extends BaseAftermathModule implements IRaidModule {
     }
 
     @Override
-    public ResourceLocation getRegistryName() {
+    public Identifier getRegistryName() {
         return SurvivingTheAftermath.asResource(IDENTIFIER);
     }
 

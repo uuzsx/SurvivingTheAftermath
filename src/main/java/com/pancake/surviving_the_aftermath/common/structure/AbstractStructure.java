@@ -2,7 +2,7 @@ package com.pancake.surviving_the_aftermath.common.structure;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -50,7 +50,7 @@ public abstract class AbstractStructure extends Structure {
             pieces.addPiece(new Piece(this.pieceType(), context.structureTemplateManager(), this.location(), pos, rotation));
         });
     }
-    
+
 	@Override
 	public void afterPlace(WorldGenLevel pLevel, StructureManager pStructureManager, ChunkGenerator pChunkGenerator,
 			RandomSource pRandom, BoundingBox pBoundingBox, ChunkPos pChunkPos, PiecesContainer pPieces) {
@@ -63,7 +63,7 @@ public abstract class AbstractStructure extends Structure {
                 for (var info : templatePiece.template().filterBlocks(templatePiece.templatePosition(), settings, block)) {
                     if (!pBoundingBox.isInside(info.pos()) || !pLevel.getBlockState(info.pos()).is(block)) continue;
                     if (pLevel.getBlockEntity(info.pos()) instanceof RandomizableContainerBlockEntity chest
-                            && !chest.saveWithoutMetadata().contains("LootTable") && chest.isEmpty()) {
+                            && !chest.saveWithoutMetadata(pLevel.registryAccess()).contains("LootTable") && chest.isEmpty()) {
                         chest.setLootTable(BuiltInLootTables.DESERT_PYRAMID, pRandom.nextLong());
                     }
                 }
@@ -76,16 +76,16 @@ public abstract class AbstractStructure extends Structure {
 
     public abstract StructurePieceType pieceType();
 
-    public abstract ResourceLocation location();
+    public abstract Identifier location();
 
     public static class Piece extends TemplateStructurePiece {
 
-        public Piece(StructurePieceType type, StructureTemplateManager structureTemplateManager, ResourceLocation location, BlockPos templatePosition, Rotation rotation) {
+        public Piece(StructurePieceType type, StructureTemplateManager structureTemplateManager, Identifier location, BlockPos templatePosition, Rotation rotation) {
             super(type, 0, structureTemplateManager, location, location.toString(), makeSettings(rotation), templatePosition);
         }
 
         public Piece(StructurePieceType type, StructureTemplateManager structureManager, CompoundTag tag) {
-            super(type, tag, structureManager, (location) -> makeSettings(Rotation.valueOf(tag.getString("rot"))));
+            super(type, tag, structureManager, (location) -> makeSettings(Rotation.valueOf(tag.getStringOr("rot", ""))));
         }
 
         public Piece(StructurePieceType type, StructurePieceSerializationContext context, CompoundTag tag) {
@@ -104,7 +104,7 @@ public abstract class AbstractStructure extends Structure {
         private static StructurePlaceSettings makeSettings(Rotation rotation) {
             return new StructurePlaceSettings().setRotation(rotation).setMirror(Mirror.NONE).addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR);
         }
-        
+
     }
-    
+
 }

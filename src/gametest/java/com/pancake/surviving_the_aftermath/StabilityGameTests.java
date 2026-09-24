@@ -23,10 +23,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.*;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
@@ -34,26 +34,26 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.gametest.*;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.gametest.*;
 import java.util.*;
 
-@GameTestHolder(SurvivingTheAftermath.MOD_ID)
-@PrefixGameTestTemplate(false)
+
+
 public class StabilityGameTests {
     private static final AftermathManager MANAGER = AftermathManager.getInstance();
     private static BaseRaidModule module() {
         return new BaseRaidModule("regression", new ItemWeightedModule.Builder().add(Items.APPLE, 1).build(),
-                List.of(), List.of(List.of(new EntityInfoModule(EntityType.ZOMBIE, new IntegerAmountModule(1)))), 7, 13);
+                List.of(), List.of(List.of(new EntityInfoModule(net.minecraft.world.entity.EntityTypes.ZOMBIE, new IntegerAmountModule(1)))), 7, 13);
     }
     private static BaseRaid raid(GameTestHelper h) { return new BaseRaid(module(), h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5))); }
-    private static void check(boolean condition, String message) { if (!condition) throw new GameTestAssertException(message); }
+    private static void check(boolean condition, String message) { if (!condition) throw new GameTestAssertException(net.minecraft.network.chat.Component.literal(message), 0); }
 
-    @GameTest(template = "stability_empty")
+
     public static void serverLifecycleAndRewardTimer(GameTestHelper h) {
         BaseRaid raid = raid(h);
         check(MANAGER.create(raid, h.getLevel(), raid.getStartPos(), null), "Encounter did not start");
@@ -75,16 +75,19 @@ public class StabilityGameTests {
     public static final class Canceller {
         final UUID id;
         Canceller(UUID id) { this.id = id; }
-        @SubscribeEvent public void cancel(AftermathEvent event) {
-            if (event.getAftermath().getUUID().equals(id) && event.isCancelable()) event.setCanceled(true);
+        @SubscribeEvent public void start(AftermathEvent.Start event) { cancel(event); }
+        @SubscribeEvent public void ready(AftermathEvent.Ready event) { cancel(event); }
+        @SubscribeEvent public void celebrating(AftermathEvent.Celebrating event) { cancel(event); }
+        private void cancel(AftermathEvent event) {
+            if (event.getAftermath().getUUID().equals(id) && event instanceof net.neoforged.bus.api.ICancellableEvent cancellable) cancellable.setCanceled(true);
         }
     }
-    @GameTest(template = "stability_empty")
+
     public static void cancelledLifecycleStops(GameTestHelper h) {
         for (AftermathState state : List.of(AftermathState.START, AftermathState.READY, AftermathState.VICTORY)) {
             BaseRaid raid = raid(h);
             Canceller cancel = new Canceller(raid.getUUID());
-            MinecraftForge.EVENT_BUS.register(cancel);
+            NeoForge.EVENT_BUS.register(cancel);
             try {
                 if (state == AftermathState.START) {
                     check(!MANAGER.create(raid, h.getLevel(), raid.getStartPos(), null), "Cancelled Start registered encounter");
@@ -93,12 +96,12 @@ public class StabilityGameTests {
                     raid.tick();
                 }
                 check(raid.isEnd(), "Cancelled lifecycle continued: " + state);
-            } finally { MinecraftForge.EVENT_BUS.unregister(cancel); raid.end(); }
+            } finally { NeoForge.EVENT_BUS.unregister(cancel); raid.end(); }
         }
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void allConditionsAndMissingActor(GameTestHelper h) {
         var module = module();
         BlockPos pos = h.absolutePos(new BlockPos(1, 1, 1));
@@ -112,7 +115,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void savedBattleIdentityAndLegacyUuid(GameTestHelper h) {
         UUID player = UUID.randomUUID(), enemy = UUID.randomUUID(), savedId = UUID.randomUUID();
         RaidPlayerBattleTracker tracker = new RaidPlayerBattleTracker(Set.of(player), Map.of(player, 2),
@@ -128,7 +131,7 @@ public class StabilityGameTests {
         // Legacy UUID elements were compounds; map keys are now proper strings.
         CompoundTag oldPlayer = new CompoundTag(); oldPlayer.putString("uuid", player.toString());
         ListTag legacy = new ListTag(); legacy.add(oldPlayer);
-        saved.getCompound(savedId.toString()).put("players", legacy);
+        saved.getCompoundOrEmpty(savedId.toString()).put("players", legacy);
         cap.deserializeNBT(saved);
         BaseRaid loaded = (BaseRaid) MANAGER.getAftermath(savedId).orElseThrow();
         try {
@@ -137,7 +140,7 @@ public class StabilityGameTests {
             RaidPlayerBattleTracker restored = (RaidPlayerBattleTracker) loaded.getTrackers().get(0);
             check(restored.getDeathMap().get(player) == 2, "UUID-keyed death map lost");
             UUID joined = UUID.randomUUID();
-            MinecraftForge.EVENT_BUS.post(new AftermathEvent.Ongoing(loaded, Set.of(joined), h.getLevel()));
+            NeoForge.EVENT_BUS.post(new AftermathEvent.Ongoing(loaded, Set.of(joined), h.getLevel()));
             check(restored.getPlayers().contains(joined), "Loaded tracker not rebound or registered");
             loaded.tick();
             check(loaded.getEnemies().contains(enemy), "Unloaded enemy treated as dead");
@@ -145,7 +148,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void trackersIgnoreOtherBattles(GameTestHelper h) {
         BaseRaid a = raid(h), b = raid(h);
         RaidPlayerBattleTracker tracker = new RaidPlayerBattleTracker(); tracker.setUUID(a.getUUID());
@@ -157,58 +160,58 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void amountIsDrawnOnce(GameTestHelper h) {
         int[] calls = {0};
         var amount = new IntegerAmountModule(3) {
             @Override public int getSpawnAmount() { calls[0]++; return super.getSpawnAmount(); }
         };
-        var spawned = new EntityInfoModule(EntityType.ZOMBIE, amount).spawnEntity(h.getLevel());
+        var spawned = new EntityInfoModule(net.minecraft.world.entity.EntityTypes.ZOMBIE, amount).spawnEntity(h.getLevel());
         check(spawned.size() == 3 && calls[0] == 1, "Amount sampled during loop");
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void largeMobsSpawnOutsideBlocks(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos center = h.absolutePos(new BlockPos(8, 2, 8));
         for (BlockPos p : BlockPos.betweenClosed(center.offset(-1, 0, -1), center.offset(1, 4, 1))) level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
-        for (EntityType<? extends Mob> type : List.of(EntityType.HOGLIN, EntityType.MAGMA_CUBE, EntityType.GHAST)) {
-            Mob mob = type.create(level);
+        for (EntityType<? extends Mob> type : List.of(net.minecraft.world.entity.EntityTypes.HOGLIN, net.minecraft.world.entity.EntityTypes.MAGMA_CUBE, net.minecraft.world.entity.EntityTypes.GHAST)) {
+            Mob mob = type.create(level, net.minecraft.world.entity.EntitySpawnReason.EVENT);
             if (mob instanceof MagmaCube magma) magma.setSize(4, true);
             check(SafeSpawn.placeMob(level, mob, Set.of(center), center, 50), "No safe candidate found for " + type);
             check(SafeSpawn.isSafe(level, mob), "Body intersects blocks for " + type);
-            if (type == EntityType.GHAST) check(mob.getY() >= center.getY() + 18, "Ghast height overwritten");
+            if (type == net.minecraft.world.entity.EntityTypes.GHAST) check(mob.getY() >= center.getY() + 18, "Ghast height overwritten");
         }
         // A fully obstructed search must fail instead of placing an embedded entity.
         BlockPos blocked = h.absolutePos(new BlockPos(8, 2, 8));
-        check(!SafeSpawn.placeMob(level, EntityType.HOGLIN.create(level), Set.of(blocked), blocked, 1), "Blocked spawn accepted");
+        check(!SafeSpawn.placeMob(level, net.minecraft.world.entity.EntityTypes.HOGLIN.create(level, net.minecraft.world.entity.EntitySpawnReason.EVENT), Set.of(blocked), blocked, 1), "Blocked spawn accepted");
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void movementRestrictedOnlyOutsideArena(GameTestHelper h) {
         BaseRaid raid = raid(h); MANAGER.getAftermathMap().put(raid.getUUID(), raid);
-        var mob = EntityType.GHAST.create(h.getLevel()); raid.insertTag(mob);
+        var mob = net.minecraft.world.entity.EntityTypes.GHAST.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.EVENT); raid.insertTag(mob);
         var tracker = new RaidMobBattleTracker(); tracker.setUUID(raid.getUUID());
         try {
-            mob.moveTo(raid.getStartPos().getX(), raid.getStartPos().getY(), raid.getStartPos().getZ());
-            tracker.onLivingRestrictedRange(new LivingEvent.LivingTickEvent(mob));
+            mob.snapTo(raid.getStartPos().getX(), raid.getStartPos().getY(), raid.getStartPos().getZ());
+            tracker.onLivingRestrictedRange(new EntityTickEvent.Post(mob));
             check(!mob.getPersistentData().contains("restricted_range"), "In-arena movement overridden");
-            mob.moveTo(raid.getStartPos().getX() + 55, raid.getStartPos().getY(), raid.getStartPos().getZ());
-            tracker.onLivingRestrictedRange(new LivingEvent.LivingTickEvent(mob));
+            mob.snapTo(raid.getStartPos().getX() + 55, raid.getStartPos().getY(), raid.getStartPos().getZ());
+            tracker.onLivingRestrictedRange(new EntityTickEvent.Post(mob));
             check(mob.getPersistentData().contains("restricted_range"), "Escaped mob not restricted");
         } finally { MANAGER.getAftermathMap().remove(raid.getUUID()); }
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void endCleansTagsAndPreservesPreviousGlow(GameTestHelper h) {
         BaseRaid raid = raid(h);
         var mobs = new ArrayList<Mob>();
         for (boolean original : List.of(false, true)) {
-            var mob = EntityType.ZOMBIE.create(h.getLevel());
-            mob.moveTo(h.absolutePos(new BlockPos(original ? 4 : 2, 2, 2)).getCenter());
+            var mob = net.minecraft.world.entity.EntityTypes.ZOMBIE.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.EVENT);
+            mob.snapTo(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(new BlockPos(original ? 4 : 2, 2, 2))));
             h.getLevel().addFreshEntity(mob);
             raid.insertTag(mob); mob.setGlowingTag(original); BattleEntityState.highlight(mob);
             mob.getPersistentData().putBoolean("restricted_range", true);
@@ -226,7 +229,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void offlineSpectatorRecovery(GameTestHelper h) {
         var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "recovery_test"));
         player.setGameMode(GameType.ADVENTURE);
@@ -239,7 +242,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void authoredLootAndDecorativeBarrels(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(new BlockPos(2, 2, 2));
@@ -248,23 +251,23 @@ public class StabilityGameTests {
         level.setBlockAndUpdate(origin.east(4), Blocks.CHEST.defaultBlockState());
         var authored = (RandomizableContainerBlockEntity) level.getBlockEntity(origin.east(4));
         authored.setLootTable(BuiltInLootTables.SIMPLE_DUNGEON, 123L);
-        ResourceLocation id = SurvivingTheAftermath.asResource("regression_loot");
-        var template = level.getStructureManager().getOrCreate(id);
-        template.fillFromWorld(level, origin, new Vec3i(5, 1, 1), false, Blocks.STRUCTURE_VOID);
-        var piece = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), level.getStructureManager(), id, origin, Rotation.NONE);
-        var city = level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ModStructures.CITY);
-        city.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random,
-                BoundingBox.fromCorners(origin, origin.offset(5, 1, 1)), new ChunkPos(origin), new PiecesContainer(List.of(piece)));
-        check(!level.getBlockEntity(origin).saveWithoutMetadata().contains("LootTable"), "Decorative barrel gained treasure");
-        check(level.getBlockEntity(origin.east(2)).saveWithoutMetadata().getString("LootTable").equals(BuiltInLootTables.DESERT_PYRAMID.toString()), "Treasure chest lost fallback");
-        check(authored.saveWithoutMetadata().getString("LootTable").equals(BuiltInLootTables.SIMPLE_DUNGEON.toString()), "Authored loot table overwritten");
+        Identifier id = SurvivingTheAftermath.asResource("regression_loot");
+        var template = level.getStructureTemplateManager().getOrCreate(id);
+        template.fillFromWorld(level, origin, new Vec3i(5, 1, 1), false, List.of(Blocks.STRUCTURE_VOID));
+        var piece = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), level.getStructureTemplateManager(), id, origin, Rotation.NONE);
+        var city = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.CITY).value();
+        city.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
+                BoundingBox.fromCorners(origin, origin.offset(5, 1, 1)), ChunkPos.containing(origin), new PiecesContainer(List.of(piece)));
+        check(!level.getBlockEntity(origin).saveWithoutMetadata(level.registryAccess()).contains("LootTable"), "Decorative barrel gained treasure");
+        check(level.getBlockEntity(origin.east(2)).saveWithoutMetadata(level.registryAccess()).getStringOr("LootTable", "").equals(BuiltInLootTables.DESERT_PYRAMID.identifier().toString()), "Treasure chest lost fallback");
+        check(authored.saveWithoutMetadata(level.registryAccess()).getStringOr("LootTable", "").equals(BuiltInLootTables.SIMPLE_DUNGEON.identifier().toString()), "Authored loot table overwritten");
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void reloadReplacesModules(GameTestHelper h) {
         var old = ArrayListMultimap.create(MANAGER.getAftermathModuleMap());
-        var modules = ArrayListMultimap.<ResourceLocation, com.pancake.surviving_the_aftermath.api.module.IAftermathModule>create();
+        var modules = ArrayListMultimap.<Identifier, com.pancake.surviving_the_aftermath.api.module.IAftermathModule>create();
         modules.put(SurvivingTheAftermath.asResource("regression"), module());
         try {
             MANAGER.fillAftermathModuleMap(modules); MANAGER.fillAftermathModuleMap(modules);
@@ -273,7 +276,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void bossBarPacketRoundTrip(GameTestHelper h) {
         UUID id = UUID.randomUUID();
         var packet = new AftermathNetwork.BarPacket(id, NetherRaid.BARS_RESOURCE, new int[]{192, 23, 182, 4, 5, 4});
@@ -288,7 +291,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void netherEventsOnDedicatedServer(GameTestHelper h) {
         NetherRaid raid = new NetherRaid(AftermathState.START, module(), Set.of(), 0f,
                 h.absolutePos(new BlockPos(5, 2, 5)), 7, 13, Set.of(), Set.of(), -1, 0, List.of());
@@ -299,10 +302,10 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void absentAndIneligibleModulesDoNotCrash(GameTestHelper h) {
         var modules = com.pancake.surviving_the_aftermath.common.data.pack.AftermathModuleLoader.AFTERMATH_MODULE_MAP;
-        ResourceLocation key = SurvivingTheAftermath.asResource(BaseRaid.IDENTIFIER);
+        Identifier key = SurvivingTheAftermath.asResource(BaseRaid.IDENTIFIER);
         var old = List.copyOf(modules.get(key));
         try {
             modules.removeAll(key);
@@ -317,7 +320,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void deathRespawnAndEndRestoreSpectators(GameTestHelper h) throws ReflectiveOperationException {
         ServerLevel level = h.getLevel();
         // FakePlayer has a packet sink; register UUID lookups for this synchronous fixture.
@@ -329,7 +332,7 @@ public class StabilityGameTests {
         @SuppressWarnings("unchecked")
         var byId = (Map<UUID, net.minecraft.server.level.ServerPlayer>) field.get(level.getServer().getPlayerList());
         for (var player : List.of(first, second, survivor)) {
-            player.moveTo(h.absolutePos(new BlockPos(5, 2, 5)).getCenter());
+            player.snapTo(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(new BlockPos(5, 2, 5))));
             byId.put(player.getUUID(), player);
             level.addNewPlayer(player);
         }
@@ -342,10 +345,10 @@ public class StabilityGameTests {
             Set<UUID> ids = Set.of(first.getUUID(), second.getUUID(), survivor.getUUID());
             raid.getPlayers().addAll(ids);
             tracker.updatePlayer(new AftermathEvent.Ongoing(raid, ids, level));
-            tracker.onDeath(new net.minecraftforge.event.entity.living.LivingDeathEvent(first, level.damageSources().generic()));
+            tracker.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(first, level.damageSources().generic()));
             tracker.onPlayerRespawn(new PlayerEvent.PlayerRespawnEvent(first, false));
             check(first.isSpectator(), "Dead teammate did not spectate survivor");
-            tracker.onDeath(new net.minecraftforge.event.entity.living.LivingDeathEvent(second, level.damageSources().generic()));
+            tracker.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(second, level.damageSources().generic()));
             tracker.onPlayerRespawn(new PlayerEvent.PlayerRespawnEvent(second, false));
             check(second.isSpectator(), "Second dead teammate did not spectate");
             check(tracker.getSpectatorMap().values().stream().mapToInt(Set::size).sum() == 2, "Watcher set overwritten");
@@ -366,9 +369,9 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void kubeJsLifecycleCancellation(GameTestHelper h) {
-        if (net.minecraftforge.fml.ModList.get().isLoaded("kubejs")) {
+        if (net.neoforged.fml.ModList.get().isLoaded("kubejs")) {
             for (String phase : List.of("start", "ready", "celebrating")) {
                 var module = module(); module.setName("regression_cancel_" + phase);
                 BaseRaid raid = new BaseRaid(module, h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)));
@@ -380,7 +383,7 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void missingEnemyDoesNotCompleteOccupiedWave(GameTestHelper h) {
         UUID enemy = UUID.randomUUID();
         BaseRaid raid = new BaseRaid(AftermathState.ONGOING, module(), Set.of(UUID.randomUUID()), 1f,
@@ -394,24 +397,48 @@ public class StabilityGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void escapedPlayerIsRemovedFromPenaltyQueue(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BaseRaid raid = raid(h);
         MANAGER.getAftermathMap().put(raid.getUUID(), raid);
         var player = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "escape_test"));
-        player.moveTo(raid.getStartPos().getX() + 150, raid.getStartPos().getY(), raid.getStartPos().getZ());
+        player.snapTo(raid.getStartPos().getX() + 150, raid.getStartPos().getY(), raid.getStartPos().getZ());
         var tracker = new RaidPlayerBattleTracker(); tracker.setUUID(raid.getUUID());
         tracker.getEscapeMap().put(player.getUUID(), level.getGameTime() - 101);
-        var tick = new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END, player);
+        var tick = new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player);
         try {
             tracker.onPlayerEscape(tick);
             check(!tracker.getEscapeMap().containsKey(player.getUUID()), "Escape queue removed battle UUID instead of player UUID");
-            check(player.hasEffect(ModMobEffects.COWARDICE.get()), "Escape effect was not applied");
-            player.removeEffect(ModMobEffects.COWARDICE.get());
+            check(player.hasEffect(ModMobEffects.COWARDICE), "Escape effect was not applied");
+            player.removeEffect(ModMobEffects.COWARDICE);
             tracker.onPlayerEscape(tick);
-            check(!player.hasEffect(ModMobEffects.COWARDICE.get()), "Penalty kept being reapplied");
+            check(!player.hasEffect(ModMobEffects.COWARDICE), "Penalty kept being reapplied");
         } finally { raid.end(); MANAGER.getAftermathMap().remove(raid.getUUID()); }
+        h.succeed();
+    }
+    public static void attachmentSerializationRoundTrip(GameTestHelper h) {
+        var source = new net.neoforged.neoforge.attachment.AttachmentHolder.AsField(h.getLevel());
+        var stageType = com.pancake.surviving_the_aftermath.common.init.ModCapability.STAGE_CAP;
+        source.getData(stageType).getStages().add("regression_saved_stage");
+        source.getData(com.pancake.surviving_the_aftermath.common.init.ModCapability.AFTERMATH_CAP);
+        var original = raid(h);
+        var id = original.getUUID();
+        MANAGER.getAftermathMap().put(id, original);
+
+        var output = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
+        source.serializeAttachments(output);
+        var saved = output.buildResult();
+        check(!saved.isEmpty(), "Attachment serializer produced no data");
+        original.end(); MANAGER.tick();
+        var restored = new net.neoforged.neoforge.attachment.AttachmentHolder.AsField(h.getLevel());
+        restored.deserializeInternal(h.getLevel().registryAccess(), net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess(), saved));
+
+        var loaded = (BaseRaid) MANAGER.getAftermath(id).orElseThrow(() -> new IllegalStateException("Battle lost by NeoForge attachment deserialization"));
+        try {
+            check(restored.getData(stageType).getStages().contains("regression_saved_stage"), "Progression stage lost by NeoForge attachment deserialization");
+            check(loaded.getUUID().equals(id), "Attachment changed battle identity");
+        } finally { loaded.end(); MANAGER.tick(); }
         h.succeed();
     }
 }

@@ -5,7 +5,7 @@ import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.init.ModStructurePieceTypes;
 import com.pancake.surviving_the_aftermath.common.init.ModStructureTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 public class NetherRaidStructure extends AbstractStructure {
 
 
-	public static final ResourceLocation STRUCTURE_TRANSFORMED = SurvivingTheAftermath.asResource("nether_invasion_portal_transformed");
+	public static final Identifier STRUCTURE_TRANSFORMED = SurvivingTheAftermath.asResource("nether_invasion_portal_transformed");
 
 	public NetherRaidStructure(StructureSettings settings) {
 		super(settings);
@@ -30,7 +30,7 @@ public class NetherRaidStructure extends AbstractStructure {
 	}
 
 	@Override
-	public ResourceLocation location() {
+	public Identifier location() {
 		return SurvivingTheAftermath.asResource("nether_invasion_portal");
 	}
 

@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.pancake.surviving_the_aftermath.api.module.IAftermathModule;
 import com.pancake.surviving_the_aftermath.common.init.ModuleRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -16,10 +16,10 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public interface IAftermath extends IModule<IAftermath> {
-    Supplier<Codec<IAftermath>> CODEC = () -> ModuleRegistry.AFTERMATH_REGISTRY.get().getCodec()
-            .dispatch("aftermath", IAftermath::type, IAftermath::codec);
-    ResourceLocation getRegistryName();
-    ResourceLocation getBarsResource();
+    Supplier<Codec<IAftermath>> CODEC = () -> ModuleRegistry.AFTERMATH_REGISTRY.byNameCodec()
+            .dispatch("aftermath", IAftermath::type, value -> com.pancake.surviving_the_aftermath.common.util.CodecUtils.mapCodec(value.codec()));
+    Identifier getRegistryName();
+    Identifier getBarsResource();
 
     int[] getBarsOffset();
 

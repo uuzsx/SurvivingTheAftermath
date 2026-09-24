@@ -7,16 +7,16 @@ import com.pancake.surviving_the_aftermath.common.config.AftermathConfig;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.util.BattleEntityState;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class MobBattleTracker extends BaseTracker {
-    @SubscribeEvent public void onLivingAddHighlight(LivingEvent.LivingTickEvent event) {
+    @SubscribeEvent public void onLivingAddHighlight(EntityTickEvent.Post event) {
         Entity entity = event.getEntity();
-        if (!entity.level().isClientSide && AftermathConfig.enableMobBattleTrackerHighlight.get()
+        if (!entity.level().isClientSide() && AftermathConfig.enableMobBattleTrackerHighlight.get()
                 && BattleEntityState.belongsTo(entity, uuid)) BattleEntityState.highlight(entity);
     }
     @SubscribeEvent(priority = EventPriority.LOWEST) public void death(LivingDeathEvent event) { remove(event.getEntity()); }
@@ -25,9 +25,9 @@ public class MobBattleTracker extends BaseTracker {
         if (entity.getRemovalReason() != null && entity.getRemovalReason().shouldDestroy()) remove(entity);
     }
     private void remove(Entity entity) {
-        if (entity.level().isClientSide || !BattleEntityState.belongsTo(entity, uuid)) return;
+        if (entity.level().isClientSide() || !BattleEntityState.belongsTo(entity, uuid)) return;
         manager.getAftermath(uuid).ifPresent(a -> a.getEnemies().remove(entity.getUUID()));
     }
-    @Override public Codec<? extends ITracker> codec() { return Codec.unit(MobBattleTracker::new); }
+    @Override public Codec<? extends ITracker> codec() { return com.mojang.serialization.MapCodec.unit(MobBattleTracker::new).codec(); }
     @Override public ITracker type() { return ModAftermathModule.MOB_BATTLE_TRACKER.get(); }
 }

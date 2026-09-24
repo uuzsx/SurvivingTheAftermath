@@ -25,7 +25,7 @@ import com.pancake.surviving_the_aftermath.common.util.SafeSpawn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -37,7 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -155,8 +155,8 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
     private void spawnEntities(IEntityInfoModule entityInfoModule) {
         if (players.isEmpty() || isEnd()) return;
-        List<LazyOptional<Entity>> arrayList = entityInfoModule.spawnEntity(level, startPos);
-        for (LazyOptional<Entity> lazyOptional : arrayList) {
+        List<Optional<Entity>> arrayList = entityInfoModule.spawnEntity(level, startPos);
+        for (Optional<Entity> lazyOptional : arrayList) {
             lazyOptional.ifPresent(entity -> {
                 if (entity instanceof Mob mob && !isEnd()) {
                     setMobSpawn(level,mob);
@@ -171,10 +171,10 @@ public class BaseRaid extends BaseAftermath implements IRaid {
         Direction dir = Direction.Plane.HORIZONTAL.stream().filter(d -> level.isEmptyBlock(blockPos.relative(d))
                 && !spawnPos.contains(blockPos.relative(d))).findFirst().orElse(Direction.UP);
         Vec3 vec = Vec3.atCenterOf(blockPos);
-        getModule().getRewards().getWeightedList().getRandomValue(level.random).ifPresent(reward -> {
+        getModule().getRewards().getWeightedList().getRandom(level.getRandom()).ifPresent(reward -> {
             ItemEntity itemEntity = new ItemEntity(level, vec.x, vec.y, vec.z, new ItemStack(reward),
                     dir.getStepX() * 0.2, 0.2, dir.getStepZ() * 0.2f);
-            itemEntity.setInvulnerable(true);
+            itemEntity.setPermanentlyInvulnerable(true);
             level.addFreshEntity(itemEntity);
         });
     }
@@ -217,7 +217,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
     public Player randomPlayersUnderAttack(){
         List<Player> targets = players.stream().map(level::getPlayerByUUID)
                 .filter(Objects::nonNull).filter(player -> player.isAlive() && !player.isSpectator()).toList();
-        return targets.isEmpty() ? null : targets.get(level.random.nextInt(targets.size()));
+        return targets.isEmpty() ? null : targets.get(level.getRandom().nextInt(targets.size()));
     }
 
     public boolean join(Entity entity) {
@@ -274,7 +274,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
                     .map(condition -> (StructureConditionModule) condition)
                     .findFirst();
             if (module.isPresent()){
-                StructureUtils.handleDataMarker(serverLevel, startPos, module.get().getResourceLocation(), (serverLevel1, metadata, blockInfo, startPos1) -> {
+                StructureUtils.handleDataMarker(serverLevel, startPos, module.get().getIdentifier(), (serverLevel1, metadata, blockInfo, startPos1) -> {
                     this.startPos = startPos1;
                     BlockPos metaPos = blockInfo.pos();
                     setMobSpawnPos(serverLevel1,metadata,startPos1,metaPos);
@@ -332,7 +332,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
 
     @Override
-    public ResourceLocation getRegistryName() {
+    public Identifier getRegistryName() {
         return SurvivingTheAftermath.asResource(IDENTIFIER);
     }
 
@@ -351,16 +351,16 @@ public class BaseRaid extends BaseAftermath implements IRaid {
     public void insertTag(LivingEntity entity){
         if (entity instanceof Mob mob) com.pancake.surviving_the_aftermath.common.util.RaidMobLoot.mark(mob);
         entity.getPersistentData().put(IDENTIFIER, StringTag.valueOf("enemies"));
-        entity.getPersistentData().putUUID("raid_uuid", this.uuid);
+        entity.getPersistentData().store("raid_uuid", net.minecraft.core.UUIDUtil.CODEC, this.uuid);
 
         if (entity instanceof Player player){
             player.getPersistentData().put(IDENTIFIER, StringTag.valueOf("players"));
-            player.getPersistentData().putUUID("raid_uuid", this.uuid);
+            player.getPersistentData().store("raid_uuid", net.minecraft.core.UUIDUtil.CODEC, this.uuid);
         }
     }
 
     @Override
-    public ResourceLocation getBarsResource() {
+    public Identifier getBarsResource() {
         return null;
     }
 

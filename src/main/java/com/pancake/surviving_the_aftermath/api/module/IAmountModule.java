@@ -7,8 +7,8 @@ import com.pancake.surviving_the_aftermath.common.init.ModuleRegistry;
 import java.util.function.Supplier;
 
 public interface IAmountModule extends IModule<IAmountModule> {
-    Supplier<Codec<IAmountModule>> CODEC = () -> ModuleRegistry.AMOUNT_REGISTRY.get().getCodec()
-            .dispatch("amount", IAmountModule::type, IAmountModule::codec);
+    Supplier<Codec<IAmountModule>> CODEC = () -> ModuleRegistry.AMOUNT_REGISTRY.byNameCodec()
+            .dispatch("amount", IAmountModule::type, value -> com.pancake.surviving_the_aftermath.common.util.CodecUtils.mapCodec(value.codec()));
     int getSpawnAmount();
 
 

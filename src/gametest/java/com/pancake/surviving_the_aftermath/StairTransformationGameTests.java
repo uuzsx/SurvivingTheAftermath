@@ -13,11 +13,9 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import java.util.List;
 
-@net.minecraftforge.gametest.GameTestHolder(SurvivingTheAftermath.MOD_ID)
-@net.minecraftforge.gametest.PrefixGameTestTemplate(false)
 public final class StairTransformationGameTests {
     private static void check(boolean value, String message) {
-        if (!value) throw new GameTestAssertException(message);
+        if (!value) throw new GameTestAssertException(Component.literal(message), 0);
     }
     private static RandomSource selection(boolean change) {
         return new LegacyRandomSource(0) { @Override public float nextFloat() { return change ? 0.95F : 0.5F; } };
@@ -25,7 +23,7 @@ public final class StairTransformationGameTests {
     private static StructureTemplate template(ServerLevel level, BlockPos source, Block material) {
         level.setBlock(source, material.defaultBlockState(), 18);
         var template = new StructureTemplate();
-        template.fillFromWorld(level, source, new Vec3i(1, 1, 1), false, Blocks.STRUCTURE_VOID);
+        template.fillFromWorld(level, source, new Vec3i(1, 1, 1), false, List.of(Blocks.STRUCTURE_VOID));
         level.setBlock(source, Blocks.AIR.defaultBlockState(), 18);
         return template;
     }
@@ -41,7 +39,6 @@ public final class StairTransformationGameTests {
         check(expected.getValue(StairBlock.SHAPE).equals(actual.getValue(StairBlock.SHAPE)), context + ": SHAPE changed");
         check(expected.getValue(StairBlock.WATERLOGGED).equals(actual.getValue(StairBlock.WATERLOGGED)), context + ": WATERLOGGED changed");
     }
-    @GameTest(template = "stability_empty")
     public static void skippedBlocksKeepWorldState(GameTestHelper h) {
         var level = h.getLevel();
         var source = h.absolutePos(new BlockPos(1, 3, 1));
@@ -67,7 +64,6 @@ public final class StairTransformationGameTests {
         level.setBlock(target, Blocks.AIR.defaultBlockState(), 18);
         h.succeed();
     }
-    @GameTest(template = "stability_empty")
     public static void convertedStairsKeepProperties(GameTestHelper h) {
         var level = h.getLevel();
         var source = h.absolutePos(new BlockPos(1, 3, 1));
@@ -90,7 +86,6 @@ public final class StairTransformationGameTests {
         level.setBlock(target, Blocks.AIR.defaultBlockState(), 18);
         h.succeed();
     }
-    @GameTest(template = "stability_empty")
     public static void mixedWavesKeepStairGeometry(GameTestHelper h) {
         var level = h.getLevel();
         var source = h.absolutePos(new BlockPos(1, 3, 1));

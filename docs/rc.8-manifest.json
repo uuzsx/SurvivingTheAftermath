@@ -1,0 +1,91 @@
+{
+  "version": "0.0.4-rc.8",
+  "repository": "https://github.com/uuzsx/SurvivingTheAftermath",
+  "artifacts": [
+    {
+      "minecraft": "1.20.1",
+      "branch": "main",
+      "loader": "Forge 47.2.1",
+      "java": 17,
+      "game_test_total": 40,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-1.20.1-0.0.4-rc.8.jar",
+      "bytes": 3172474,
+      "sha256": "e1e418216f42a7f85ce71714af354d17b86390fa87d83ae9cdc7f973bfbd563e"
+    },
+    {
+      "minecraft": "1.21.1",
+      "branch": "1.21.1",
+      "loader": "NeoForge 21.1.251",
+      "java": 21,
+      "game_test_total": 41,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.8.jar",
+      "bytes": 3167498,
+      "sha256": "4f34a3ec65b23da19b7ce193602906358df39441ff433800ebdeeaeaea65483e"
+    },
+    {
+      "minecraft": "1.21.2",
+      "branch": "1.21.2",
+      "loader": "NeoForge 21.2.1-beta",
+      "java": 21,
+      "game_test_total": 41,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.8.jar",
+      "bytes": 3154852,
+      "sha256": "4032b9db0edbc5e1de67db9f055a6ef8310ad06854a272bc40bb8159cfcb77b6"
+    },
+    {
+      "minecraft": "26.1.1",
+      "branch": "26.1.1",
+      "loader": "NeoForge 26.1.1.15-beta",
+      "java": 25,
+      "game_test_total": 42,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.8.jar",
+      "bytes": 3159480,
+      "sha256": "e2ddedde5c4e8511ed302dfd6d851c10e11368d95b694a7fc1271ce8ef3daf9d"
+    },
+    {
+      "minecraft": "26.1.2",
+      "branch": "26.1.2",
+      "loader": "NeoForge 26.1.2.109",
+      "java": 25,
+      "game_test_total": 42,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.8.jar",
+      "bytes": 3173830,
+      "sha256": "0447b2681a2308dd6ebad0035f2fa80b212a8afb6c586712d883c614f311d796"
+    },
+    {
+      "minecraft": "26.2",
+      "branch": "26.2",
+      "loader": "NeoForge 26.2.0.88",
+      "java": 25,
+      "game_test_total": 42,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.8.jar",
+      "bytes": 3159595,
+      "sha256": "7a420ee1cf294a056a354f3caac2734eb894f1d13d0d1b81fa65107c2ce399f5"
+    },
+    {
+      "minecraft": "26.3",
+      "branch": "26.3",
+      "loader": "NeoForge 26.3.0.16-beta",
+      "java": 25,
+      "game_test_total": 42,
+      "client_audio_cases": 6,
+      "logo_decoded": true,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.8.jar",
+      "bytes": 3158731,
+      "sha256": "b1fda898a8a993a1c3ed409dcf379034a75ae80f9542cfcdd13df4eaef9d4c08"
+    }
+  ],
+  "test_notes": "Base GameTest runs have one conditional KubeJS test whose body skips without KubeJS; 26.x totals include one vanilla test. Gameplay source and assets match rc.7. No manual graphical or multiplayer playtest."
+}

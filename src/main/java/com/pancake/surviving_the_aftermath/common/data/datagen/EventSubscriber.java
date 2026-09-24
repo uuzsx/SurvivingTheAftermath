@@ -4,29 +4,29 @@ import com.pancake.surviving_the_aftermath.common.data.datagen.raid.RaidModulePr
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
+
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
 
 public class EventSubscriber {
 
-	public static void onGatherData(GatherDataEvent event) {
+	public static void onGatherData(GatherDataEvent.Client event) {
 		DataGenerator generator = event.getGenerator();
 		PackOutput output = generator.getPackOutput();
-		ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-		CompletableFuture<HolderLookup.Provider> provider = event.getLookupProvider();
-		generator.addProvider(event.includeServer(), new ModTagProviders.ModBiomeTagsProvider(output, provider, existingFileHelper));
-		generator.addProvider(event.includeServer(), new ModTagProviders.ModStructureTagsProvider(output, provider, existingFileHelper));
-		generator.addProvider(event.includeServer(), new RaidModuleProvider(output));
-		generator.addProvider(event.includeServer(), new RegistryDataGenerator(output, provider));
-		generator.addProvider(event.includeServer(), new ModRecipeProvider(output));
-		generator.addProvider(event.includeClient(), new ModItemModelProvider(output, existingFileHelper));
 
-		generator.addProvider(event.includeClient(), new ModLanguageCNProvider(output));
-		generator.addProvider(event.includeClient(), new ModLanguageProvider(output));
+		CompletableFuture<HolderLookup.Provider> provider = event.getWorldLookupProvider();
+		generator.addProvider(true, new ModTagProviders.ModBiomeTagsProvider(output, provider));
+		generator.addProvider(true, new ModTagProviders.ModStructureTagsProvider(output, provider));
+		generator.addProvider(true, new RaidModuleProvider(output));
+		event.createWorldRegistryObjects(RegistryDataGenerator.BUILDER);
+		event.createReloadableRegistryObjects(new net.minecraft.core.RegistrySetBuilder().add(net.minecraft.data.recipes.RecipeProvider.asBootstrap(ModRecipeProvider::new)));
+		generator.addProvider(true, new ModItemModelProvider(output));
 
-		generator.addProvider(event.includeClient(), new ModSoundProvider(output, existingFileHelper));
+		generator.addProvider(true, new ModLanguageCNProvider(output));
+		generator.addProvider(true, new ModLanguageProvider(output));
+
+		generator.addProvider(true, new ModSoundProvider(output));
 	}
 
 }

@@ -2,7 +2,7 @@ package com.pancake.surviving_the_aftermath;
 
 import com.pancake.surviving_the_aftermath.client.OffsetAudioStream;
 import net.minecraft.client.sounds.AudioStream;
-import com.mojang.blaze3d.audio.OggAudioStream;
+import net.minecraft.client.sounds.JOrbisAudioStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 /** Uses Minecraft's actual client decoder without opening a game window or an audio device. */
 public final class ClientAudioCheck {
     private static AudioStream stream() throws Exception {
-        return new OggAudioStream(ClientAudioCheck.class.getResourceAsStream("/assets/surviving_the_aftermath/sounds/orchelias_vox.ogg"));
+        return new JOrbisAudioStream(ClientAudioCheck.class.getResourceAsStream("/assets/surviving_the_aftermath/sounds/orchelias_vox.ogg"));
     }
     private static byte[] readAll(AudioStream stream) throws Exception {
         var output = new ByteArrayOutputStream();

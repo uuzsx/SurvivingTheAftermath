@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.pancake.surviving_the_aftermath.api.module.IPredicateModule;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.module.weighted.AttributeWeightedModule;
-import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -44,11 +44,11 @@ public class AttributePredicate implements IPredicateModule {
 
     @Override
     public void apply(LivingEntity livingEntity) {
-        attribute.getWeightedList().getRandomValue(livingEntity.getRandom())
+        attribute.getWeightedList().getRandom(livingEntity.getRandom())
                 .ifPresent(attributeInfo -> {
                     AttributeInstance instance = livingEntity.getAttribute(attributeInfo.attribute());
                     if (instance != null) {
-                        UUID uuid = attributeInfo.attributeModifier().getId();
+                        net.minecraft.resources.Identifier uuid = attributeInfo.attributeModifier().id();
                         if (instance.getModifier(uuid) != null){
                             instance.removeModifier(uuid);
                         }
@@ -58,14 +58,14 @@ public class AttributePredicate implements IPredicateModule {
     }
 
     public static class Builder {
-        private final List<WeightedEntry.Wrapper<AttributeWeightedModule.AttributeInfo>> attributes = Lists.newArrayList();
+        private final List<Weighted<AttributeWeightedModule.AttributeInfo>> attributes = Lists.newArrayList();
 
         public Builder add(AttributeWeightedModule.AttributeInfo instance, int weight){
-            attributes.add(WeightedEntry.wrap(instance,weight));
+            attributes.add(new Weighted<>(instance,weight));
             return this;
         }
-        public Builder add(Attribute attribute, AttributeModifier modifier, int weight){
-            attributes.add(WeightedEntry.wrap(new AttributeWeightedModule.AttributeInfo(attribute,modifier),weight));
+        public Builder add(net.minecraft.core.Holder<Attribute> attribute, AttributeModifier modifier, int weight){
+            attributes.add(new Weighted<>(new AttributeWeightedModule.AttributeInfo(attribute,modifier),weight));
             return this;
         }
         public AttributePredicate build(){

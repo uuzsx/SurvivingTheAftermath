@@ -4,20 +4,20 @@ import com.mojang.serialization.Codec;
 import com.pancake.surviving_the_aftermath.api.module.IWeightedModule;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.util.CodecUtils;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
 
 public class EffectWeightedModule extends BaseWeightedModule<MobEffectInstance> {
     public static final String IDENTIFIER = "effect_weighted";
 
-    public static final Codec<EffectWeightedModule> CODEC = Codec.list(WeightedEntry.Wrapper.codec(CodecUtils.MOB_EFFECT_INSTANCE_CODEC))
+    public static final Codec<EffectWeightedModule> CODEC = Codec.list(Weighted.codec(CodecUtils.MOB_EFFECT_INSTANCE_CODEC))
             .xmap(EffectWeightedModule::new, EffectWeightedModule::getList);
 
-    public EffectWeightedModule(List<WeightedEntry.Wrapper<MobEffectInstance>> list) {
+    public EffectWeightedModule(List<Weighted<MobEffectInstance>> list) {
         super(list);
     }
 
@@ -35,14 +35,14 @@ public class EffectWeightedModule extends BaseWeightedModule<MobEffectInstance> 
     }
 
     public static class Builder {
-        private List<WeightedEntry.Wrapper<MobEffectInstance>> effects;
+        private List<Weighted<MobEffectInstance>> effects;
 
         public Builder add(MobEffectInstance effect, int weight){
-            effects.add(WeightedEntry.wrap(effect, weight));
+            effects.add(new Weighted<>(effect, weight));
             return this;
         }
         public Builder add(String effect, int duration, int amplifier, int weight){
-            effects.add(WeightedEntry.wrap(new MobEffectInstance(ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.tryParse(effect)), duration, amplifier), weight));
+            effects.add(new Weighted<>(new MobEffectInstance(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.get(Identifier.parse(effect)).orElseThrow(), duration, amplifier), weight));
             return this;
         }
 

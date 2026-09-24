@@ -17,11 +17,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import java.util.*;
 
 public class RaidPlayerBattleTracker extends BaseTracker {
@@ -103,8 +104,8 @@ public class RaidPlayerBattleTracker extends BaseTracker {
             List<ServerPlayer> survivors = players.stream().map(id -> battle.level.getServer().getPlayerList().getPlayer(id))
                     .filter(p -> p != null && p.level() == battle.level && p.isAlive() && !p.isSpectator() && p != player).toList();
             if (!survivors.isEmpty()) {
-                player.displayClientMessage(Component.translatable(PLAYER_BATTLE_PERSONAL_FAIL), true);
-                setSpectator(player, survivors.get(battle.level.random.nextInt(survivors.size())), battle.level);
+                player.sendSystemMessage(Component.translatable(PLAYER_BATTLE_PERSONAL_FAIL), true);
+                setSpectator(player, survivors.get(battle.level.getRandom().nextInt(survivors.size())), battle.level);
                 return;
             }
             if (deathMap.get(player.getUUID()) >= MAX_DEATH_COUNT || !spectatorMap.isEmpty()) {
@@ -118,8 +119,8 @@ public class RaidPlayerBattleTracker extends BaseTracker {
     }
 
     @SubscribeEvent
-    public void onPlayerEscape(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer player)) return;
+    public void onPlayerEscape(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
         UUID playerId = player.getUUID();
         if (!escapeMap.containsKey(playerId)) return;
         manager.getAftermath(uuid).filter(a -> a instanceof BaseAftermath && a instanceof IRaid).ifPresent(aftermath -> {
@@ -128,13 +129,13 @@ public class RaidPlayerBattleTracker extends BaseTracker {
             long time = battle.level.getGameTime() - escapeMap.get(playerId);
             double distance = player.level() == battle.level ? Math.sqrt(battle.getStartPos().distSqr(player.blockPosition())) : Double.POSITIVE_INFINITY;
             if (time > 20 * 5) {
-                player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE.get(), 45 * 60 * 20));
+                player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE, 45 * 60 * 20));
                 if (distance > 120) {
-                    player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE.get(), 45 * 60 * 20, 1));
+                    player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE, 45 * 60 * 20, 1));
                     escapeMap.remove(playerId);
                     restorePlayerGameMode(battle.level);
                 }
-            } else player.displayClientMessage(Component.translatable(PLAYER_BATTLE_ESCAPE, 20 * 5 - time), true);
+            } else player.sendSystemMessage(Component.translatable(PLAYER_BATTLE_ESCAPE, 20 * 5 - time), true);
         });
     }
 
@@ -166,7 +167,7 @@ public class RaidPlayerBattleTracker extends BaseTracker {
         for (UUID id : watchers) {
             ServerPlayer watcher = level.getServer().getPlayerList().getPlayer(id);
             if (watcher != null) {
-                if (watcher.level() != level) watcher.teleportTo(level, target.getX(), target.getY(), target.getZ(), watcher.getYRot(), watcher.getXRot());
+                if (watcher.level() != level) watcher.teleportTo(level, target.getX(), target.getY(), target.getZ(), java.util.Set.of(), watcher.getYRot(), watcher.getXRot(), true);
                 watcher.setGameMode(GameType.SPECTATOR);
                 watcher.setCamera(target);
             }

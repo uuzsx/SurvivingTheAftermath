@@ -13,11 +13,12 @@ public class ModBiomesMaker {
         Biome.BiomeBuilder biomeBuilder = new Biome.BiomeBuilder();
         BiomeSpecialEffects.Builder effects = new BiomeSpecialEffects.Builder();
         MobSpawnSettings.Builder spawnInfo = new MobSpawnSettings.Builder();
-        effects.waterColor(4159204).waterFogColor(329011).fogColor(12638463)
-                .skyColor(calculateSkyColor(2.0F))
-                .ambientParticle(new AmbientParticleSettings(ParticleTypes.WHITE_ASH, 0.118093334F));
-        spawnInfo.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(
-                EntityType.ZOMBIFIED_PIGLIN, 100, 4, 4));
+        effects.waterColor(4159204);
+        biomeBuilder.setAttribute(net.minecraft.world.attribute.EnvironmentAttributes.WATER_FOG_COLOR, net.minecraft.util.ARGB.vector3fFromRGB24(329011))
+            .setAttribute(net.minecraft.world.attribute.EnvironmentAttributes.FOG_COLOR, net.minecraft.util.ARGB.vector3fFromRGB24(12638463))
+            .setAttribute(net.minecraft.world.attribute.EnvironmentAttributes.SKY_COLOR, net.minecraft.util.ARGB.vector3fFromRGB24(calculateSkyColor(2.0F)))
+            .setAttribute(net.minecraft.world.attribute.EnvironmentAttributes.AMBIENT_PARTICLES, net.minecraft.world.attribute.AmbientParticle.of(ParticleTypes.WHITE_ASH, 0.118093334F));
+        spawnInfo.addSpawn(net.minecraft.world.entity.EntityTypes.ZOMBIFIED_PIGLIN, 100, 4, 4);
         BiomeDefaultFeatures.commonSpawns(spawnInfo);
         biomeBuilder.hasPrecipitation(true).temperature(0.8F).downfall(0.9F)
                 .specialEffects(effects.build()).mobSpawnSettings(spawnInfo.build()).generationSettings(builder.build())
