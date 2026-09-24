@@ -31,6 +31,11 @@ public abstract class AbstractStructure extends Structure {
         super(settings);
     }
 
+    // Use the same specialized piece for fresh generation and saved-start reloads.
+    protected Piece createPiece(StructureTemplateManager manager, BlockPos origin, Rotation rotation) {
+        return new Piece(this.pieceType(), manager, this.location(), origin, rotation);
+    }
+
     @Override
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
         Rotation rotation = Rotation.getRandom(context.random());
@@ -38,7 +43,7 @@ public abstract class AbstractStructure extends Structure {
         int groundOffset = SurfaceStructurePlacement.groundOffset(this.location().getPath());
         return SurfaceStructurePlacement.findOrigin(context, template, rotation, groundOffset).map(origin ->
                 new GenerationStub(new BlockPos(context.chunkPos().getMiddleBlockX(), origin.getY(), context.chunkPos().getMiddleBlockZ()),
-                        pieces -> pieces.addPiece(new Piece(this.pieceType(), context.structureTemplateManager(), this.location(), origin, rotation))));
+                        pieces -> pieces.addPiece(this.createPiece(context.structureTemplateManager(), origin, rotation))));
     }
     
 	@Override
