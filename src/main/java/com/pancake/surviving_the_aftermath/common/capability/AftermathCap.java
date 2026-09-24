@@ -16,6 +16,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class AftermathCap implements INBTSerializable<CompoundTag> {
     private static final AftermathManager AFTERMATH_MANAGER = AftermathManager.getInstance();
     private final ServerLevel level;
@@ -38,7 +40,11 @@ public class AftermathCap implements INBTSerializable<CompoundTag> {
     public void deserializeNBT(CompoundTag compoundTag) {
         for (String uuid : compoundTag.getAllKeys()) {
             CompoundTag tag = compoundTag.getCompound(uuid);
-            AFTERMATH_MANAGER.create(level, tag);
+            try {
+                AFTERMATH_MANAGER.create(level, UUID.fromString(uuid), tag);
+            } catch (IllegalArgumentException exception) {
+                SurvivingTheAftermath.LOGGER.error("Invalid saved aftermath id {}", uuid, exception);
+            }
         }
     }
 

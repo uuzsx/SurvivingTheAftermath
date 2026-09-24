@@ -11,10 +11,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import java.util.*;
 
 public class CodecUtils {
-    public static final Codec<UUID> UUID_CODEC = Codec.STRING
-            .xmap(UUID::fromString, UUID::toString)
-            .fieldOf("uuid")
-            .codec();
+    private static final Codec<UUID> UUID_STRING = Codec.STRING.comapFlatMap(value -> {
+        try { return com.mojang.serialization.DataResult.success(UUID.fromString(value)); }
+        catch (IllegalArgumentException exception) { return com.mojang.serialization.DataResult.error(() -> "Invalid UUID: " + value); }
+    }, UUID::toString);
+    // Write primitive keys for maps, while accepting the old {uuid: ...} list entries.
+    public static final Codec<UUID> UUID_CODEC = Codec.either(UUID_STRING, UUID_STRING.fieldOf("uuid").codec())
+            .xmap(either -> either.map(value -> value, value -> value), com.mojang.datafixers.util.Either::left);
 
     public static final Codec<AttributeModifier.Operation> ATTRIBUTE_MODIFIER_OPERATION_CODEC = Codec.INT
             .xmap(AttributeModifier.Operation::fromValue, AttributeModifier.Operation::toValue);

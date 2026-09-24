@@ -36,7 +36,8 @@ public class EntityInfoModule implements IEntityInfoModule {
     @Override
     public List<LazyOptional<Entity>> spawnEntity(Level level) {
         List<LazyOptional<Entity>> arrayList = Lists.newArrayList();
-        for (int i = 0; i < amountModule.getSpawnAmount(); i++) {
+        int amount = amountModule.getSpawnAmount();
+        for (int i = 0; i < amount; i++) {
             Entity entity = entityType.create(level);
             arrayList.add(entity == null ? LazyOptional.empty() : LazyOptional.of(() -> entity));
         }

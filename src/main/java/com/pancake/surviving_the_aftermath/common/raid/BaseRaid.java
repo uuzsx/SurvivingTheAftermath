@@ -21,6 +21,7 @@ import com.pancake.surviving_the_aftermath.common.util.AftermathEventUtil;
 import com.pancake.surviving_the_aftermath.common.util.CodecUtils;
 import com.pancake.surviving_the_aftermath.common.util.RandomUtils;
 import com.pancake.surviving_the_aftermath.common.util.StructureUtils;
+import com.pancake.surviving_the_aftermath.common.util.SafeSpawn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.StringTag;
@@ -73,8 +74,8 @@ public class BaseRaid extends BaseAftermath implements IRaid {
         this.readyTime = readyTime;
         this.rewardTime = rewardTime;
         this.startPos = startPos;
-        this.spawnPos = spawnPos;
-        this.enemies = enemies;
+        this.spawnPos = new HashSet<>(spawnPos);
+        this.enemies = new LinkedHashSet<>(enemies);
         this.currentWave = currentWave;
         this.totalEnemy = totalEnemy;
     }
@@ -96,55 +97,68 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
     @Override
     protected void init() {
-        super.init();
-        this.readyTime = getModule().getReadyTime();
-        this.rewardTime = getModule().getReadyTime();
+        readyTime = Math.max(0, getModule().getReadyTime());
+        rewardTime = Math.max(0, getModule().getRewardTime());
         SetSpawnPos(this::defaultSetSpawnPos);
+        if (spawnPos.isEmpty()) spawnPos.add(startPos);
+        super.init();
     }
+
     @Override
     public void tick() {
+        AftermathState before = state;
         super.tick();
-
-        if (state == AftermathState.START){
-            AftermathEventUtil.ready(this,players,level);
+        if (isEnd()) return;
+        if (state == AftermathState.START) {
+            if (!AftermathEventUtil.ready(this, players, level)) end();
+            return;
         }
-
-        if (state == AftermathState.ONGOING){
-            AftermathEventUtil.ongoing(this,players,level);
+        if (state == AftermathState.ONGOING) {
+            AftermathEventUtil.ongoing(this, players, level);
+            if (isEnd() || players.isEmpty()) return;
+            // Missing entities can be unloaded. Death/destruction events remove them.
+            enemies.removeIf(id -> {
+                Entity entity = level.getEntity(id);
+                return entity != null && !entity.isAlive();
+            });
             checkNextWave();
             spawnWave();
             EnemyTotalRatio();
+            super.updateProgress();
         }
-
-        if (state == AftermathState.CELEBRATING){
-            AftermathEventUtil.celebrating(this,players,level);
-            if (rewardTime <= 0){
+        boolean celebrationStarted = before == AftermathState.VICTORY;
+        if (state == AftermathState.VICTORY) {
+            celebrationStarted = true;
+            if (!AftermathEventUtil.celebrating(this, players, level)) { end(); return; }
+        }
+        if (state == AftermathState.CELEBRATING) {
+            if (!celebrationStarted && !AftermathEventUtil.celebrating(this, players, level)) {
                 end();
                 return;
             }
+            if (rewardTime <= 0) { end(); return; }
             createRewards();
             rewardTime--;
+            if (rewardTime <= 0) end();
         }
     }
 
     private void EnemyTotalRatio(){
-        if (enemies.isEmpty()) return;
-        this.progressPercent = enemies.size() / (float) totalEnemy;
+        this.progressPercent = totalEnemy == 0 ? 0 : enemies.size() / (float) totalEnemy;
     }
 
     protected void spawnWave() {
         if (enemies.isEmpty() && state == AftermathState.ONGOING){
             getModule().getWaves().get(currentWave).forEach(this::spawnEntities);
         }
-        enemies.removeIf(uuid -> level.getEntity(uuid) == null);
     }
 
     private void spawnEntities(IEntityInfoModule entityInfoModule) {
-        if (players.isEmpty()) return;
+        if (players.isEmpty() || isEnd()) return;
         List<LazyOptional<Entity>> arrayList = entityInfoModule.spawnEntity(level);
         for (LazyOptional<Entity> lazyOptional : arrayList) {
             lazyOptional.ifPresent(entity -> {
-                if (entity instanceof Mob mob) {
+                if (entity instanceof Mob mob && !isEnd()) {
                     setMobSpawn(level,mob);
                 }
             });
@@ -153,7 +167,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
     @Override
     public void createRewards() {
-        BlockPos blockPos = RandomUtils.getRandomElement(spawnPos);
+        BlockPos blockPos = spawnPos.isEmpty() ? startPos : RandomUtils.getRandomElement(spawnPos);
         Direction dir = Direction.Plane.HORIZONTAL.stream().filter(d -> level.isEmptyBlock(blockPos.relative(d))
                 && !spawnPos.contains(blockPos.relative(d))).findFirst().orElse(Direction.UP);
         Vec3 vec = Vec3.atCenterOf(blockPos);
@@ -176,24 +190,34 @@ public class BaseRaid extends BaseAftermath implements IRaid {
         return startPos;
     }
     public void setMobSpawn(ServerLevel level, Mob mob) {
-        mob.setPersistenceRequired();
         Player target = randomPlayersUnderAttack();
+        if (target == null) return;
+        if (!SafeSpawn.placeMob(level, mob, spawnPos, startPos, getRadius())) {
+            SurvivingTheAftermath.LOGGER.warn("No safe spawn space for {} in aftermath {}", mob.getType(), uuid);
+            lose();
+            return;
+        }
+        mob.setPersistenceRequired();
         mob.getBrain().setMemory(MemoryModuleType.ANGRY_AT, target.getUUID());
         mob.setTarget(target);
-
-        try {
-            BlockPos blockPos = RandomUtils.getRandomElement(spawnPos);
-            mob.moveTo(blockPos.getX() + 0.5, blockPos.getY() , blockPos.getZ()+ 0.5);
-        } catch (NullPointerException e){
-            mob.moveTo(this.startPos.getX() + 0.5, this.startPos.getY() , this.startPos.getZ()+ 0.5);
-        }
-
+        // Test escape direction at the final spawn position, using the entire body.
+        Direction dir = Direction.Plane.HORIZONTAL.stream()
+                .filter(d -> level.noCollision(mob, mob.getBoundingBox().move(d.getStepX() * 0.5, 0, d.getStepZ() * 0.5)))
+                .findFirst().orElse(null);
+        if (dir != null) mob.setDeltaMovement(dir.getStepX() * 0.5, 0, dir.getStepZ() * 0.5);
         if (join(mob)) {
-            level.addFreshEntityWithPassengers(mob);
+            insertTag(mob);
+            if (!level.tryAddFreshEntityWithPassengers(mob)) {
+                enemies.remove(mob.getUUID());
+                totalEnemy--;
+                lose();
+            }
         }
     }
     public Player randomPlayersUnderAttack(){
-        return level.getPlayerByUUID(RandomUtils.getRandomElement(getPlayers()));
+        List<Player> targets = players.stream().map(level::getPlayerByUUID)
+                .filter(Objects::nonNull).filter(player -> player.isAlive() && !player.isSpectator()).toList();
+        return targets.isEmpty() ? null : targets.get(level.random.nextInt(targets.size()));
     }
 
     public boolean join(Entity entity) {
@@ -214,15 +238,21 @@ public class BaseRaid extends BaseAftermath implements IRaid {
             } else {
                 currentWave++;
                 totalEnemy = 0;
+                onWaveStarted();
             }
         }
     }
 
+    /** Called once when advancing to a new wave, before its mobs are placed. */
+    protected void onWaveStarted() {}
+
     @Override
     public boolean isCreate(Level level, BlockPos pos, @Nullable Player player) {
         boolean create = super.isCreate(level, pos, player);
+        if (!create || !(module instanceof BaseRaidModule raidModule) || raidModule.getWaves() == null
+                || raidModule.getWaves().isEmpty() || raidModule.getRewards() == null) return false;
         boolean noneMatch = AftermathManager.getInstance().getAftermathMap().values().stream()
-                .filter(aftermath -> aftermath instanceof IRaid)
+                .filter(aftermath -> !aftermath.isEnd() && aftermath instanceof IRaid)
                 .map(aftermath -> (IRaid) aftermath)
                 .noneMatch(raid -> raid.getStartPos().distSqr(startPos) < Math.pow(raid.getRadius(), 2));
         return create && noneMatch;
@@ -264,7 +294,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
     public void updateProgress() {
         super.updateProgress();
 
-        if (state == AftermathState.READY){
+        if (state == AftermathState.READY && !players.isEmpty()){
             ready();
         }
     }

@@ -43,10 +43,16 @@ public class ForgeEventSubscriber {
 	}
 	@SubscribeEvent
 	public static void onLevel(LevelEvent.Unload event) {
-		if (event.getLevel().isClientSide()) return;
-		AftermathManager.getInstance().getAftermathMap().values().stream()
-				.map(IAftermath::getTrackers)
-				.forEach(trackers -> trackers.forEach(ITracker::unregister));
-		AftermathManager.getInstance().getAftermathMap().clear();
-	}
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
+        AftermathManager.getInstance().clear();
+    }
+
+    @SubscribeEvent
+    public static void clearStaleBattleState(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
+        var entity = event.getEntity();
+        if (event.getLevel().isClientSide() || !entity.getPersistentData().hasUUID("raid_uuid")) return;
+        var id = entity.getPersistentData().getUUID("raid_uuid");
+        if (AftermathManager.getInstance().getAftermath(id).isEmpty())
+            com.pancake.surviving_the_aftermath.common.util.BattleEntityState.clear(entity, id);
+    }
 }

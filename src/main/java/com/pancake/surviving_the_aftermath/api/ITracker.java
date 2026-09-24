@@ -19,4 +19,6 @@ public interface ITracker extends ICodec<ITracker> {
     }
 
     ITracker setUUID(UUID uuid);
+
+    default void onEnd(net.minecraft.server.level.ServerLevel level) {}
 }

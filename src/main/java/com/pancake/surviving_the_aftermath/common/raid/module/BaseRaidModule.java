@@ -57,7 +57,7 @@ public class BaseRaidModule extends BaseAftermathModule implements IRaidModule {
     public int getReadyTime() {
         return readyTime;
     }
-    private int getRewardTime() {
+    public int getRewardTime() {
         return rewardTime;
     }
     public BaseRaidModule setWaves(List<List<IEntityInfoModule>> waves) {

@@ -4,14 +4,15 @@ package com.pancake.surviving_the_aftermath.common.event.subscriber;
 import com.pancake.surviving_the_aftermath.api.AftermathManager;
 import com.pancake.surviving_the_aftermath.common.event.AftermathEvent;
 import com.pancake.surviving_the_aftermath.common.init.ModSoundEvents;
-import com.pancake.surviving_the_aftermath.common.init.ModStructures;
+import com.pancake.surviving_the_aftermath.common.item.DiamondFlintAndSteelItem;
+import com.pancake.surviving_the_aftermath.common.util.RaidPortal;
 import com.pancake.surviving_the_aftermath.common.raid.NetherRaid;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraft.world.item.Items;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -29,6 +30,16 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
 public class RaidEventSubscriber {
+    @SubscribeEvent
+    public static void onIgnition(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof ServerPlayer player
+                && (event.getItemStack().is(Items.FLINT_AND_STEEL) || event.getItemStack().is(Items.FIRE_CHARGE))) {
+            if (RaidPortal.isArena(level, event.getPos())) {
+                player.displayClientMessage(Component.translatable(DiamondFlintAndSteelItem.REQUIRED), true);
+            }
+        }
+    }
+
     public static final String NETHER_RAID_START = "message.surviving_the_aftermath.nether_raid.start";
     public static final String NETHER_RAID_VICTORY = "message.surviving_the_aftermath.nether_raid.victory";
     @SubscribeEvent
@@ -37,47 +48,36 @@ public class RaidEventSubscriber {
         Level level = entity.level();
         BlockPos pos = entity.blockPosition();
         if (level instanceof ServerLevel serverLevel) {
-            event.setCanceled(serverLevel.structureManager().getAllStructuresAt(pos)
-                    .containsKey(level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ModStructures.NETHER_RAID)));
+            if (RaidPortal.isArena(serverLevel, pos)) event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public static void onBlock(BlockEvent.PortalSpawnEvent event) {
         LevelAccessor level = event.getLevel();
-        if (level instanceof ServerLevel serverLevel) {
-            NetherRaid netherRaid = new NetherRaid(serverLevel,event.getPos());
-            AftermathManager instance = AftermathManager.getInstance();
-            instance.create(netherRaid, serverLevel, event.getPos(), null);
+        if (level instanceof ServerLevel serverLevel && RaidPortal.isArena(serverLevel, event.getPos())) {
+            // Vanilla fire (including fire charges/lava) cannot activate dungeon portals.
+            // The diamond tool creates the portal directly after a successful encounter start.
+            event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public static void onRaidStart(AftermathEvent.Start event) {
-        System.out.println(event.getPlayers());
+        if (!(event.getAftermath() instanceof NetherRaid)) return;
         event.getPlayers().forEach(uuid -> {
             Player player = event.getLevel().getPlayerByUUID(uuid);
-            if (player != null) {
-                player.displayClientMessage(Component.translatable(NETHER_RAID_START), true);
-            }
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                level.playLocalSound(player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(), SoundSource.NEUTRAL, 3.0F, 1.0F, false);
-            }
+            if (player != null) player.displayClientMessage(Component.translatable(NETHER_RAID_START), true);
         });
+        event.getLevel().playSound(null, event.getAftermath().getStartPos(),
+                SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(), SoundSource.NEUTRAL, 3.0F, 1.0F);
     }
 
     @SubscribeEvent
     public static void onRaidVictory(AftermathEvent.Victory event) {
-        event.getPlayers().forEach(uuid -> {
-            Player player = event.getLevel().getPlayerByUUID(uuid);
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                level.playLocalSound(player.getX(), player.getY(), player.getZ(),
-                        ModSoundEvents.ORCHELIAS_VOX.get(), SoundSource.NEUTRAL, 3.0F, 1.0F, false);
-            }
-        });
+        if (!(event.getAftermath() instanceof NetherRaid)) return;
+        event.getLevel().playSound(null, event.getAftermath().getStartPos(),
+                ModSoundEvents.ORCHELIAS_VOX.get(), SoundSource.NEUTRAL, 3.0F, 1.0F);
     }
 
     @SubscribeEvent
@@ -87,7 +87,8 @@ public class RaidEventSubscriber {
             AftermathManager.getInstance().getAftermathMap().values().stream()
                     .filter(aftermath -> aftermath instanceof NetherRaid)
                     .map(aftermath -> (NetherRaid) aftermath)
-                    .forEach(raid -> raid.join(entity));
+                    .filter(raid -> raid.level == entity.level())
+                    .forEach(raid -> { if (raid.join(entity)) raid.insertTag(magmaCube); });
         }
     }
 }

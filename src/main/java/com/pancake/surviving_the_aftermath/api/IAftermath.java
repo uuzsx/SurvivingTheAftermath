@@ -41,6 +41,11 @@ public interface IAftermath extends IModule<IAftermath> {
 
     void setLevel(ServerLevel level);
 
+    default void restore(ServerLevel level, UUID savedId) {
+        setLevel(level);
+        getTrackers().forEach(tracker -> tracker.setUUID(getUUID()));
+    }
+
     AftermathState getState();
 
     void setState(AftermathState state);

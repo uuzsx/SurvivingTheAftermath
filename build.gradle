@@ -28,6 +28,13 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
     // Channel:   Version:
@@ -111,6 +118,9 @@ minecraft {
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
+            workingDirectory project.file('run-gametest')
+            property 'forge.logging.console.level', 'info'
+            mods { "${mod_id}" { source sourceSets.gametest } }
         }
 
         data {
@@ -142,18 +152,8 @@ repositories {
     //     dir 'libs'
     // }
     maven {
-        // Shedaniel's maven (Architectury API)
-        url = "https://maven.architectury.dev"
-        content {
-            includeGroup "dev.architectury"
-        }
-    }
-    maven {
-        // saps.dev Maven (KubeJS and Rhino)
-        url = "https://maven.saps.dev/releases"
-        content {
-            includeGroup "dev.latvian.mods"
-        }
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
     }
 }
 
@@ -166,20 +166,16 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 
-    compileOnly fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
-    compileOnly fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
-    compileOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+    // Pinned official releases; the historical Saps Maven no longer serves these artifacts.
+    compileOnly fg.deobf("maven.modrinth:kubejs:${kubejs_version}")
+    compileOnly fg.deobf("maven.modrinth:rhino:${rhino_version}")
+    compileOnly fg.deobf("maven.modrinth:architectury-api:${architectury_version}")
 
-    //仅运行
-//    implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
-//    implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
-//    implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
-
-//    runtimeOnly fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
-//    runtimeOnly fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
-//    runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
-
-
+    if (project.hasProperty('withKubeJS')) {
+        runtimeOnly fg.deobf("maven.modrinth:kubejs:${kubejs_version}")
+        runtimeOnly fg.deobf("maven.modrinth:rhino:${rhino_version}")
+        runtimeOnly fg.deobf("maven.modrinth:architectury-api:${architectury_version}")
+    }
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -238,4 +234,13 @@ tasks.named('jar', Jar).configure {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+tasks.matching { it.name == 'prepareRunGameTestServer' }.configureEach {
+    doFirst {
+        copy {
+            from 'src/gametest/kubejs'
+            into 'run-gametest/kubejs'
+        }
+    }
 }

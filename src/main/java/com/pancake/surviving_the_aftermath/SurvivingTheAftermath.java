@@ -7,6 +7,7 @@ import com.pancake.surviving_the_aftermath.common.config.AftermathConfig;
 import com.pancake.surviving_the_aftermath.common.data.datagen.EventSubscriber;
 import com.pancake.surviving_the_aftermath.common.data.pack.AftermathModuleLoader;
 import com.pancake.surviving_the_aftermath.common.init.*;
+import com.pancake.surviving_the_aftermath.common.network.AftermathNetwork;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -30,10 +31,11 @@ public class SurvivingTheAftermath {
         ModuleRegistry.register(bus);
         ModMobEffects.MOB_EFFECTS.register(bus);
         ModSoundEvents.SOUND_EVENTS.register(bus);
+        ModItems.ITEMS.register(bus);
 
         ModStructurePieceTypes.STRUCTURE_PIECE_TYPES.register(bus);
         ModStructureTypes.STRUCTURE_TYPES.register(bus);
-        MinecraftForge.EVENT_BUS.addListener(this::onDataPackLoad);
+        AftermathNetwork.register();
 
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AftermathConfig.SPEC);

@@ -3,6 +3,8 @@ package com.pancake.surviving_the_aftermath.common.data.datagen;
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.event.subscriber.RaidEventSubscriber;
 import com.pancake.surviving_the_aftermath.common.event.tracker.RaidPlayerBattleTracker;
+import com.pancake.surviving_the_aftermath.common.init.ModItems;
+import com.pancake.surviving_the_aftermath.common.item.DiamondFlintAndSteelItem;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.LanguageProvider;
 
@@ -14,6 +16,10 @@ public class ModLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
+		add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "Diamond Flint and Steel");
+		add(DiamondFlintAndSteelItem.TOOLTIP, "Activates dungeon portals. Uses 1 durability per activation.");
+		add(DiamondFlintAndSteelItem.REQUIRED, "This dungeon requires Diamond Flint and Steel.");
+		add(DiamondFlintAndSteelItem.UNAVAILABLE, "Cannot activate: check the portal frame, challenge conditions, or an unfinished challenge.");
 		add("itemGroup." + SurvivingTheAftermath.MOD_ID, "Surviving the Aftermath");
 //		add(ModItems.RAW_FALUKORV.get(), "Raw Falukorv");
 //		add(ModItems.EGG_TART.get(), "Egg Tart");

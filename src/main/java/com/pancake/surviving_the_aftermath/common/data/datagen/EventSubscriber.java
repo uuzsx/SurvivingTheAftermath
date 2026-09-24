@@ -20,6 +20,8 @@ public class EventSubscriber {
 		generator.addProvider(event.includeServer(), new ModTagProviders.ModStructureTagsProvider(output, provider, existingFileHelper));
 		generator.addProvider(event.includeServer(), new RaidModuleProvider(output));
 		generator.addProvider(event.includeServer(), new RegistryDataGenerator(output, provider));
+		generator.addProvider(event.includeServer(), new ModRecipeProvider(output));
+		generator.addProvider(event.includeClient(), new ModItemModelProvider(output, existingFileHelper));
 
 		generator.addProvider(event.includeClient(), new ModLanguageCNProvider(output));
 		generator.addProvider(event.includeClient(), new ModLanguageProvider(output));

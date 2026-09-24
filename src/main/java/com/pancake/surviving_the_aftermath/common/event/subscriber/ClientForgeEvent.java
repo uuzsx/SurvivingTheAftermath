@@ -1,7 +1,8 @@
 package com.pancake.surviving_the_aftermath.common.event.subscriber;
 
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
-import com.pancake.surviving_the_aftermath.api.AftermathManager;
+import com.pancake.surviving_the_aftermath.client.ClientAftermathBars;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,13 +14,16 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientForgeEvent {
     @SubscribeEvent
+    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ClientAftermathBars.clear(); }
+
+    @SubscribeEvent
     public static void netherRaidProgress(CustomizeGuiOverlayEvent.BossEventProgress event) {
         LerpingBossEvent bossEvent = event.getBossEvent();
-        AftermathManager manager = AftermathManager.getInstance();
-        manager.getAftermath(bossEvent.getId()).ifPresent(aftermath -> {
+        var aftermath = ClientAftermathBars.get(bossEvent.getId());
+        if (aftermath != null) {
             var graphics = event.getGuiGraphics();
-            ResourceLocation resource = aftermath.getBarsResource();
-            int[] offset = aftermath.getBarsOffset();
+            ResourceLocation resource = aftermath.texture();
+            int[] offset = aftermath.offsets();
 
             if (resource == null || offset == null) {
                 return;
@@ -40,6 +44,6 @@ public class ClientForgeEvent {
                     0, 0, (int) (barWidth * event.getBossEvent().getProgress()), barHeight);
             event.setIncrement(frameHeight);
             event.setCanceled(true);
-        });
+        }
     }
 }

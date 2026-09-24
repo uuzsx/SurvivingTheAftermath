@@ -13,7 +13,7 @@ public interface AftermathEvents {
     EventHandler END = GROUP.server("end", () -> AftermathEventJS.EndJS.class);
 
     //Ready
-    EventHandler READY = GROUP.server("ready", () -> AftermathEventJS.ReadyJS.class);
+    EventHandler READY = GROUP.server("ready", () -> AftermathEventJS.ReadyJS.class).hasResult();
 
     //Ongoing
     EventHandler ONGOING = GROUP.server("ongoing", () -> AftermathEventJS.OngoingJS.class);

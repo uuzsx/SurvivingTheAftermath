@@ -3,6 +3,8 @@ package com.pancake.surviving_the_aftermath.common.data.datagen;
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.event.subscriber.RaidEventSubscriber;
 import com.pancake.surviving_the_aftermath.common.event.tracker.RaidPlayerBattleTracker;
+import com.pancake.surviving_the_aftermath.common.init.ModItems;
+import com.pancake.surviving_the_aftermath.common.item.DiamondFlintAndSteelItem;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.LanguageProvider;
 
@@ -14,6 +16,10 @@ public class ModLanguageCNProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "钻石打火石");
+        add(DiamondFlintAndSteelItem.TOOLTIP, "用于激活副本门，每次激活消耗 1 点耐久。");
+        add(DiamondFlintAndSteelItem.REQUIRED, "此副本需要使用钻石打火石激活。");
+        add(DiamondFlintAndSteelItem.UNAVAILABLE, "无法激活：请检查门框、挑战条件，或等待当前挑战发奖结束。");
         add("itemGroup." + SurvivingTheAftermath.MOD_ID, "劫后余生");
 //        add(ModItems.RAW_FALUKORV.get(), "生的法伦香肠");
 //        add(ModItems.COOKED_FALUKORV.get(), "熟的法伦香肠");

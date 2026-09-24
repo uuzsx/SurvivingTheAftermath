@@ -9,6 +9,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -53,11 +54,21 @@ public abstract class AbstractStructure extends Structure {
 	@Override
 	public void afterPlace(WorldGenLevel pLevel, StructureManager pStructureManager, ChunkGenerator pChunkGenerator,
 			RandomSource pRandom, BoundingBox pBoundingBox, ChunkPos pChunkPos, PiecesContainer pPieces) {
-		BlockPos.betweenClosedStream(pBoundingBox).forEach(p -> {
-			if (pLevel.getBlockEntity(p) instanceof RandomizableContainerBlockEntity chest) {
-				chest.setLootTable(BuiltInLootTables.DESERT_PYRAMID, pRandom.nextLong());
-			}
-		});
+        // Only fallback treasure chests authored into this template receive a table.
+        // Decorative barrels and containers outside the template are left untouched.
+        for (var piece : pPieces.pieces()) {
+            if (!(piece instanceof TemplateStructurePiece templatePiece)) continue;
+            var settings = templatePiece.placeSettings();
+            for (var block : java.util.List.of(Blocks.CHEST, Blocks.TRAPPED_CHEST)) {
+                for (var info : templatePiece.template().filterBlocks(templatePiece.templatePosition(), settings, block)) {
+                    if (!pBoundingBox.isInside(info.pos()) || !pLevel.getBlockState(info.pos()).is(block)) continue;
+                    if (pLevel.getBlockEntity(info.pos()) instanceof RandomizableContainerBlockEntity chest
+                            && !chest.saveWithoutMetadata().contains("LootTable") && chest.isEmpty()) {
+                        chest.setLootTable(BuiltInLootTables.DESERT_PYRAMID, pRandom.nextLong());
+                    }
+                }
+            }
+        }
 	}
 
     @Override

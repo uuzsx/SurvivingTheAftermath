@@ -13,8 +13,6 @@ import com.pancake.surviving_the_aftermath.common.init.ModStructures;
 import com.pancake.surviving_the_aftermath.common.raid.module.BaseRaidModule;
 import com.pancake.surviving_the_aftermath.common.structure.NetherRaidStructure;
 import com.pancake.surviving_the_aftermath.common.util.CodecUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -57,14 +55,28 @@ public class NetherRaid extends BaseRaid {
             CodecUtils.setOf(CodecUtils.UUID_CODEC).fieldOf("enemies").forGetter(BaseRaid::getEnemies),
             Codec.INT.fieldOf("currentWave").forGetter(BaseRaid::getCurrentWave),
             Codec.INT.fieldOf("totalEnemy").forGetter(BaseRaid::getTotalEnemy),
-            Codec.list(ITracker.CODEC.get()).fieldOf("trackers").forGetter(NetherRaid::getTrackers)
+            Codec.list(ITracker.CODEC.get()).fieldOf("trackers").forGetter(NetherRaid::getTrackers),
+            CodecUtils.setOf(BlockPos.CODEC).optionalFieldOf("portal_blocks", Set.of()).forGetter(NetherRaid::getPortalBlocks)
     ).apply(instance, NetherRaid::new));
 
     public NetherRaid(AftermathState state, BaseRaidModule module, Set<UUID> players, Float progressPercent, BlockPos startPos, Integer readyTime, Integer rewardTime,
                       Set<BlockPos> spawnPos, Set<UUID> enemies, Integer currentWave, Integer totalEnemy,List<ITracker> trackers) {
         super(state, module, players, progressPercent, startPos, readyTime, rewardTime, spawnPos, enemies, currentWave, totalEnemy,trackers);
+        // Old saves used the portal plane as the mob spawn positions.
+        this.portalBlocks.addAll(spawnPos);
+    }
+    public NetherRaid(AftermathState state, BaseRaidModule module, Set<UUID> players, Float progressPercent, BlockPos startPos, Integer readyTime, Integer rewardTime,
+                      Set<BlockPos> spawnPos, Set<UUID> enemies, Integer currentWave, Integer totalEnemy, List<ITracker> trackers, Set<BlockPos> portalBlocks) {
+        this(state, module, players, progressPercent, startPos, readyTime, rewardTime, spawnPos, enemies, currentWave, totalEnemy, trackers);
+        if (!portalBlocks.isEmpty()) {
+            this.portalBlocks.clear();
+            this.portalBlocks.addAll(portalBlocks);
+        }
     }
     private PortalShape portalShape;
+    private final Set<BlockPos> portalBlocks = new HashSet<>();
+
+    public Set<BlockPos> getPortalBlocks() { return Collections.unmodifiableSet(portalBlocks); }
 
 
     public NetherRaid(ServerLevel level, BlockPos startPos) {
@@ -77,27 +89,34 @@ public class NetherRaid extends BaseRaid {
     @Override
     protected void init() {
         setDir(this.level,this.startPos);
+        if (portalShape == null) { state = AftermathState.END; return; }
+        PortalShapeAccessor shape = (PortalShapeAccessor) portalShape;
+        BlockPos bottomLeft = shape.survivingTheAftermath$getBottomLeft();
+        BlockPos topRight = bottomLeft.above(shape.survivingTheAftermath$getHeight() - 1)
+                .relative(shape.survivingTheAftermath$getRightDir(), shape.survivingTheAftermath$getWidth() - 1);
+        BlockPos.betweenClosed(bottomLeft, topRight).forEach(pos -> portalBlocks.add(pos.immutable()));
         super.init();
     }
 
     @Override
     public void setMobSpawnPos(ServerLevel serverLevel, String metadata, BlockPos startPos, BlockPos pos) {
         if (metadata.equals("spawnPos")){
-            PortalShapeAccessor shape = (PortalShapeAccessor) this.portalShape;
-            BlockPos bottomLeft = shape.survivingTheAftermath$getBottomLeft();
-            Direction dir = shape.survivingTheAftermath$getRightDir();
-            int height = shape.survivingTheAftermath$getHeight();
-            int width = shape.survivingTheAftermath$getWidth();
-            BlockPos.betweenClosed(bottomLeft, bottomLeft.relative(Direction.UP, height - 1).relative(dir, width - 1))
-                .forEach(blockPos -> spawnPos.add(new BlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
+            spawnPos.addAll(portalBlocks);
         }
     }
 
     private void setDir(ServerLevel serverLevel,BlockPos pos){
-        PortalShape.findEmptyPortalShape(serverLevel, pos, Direction.Axis.X).ifPresent(portalShape -> {
-            PortalShapeAccessor portalShapeMixin = (PortalShapeAccessor) portalShape;
-            this.portalShape = portalShape;
-        });
+        portalShape = PortalShape.findPortalShape(serverLevel, pos, PortalShape::isValid, Direction.Axis.X).orElse(null);
+    }
+
+    @Override
+    public void end() {
+        if (isEnd()) return;
+        // Close only this encounter's portal; keep its frame and all rewards.
+        for (BlockPos pos : portalBlocks) {
+            if (level.getBlockState(pos).is(Blocks.NETHER_PORTAL)) level.removeBlock(pos, false);
+        }
+        super.end();
     }
 
     @Override
@@ -117,30 +136,14 @@ public class NetherRaid extends BaseRaid {
         if (mob instanceof Slime slime) {
             slime.finalizeSpawn(level, level.getCurrentDifficultyAt(slime.blockPosition()), MobSpawnType.EVENT, null, null);
         }
-        if (mob instanceof Ghast ghast) {
-            ghast.moveTo(ghast.getX(), ghast.getY() + 20, ghast.getZ());
-        }
-
-
-        Direction dir = Direction.Plane.HORIZONTAL.stream().filter(d -> level.isEmptyBlock(mob.blockPosition().relative(d))
-                && !spawnPos.contains(mob.blockPosition().relative(d))).findFirst().orElse(Direction.UP);
-        mob.setDeltaMovement(dir.getStepX() * 0.5, dir.getStepY() * 0.5, dir.getStepZ() * 0.5);
-
         super.setMobSpawn(level, mob);
     }
 
     @Override
-    protected void spawnWave() {
-        super.spawnWave();
-        if (enemies.isEmpty() && state == AftermathState.ONGOING){
-            updateStructure();
-
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                level.playLocalSound(startPos.getX(), startPos.getY(), startPos.getZ(),
-                        SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(), SoundSource.NEUTRAL, 3.0F, 1.0F, false);
-            }
-        }
+    protected void onWaveStarted() {
+        updateStructure();
+        level.playSound(null, startPos, SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(),
+                SoundSource.NEUTRAL, 3.0F, 1.0F);
     }
 
 
@@ -170,7 +173,9 @@ public class NetherRaid extends BaseRaid {
                                                                                     @NotNull StructureTemplate.StructureBlockInfo relativeBlockInfo,
                                                                                     @NotNull StructurePlaceSettings p_74145_,
                                                                                     @Nullable StructureTemplate template) {
-                                    if (level.random.nextFloat() < 0.9) {
+                                    if (levelReader.getBlockState(relativeBlockInfo.pos()).is(Blocks.OBSIDIAN)
+                                            || levelReader.getBlockState(relativeBlockInfo.pos()).is(Blocks.NETHER_PORTAL)
+                                            || level.random.nextFloat() < 0.9) {
                                         return new StructureTemplate.StructureBlockInfo(relativeBlockInfo.pos(),
                                                 levelReader.getBlockState(relativeBlockInfo.pos()), relativeBlockInfo.nbt());
                                     } else {

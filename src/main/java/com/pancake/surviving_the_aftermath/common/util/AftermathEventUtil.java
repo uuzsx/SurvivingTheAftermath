@@ -17,21 +17,29 @@ import java.util.UUID;
 
 public class AftermathEventUtil {
     public static boolean start(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
+        AftermathState previous = aftermath.getState();
         aftermath.setState(AftermathState.START);
         boolean postForge = !MinecraftForge.EVENT_BUS.post(new AftermathEvent.Start(aftermath, players, level));
         if (isKubejs()) {
             boolean postJS = AftermathEventJsUtil.start(aftermath, players, level);
-            return postForge && postJS;
+            boolean accepted = postForge && postJS;
+            if (!accepted) aftermath.setState(previous);
+            return accepted;
         }
+        if (!postForge) aftermath.setState(previous);
         return postForge;
     }
     public static boolean ready(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
+        AftermathState previous = aftermath.getState();
         aftermath.setState(AftermathState.READY);
         boolean postForge = !MinecraftForge.EVENT_BUS.post(new AftermathEvent.Ready(aftermath, players, level));
         if (isKubejs()){
             boolean postJS = AftermathEventJsUtil.ready(aftermath, players, level);
-            return postForge && postJS;
+            boolean accepted = postForge && postJS;
+            if (!accepted) aftermath.setState(previous);
+            return accepted;
         }
+        if (!postForge) aftermath.setState(previous);
         return postForge;
     }
     public static boolean ongoing(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
@@ -53,12 +61,16 @@ public class AftermathEventUtil {
         return postForge;
     }
     public static boolean celebrating(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
+        AftermathState previous = aftermath.getState();
         aftermath.setState(AftermathState.CELEBRATING);
         boolean postForge = !MinecraftForge.EVENT_BUS.post(new AftermathEvent.Celebrating(aftermath, players, level));
         if (isKubejs()){
             boolean postJS = AftermathEventJsUtil.celebrating(aftermath, players, level);
-            return postForge && postJS;
+            boolean accepted = postForge && postJS;
+            if (!accepted) aftermath.setState(previous);
+            return accepted;
         }
+        if (!postForge) aftermath.setState(previous);
         return postForge;
     }
     public static boolean lose(IAftermath aftermath, Set<UUID> players, ServerLevel level) {

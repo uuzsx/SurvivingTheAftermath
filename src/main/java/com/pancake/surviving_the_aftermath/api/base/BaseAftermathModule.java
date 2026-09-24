@@ -38,10 +38,10 @@ public abstract class BaseAftermathModule implements IAftermathModule {
 
         for (IConditionModule condition : conditions) {
             if (condition instanceof LevelConditionModule levelConditionModule) {
-                return levelConditionModule.checkCondition(level,pos);
+                if (!levelConditionModule.checkCondition(level, pos)) return false;
             }
-            if (condition instanceof PlayerConditionModule playerConditionModule && player != null) {
-                return playerConditionModule.checkCondition(player);
+            if (condition instanceof PlayerConditionModule playerConditionModule) {
+                if (player == null || !playerConditionModule.checkCondition(player)) return false;
             }
         }
         return true;
@@ -51,14 +51,8 @@ public abstract class BaseAftermathModule implements IAftermathModule {
     private void findStructureStartingPoint() {
         List<IConditionModule> mutableConditions = Lists.newArrayList(conditions);
 
-        Optional<IConditionModule> structureConditionModules = mutableConditions.stream()
-                .filter(condition -> condition instanceof StructureConditionModule)
-                .findAny();
-
-        if (structureConditionModules.isPresent()) {
-            mutableConditions.removeIf(condition -> condition instanceof StructureConditionModule);
-            mutableConditions.add(structureConditionModules.get());
-        }
+        // Keep every condition while checking expensive structure lookups last.
+        mutableConditions.sort(java.util.Comparator.comparing(condition -> condition instanceof StructureConditionModule));
 
         conditions = ImmutableList.copyOf(mutableConditions);
     }
