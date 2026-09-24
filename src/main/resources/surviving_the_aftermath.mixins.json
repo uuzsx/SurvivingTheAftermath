@@ -6,7 +6,8 @@
   "mixins": [
     "MoveControlMixin",
     "PortalShapeMixin",
-    "VillagerMixin"
+    "VillagerMixin",
+    "NetherCoreEyeMixin"
   ],
   "client": [],
   "injectors": {
