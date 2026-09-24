@@ -1,0 +1,1 @@
+{"type": "minecraft:function", "function": "surviving_the_aftermath:citycleanupkeepslivecrownsandremovesorphans", "environment": "surviving_the_aftermath:city_boundary", "structure": "surviving_the_aftermath:stability_empty", "max_ticks": 600, "required": true}
