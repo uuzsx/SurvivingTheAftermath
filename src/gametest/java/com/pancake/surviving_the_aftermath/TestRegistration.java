@@ -11,6 +11,12 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("corebackgroundsearchandcancellation"), wrap(NetherCoreGameTests::coreBackgroundSearchAndCancellation));
+   helper.register(SurvivingTheAftermath.asResource("corealwaysreturnsandcanbethrownagain"), wrap(NetherCoreGameTests::coreAlwaysReturnsAndCanBeThrownAgain));
+   helper.register(SurvivingTheAftermath.asResource("coreflightsurvivessavereload"), wrap(NetherCoreGameTests::coreFlightSurvivesSaveReload));
+   helper.register(SurvivingTheAftermath.asResource("coreusetrackslivingdealerandticksnaturally"), wrap(NetherCoreGameTests::coreUseTracksLivingDealerAndTicksNaturally));
+   helper.register(SurvivingTheAftermath.asResource("corecreativeandmissingtargetdonotduplicate"), wrap(NetherCoreGameTests::coreCreativeAndMissingTargetDoNotDuplicate));
+   helper.register(SurvivingTheAftermath.asResource("corestopsbeforewallsandneverdespawns"), wrap(NetherCoreGameTests::coreStopsBeforeWallsAndNeverDespawns));
    helper.register(SurvivingTheAftermath.asResource("cityboundarykeepswatertreesandbuildings"), wrap(CityBoundaryGameTests::cityBoundaryKeepsWaterTreesAndBuildings));
    helper.register(SurvivingTheAftermath.asResource("citytemplateairkeepsoverhangingtree"), wrap(CityBoundaryGameTests::cityTemplateAirKeepsOverhangingTree));
    helper.register(SurvivingTheAftermath.asResource("citycleanupkeepslivecrownsandremovesorphans"), wrap(CityBoundaryGameTests::cityCleanupKeepsLiveCrownsAndRemovesOrphans));
