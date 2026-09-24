@@ -5,7 +5,7 @@ import com.pancake.surviving_the_aftermath.common.init.ModStructurePieceTypes;
 import com.pancake.surviving_the_aftermath.common.init.ModStructureTypes;
 import com.pancake.surviving_the_aftermath.common.structure.AbstractStructure;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
@@ -27,7 +27,7 @@ public class CampStructure extends AbstractStructure {
     }
 
     @Override
-    public ResourceLocation location() {
+    public Identifier location() {
         return SurvivingTheAftermath.asResource("camp");
     }
 

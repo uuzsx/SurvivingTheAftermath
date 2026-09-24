@@ -24,8 +24,8 @@ public final class RaidStructureTransformation {
 
                     @Override
                     @NotNull
-                    protected StructureProcessorType<?> getType() {
-                        return null;
+                    public com.mojang.serialization.MapCodec<? extends StructureProcessor> codec() {
+                        return com.mojang.serialization.MapCodec.unit(this);
                     }
 
                     @Override

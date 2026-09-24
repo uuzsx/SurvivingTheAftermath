@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -39,8 +39,8 @@ public class EntityInfoWithPredicateModule extends EntityInfoModule {
     }
 
     @Override
-    public List<LazyOptional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
-        List<LazyOptional<Entity>> arrayList = super.spawnEntity(level, origin);
+    public List<Optional<Entity>> spawnEntity(Level level, net.minecraft.core.BlockPos origin) {
+        List<Optional<Entity>> arrayList = super.spawnEntity(level, origin);
         arrayList.forEach(lazyOptional -> lazyOptional.ifPresent(entity -> {
             if (entity instanceof LivingEntity livingEntity){
                 if (predicateModules.isEmpty()) return;

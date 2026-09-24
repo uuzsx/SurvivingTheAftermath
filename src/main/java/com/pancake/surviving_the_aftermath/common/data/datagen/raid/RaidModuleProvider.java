@@ -42,91 +42,91 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .add(Items.GOLDEN_BOOTS,1)
                 .build();
 
-        StructureConditionModule structureConditionModule = new StructureConditionModule(ModStructures.NETHER_RAID.location().toString());
+        StructureConditionModule structureConditionModule = new StructureConditionModule(ModStructures.NETHER_RAID.identifier().toString());
 
 
         List<IEntityInfoModule> wave1 = Lists.newArrayList();
-        wave1.add(new EntityInfoModule.Builder(EntityType.PIGLIN)
+        wave1.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .amountModule(new RandomAmountModule.Builder(4,5)
                         .build()
                 )
                 .build());
 
         List<IEntityInfoModule> wave2 = Lists.newArrayList();
-        wave2.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave2.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(4,5)
                         .build()
                 )
                 .build());
-        wave2.add(new EntityInfoModule.Builder(EntityType.ZOMBIFIED_PIGLIN)
+        wave2.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.ZOMBIFIED_PIGLIN)
                 .amountModule(new RandomAmountModule.Builder(4,5)
                         .build()
                 )
                 .build());
 
         List<IEntityInfoModule> wave3 = Lists.newArrayList();
-        wave3.add(new EntityInfoModule.Builder(EntityType.PIGLIN)
+        wave3.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .amountModule(new RandomAmountModule.Builder(4,5)
                         .build()
                 )
                 .build());
-        wave3.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave3.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new IntegerAmountModule.Builder(1)
                         .build()
                 )
                 .build());
-        wave3.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave3.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new IntegerAmountModule.Builder(1)
                         .build()
                 )
                 .build());
 
         List<IEntityInfoModule> wave4 = Lists.newArrayList();
-        wave4.add(new EntityInfoModule.Builder(EntityType.PIGLIN)
+        wave4.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .amountModule(new RandomAmountModule.Builder(4,5)
                         .build()
                 )
                 .build());
-        wave4.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave4.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(1,2)
                         .build()
                 )
                 .build());
-        wave4.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave4.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(1,2)
                         .build()
                 )
                 .build());
-        wave4.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave4.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(1)
                         .build()
                 )
                 .build());
 
         List<IEntityInfoModule> wave5 = Lists.newArrayList();
-        wave5.add(new EntityInfoModule.Builder(EntityType.PIGLIN)
+        wave5.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .amountModule(new RandomAmountModule.Builder(3,4)
                         .build()
                 )
                 .build());
-        wave5.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave5.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(1,2)
                         .build()
                 )
                 .build());
-        wave5.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave5.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(1,2)
                         .build()
                 )
                 .build());
-        wave5.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave5.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(1)
                         .build()
                 )
                 .build());
 
         List<IEntityInfoModule> wave6 = Lists.newArrayList();
-        wave6.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN)
+        wave6.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -139,27 +139,27 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                         .build()
                 )
                 .build());
-        wave6.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave6.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(2,3)
                         .build()
                 )
                 .build());
-        wave6.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave6.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(1,2)
                         .build()
                 )
                 .build());
-        wave6.add(new EntityInfoModule.Builder(EntityType.GHAST)
+        wave6.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.GHAST)
                 .amountModule(new RandomAmountModule.Builder(1,3)
                         .build()
                 )
                 .build());
-        wave6.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave6.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(1)
                         .build()
                 )
                 .build());
-        wave6.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN_BRUTE)
+        wave6.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN_BRUTE)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -174,7 +174,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .build());
 
         List<IEntityInfoModule> wave7 = Lists.newArrayList();
-        wave7.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN)
+        wave7.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -187,27 +187,27 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                         .build()
                 )
                 .build());
-        wave7.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave7.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(3,4)
                         .build()
                 )
                 .build());
-        wave7.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave7.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(2,4)
                         .build()
                 )
                 .build());
-        wave7.add(new EntityInfoModule.Builder(EntityType.GHAST)
+        wave7.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.GHAST)
                 .amountModule(new RandomAmountModule.Builder(1,3)
                         .build()
                 )
                 .build());
-        wave7.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave7.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(2)
                         .build()
                 )
                 .build());
-        wave7.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN_BRUTE)
+        wave7.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN_BRUTE)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -222,7 +222,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .build());
 
         List<IEntityInfoModule> wave8 = Lists.newArrayList();
-        wave8.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN)
+        wave8.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -235,27 +235,27 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                         .build()
                 )
                 .build());
-        wave8.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave8.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(3,4)
                         .build()
                 )
                 .build());
-        wave8.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave8.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(2,4)
                         .build()
                 )
                 .build());
-        wave8.add(new EntityInfoModule.Builder(EntityType.GHAST)
+        wave8.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.GHAST)
                 .amountModule(new RandomAmountModule.Builder(1,5)
                         .build()
                 )
                 .build());
-        wave8.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave8.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(4)
                         .build()
                 )
                 .build());
-        wave8.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN_BRUTE)
+        wave8.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN_BRUTE)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -270,7 +270,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .build());
 
         List<IEntityInfoModule> wave9 = Lists.newArrayList();
-        wave9.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN)
+        wave9.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -283,27 +283,27 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                         .build()
                 )
                 .build());
-        wave9.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave9.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(3,6)
                         .build()
                 )
                 .build());
-        wave9.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave9.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(2,6)
                         .build()
                 )
                 .build());
-        wave9.add(new EntityInfoModule.Builder(EntityType.GHAST)
+        wave9.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.GHAST)
                 .amountModule(new RandomAmountModule.Builder(1,5)
                         .build()
                 )
                 .build());
-        wave9.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave9.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(4)
                         .build()
                 )
                 .build());
-        wave9.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN_BRUTE)
+        wave9.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN_BRUTE)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -318,7 +318,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .build());
 
         List<IEntityInfoModule> wave10 = Lists.newArrayList();
-        wave10.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN)
+        wave10.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -331,27 +331,27 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                         .build()
                 )
                 .build());
-        wave10.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave10.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(3,5)
                         .build()
                 )
                 .build());
-        wave10.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave10.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(2,5)
                         .build()
                 )
                 .build());
-        wave10.add(new EntityInfoModule.Builder(EntityType.GHAST)
+        wave10.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.GHAST)
                 .amountModule(new RandomAmountModule.Builder(1,5)
                         .build()
                 )
                 .build());
-        wave10.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave10.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(4)
                         .build()
                 )
                 .build());
-        wave10.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN_BRUTE)
+        wave10.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN_BRUTE)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.GOLDEN_SWORD,1)
                         .add(Items.GOLDEN_HELMET,1)
@@ -366,7 +366,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .build());
 
         List<IEntityInfoModule> wave11 = Lists.newArrayList();
-        wave11.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN)
+        wave11.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.NETHERITE_SWORD,1)
                         .add(Items.NETHERITE_HELMET,1)
@@ -379,27 +379,27 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                         .build()
                 )
                 .build());
-        wave11.add(new EntityInfoModule.Builder(EntityType.HOGLIN)
+        wave11.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.HOGLIN)
                 .amountModule(new RandomAmountModule.Builder(5,10)
                         .build()
                 )
                 .build());
-        wave11.add(new EntityInfoModule.Builder(EntityType.MAGMA_CUBE)
+        wave11.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.MAGMA_CUBE)
                 .amountModule(new RandomAmountModule.Builder(4,10)
                         .build()
                 )
                 .build());
-        wave11.add(new EntityInfoModule.Builder(EntityType.GHAST)
+        wave11.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.GHAST)
                 .amountModule(new RandomAmountModule.Builder(3,10)
                         .build()
                 )
                 .build());
-        wave11.add(new EntityInfoModule.Builder(EntityType.BLAZE)
+        wave11.add(new EntityInfoModule.Builder(net.minecraft.world.entity.EntityTypes.BLAZE)
                 .amountModule(new IntegerAmountModule.Builder(5)
                         .build()
                 )
                 .build());
-        wave11.add(new EntityInfoWithPredicateModule.Builder(EntityType.PIGLIN_BRUTE)
+        wave11.add(new EntityInfoWithPredicateModule.Builder(net.minecraft.world.entity.EntityTypes.PIGLIN_BRUTE)
                 .add(new EquipmentPredicate.Builder()
                         .add(Items.NETHERITE_SWORD,1)
                         .add(Items.NETHERITE_HELMET,1)

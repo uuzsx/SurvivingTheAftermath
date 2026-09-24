@@ -8,7 +8,7 @@ public final class BattleEntityState {
     private static final String PREVIOUS_GLOW = "aftermath_previous_glow";
     public static boolean belongsTo(Entity entity, UUID id) {
         CompoundTag tag = entity.getPersistentData();
-        return id != null && tag.hasUUID("raid_uuid") && id.equals(tag.getUUID("raid_uuid"));
+        return id != null && tag.read("raid_uuid", net.minecraft.core.UUIDUtil.CODEC).isPresent() && id.equals(tag.read("raid_uuid", net.minecraft.core.UUIDUtil.CODEC).orElseThrow());
     }
     public static void highlight(Entity entity) {
         CompoundTag tag = entity.getPersistentData();
@@ -18,7 +18,7 @@ public final class BattleEntityState {
     public static void clear(Entity entity, UUID id) {
         if (!belongsTo(entity, id)) return;
         CompoundTag tag = entity.getPersistentData();
-        entity.setGlowingTag(tag.getBoolean(PREVIOUS_GLOW));
+        entity.setGlowingTag(tag.getBooleanOr(PREVIOUS_GLOW, false));
         tag.remove(PREVIOUS_GLOW);
         tag.remove("restricted_range");
         tag.remove("nether_raid");

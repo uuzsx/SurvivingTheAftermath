@@ -64,7 +64,7 @@ public class NBTPredicate implements IPredicateModule {
 
     @Override
     public void apply(LivingEntity livingEntity) {
-        livingEntity.readAdditionalSaveData(nbt);
+        ((com.pancake.surviving_the_aftermath.common.mixin.LivingEntityAccessor) livingEntity).aftermath$readAdditional(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, livingEntity.registryAccess(), nbt));
     }
 
     public static class Builder {

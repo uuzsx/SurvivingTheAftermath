@@ -18,31 +18,29 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import java.io.InputStreamReader;
 import java.util.*;
 
-@net.minecraftforge.gametest.GameTestHolder(SurvivingTheAftermath.MOD_ID)
-@net.minecraftforge.gametest.PrefixGameTestTemplate(false)
 public class Rc4GameTests {
     private static void check(boolean value, String message) {
-        if (!value) throw new GameTestAssertException(message);
+        if (!value) throw new GameTestAssertException(Component.literal(message), 0);
     }
     private static FakePlayer player(ServerLevel level, BlockPos pos, String name) {
         var player = new FakePlayer(level, new GameProfile(UUID.randomUUID(), name));
-        player.moveTo(Vec3.atCenterOf(pos));
+        player.snapTo(Vec3.atCenterOf(pos));
         player.setGameMode(GameType.SURVIVAL);
         level.addNewPlayer(player);
         return player;
@@ -51,18 +49,17 @@ public class Rc4GameTests {
         var location = SurvivingTheAftermath.asResource("aftermath/common.json");
         try (var stream = h.getLevel().getServer().getResourceManager().getResourceOrThrow(location).open();
              var reader = new InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8)) {
-            return BaseRaidModule.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow(false, message -> { throw new IllegalStateException(message); });
+            return BaseRaidModule.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow();
         }
     }
 
-    @GameTest(template = "stability_empty")
     public static void defaultWavePiglinsHaveWeapons(GameTestHelper h) throws Exception {
         var module = defaultModule(h);
         check(module.getWaves().size() == 11, "Default wave configuration changed");
         int piglins = 0;
         for (int repeat = 0; repeat < 12; repeat++) for (var wave : module.getWaves()) for (var group : wave) {
             for (var created : group.spawnEntity(h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)))) {
-                Entity entity = created.orElseThrow(IllegalStateException::new);
+                Entity entity = created.orElseThrow();
                 if (entity instanceof AbstractPiglin piglin) {
                     piglins++;
                     check(!piglin.getMainHandItem().isEmpty(), "An actual configured wave produced an unarmed piglin");
@@ -75,13 +72,12 @@ public class Rc4GameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
     public static void configuredEquipmentOverridesDefaults(GameTestHelper h) {
         var weapon = new EquipmentPredicate.Builder().add(Items.NETHERITE_SWORD, 1).canDrop(false).build();
         var armor = new EquipmentPredicate.Builder().add(Items.NETHERITE_CHESTPLATE, 1).canDrop(false).build();
-        var module = new EntityInfoWithPredicateModule(EntityType.PIGLIN, new IntegerAmountModule(32), List.of(weapon, armor));
+        var module = new EntityInfoWithPredicateModule(EntityTypes.PIGLIN, new IntegerAmountModule(32), List.of(weapon, armor));
         for (var created : module.spawnEntity(h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)))) {
-            var mob = (Mob) created.orElseThrow(IllegalStateException::new);
+            var mob = (Mob) created.orElseThrow();
             check(mob.getMainHandItem().is(Items.NETHERITE_SWORD), "Default initialization overwrote configured weapon");
             check(mob.getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE), "Configured armor was rejected by pickup AI");
             mob.discard();
@@ -89,17 +85,16 @@ public class Rc4GameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
     public static void dungeonMobsDropNoLootOrExperience(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos pos = h.absolutePos(new BlockPos(5, 2, 5));
         AABB area = new AABB(pos).inflate(4);
         var player = player(level, pos.east(2), "loot_test");
-        var mob = EntityType.PIGLIN.create(level);
-        mob.moveTo(Vec3.atCenterOf(pos));
+        var mob = EntityTypes.PIGLIN.create(level, EntitySpawnReason.EVENT);
+        mob.snapTo(Vec3.atCenterOf(pos));
         UUID oldRaid = UUID.randomUUID();
         mob.getPersistentData().putString("raid", "enemies");
-        mob.getPersistentData().putUUID("raid_uuid", oldRaid);
+        mob.getPersistentData().store("raid_uuid", net.minecraft.core.UUIDUtil.CODEC, oldRaid);
         RaidMobLoot.mark(mob);
         BattleEntityState.clear(mob, oldRaid); // Still no loot after the encounter has ended.
         mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND));
@@ -108,21 +103,21 @@ public class Rc4GameTests {
             // Apply after the entity-load handler, so the death event must suppress a guaranteed drop.
             mob.setDropChance(EquipmentSlot.MAINHAND, 2.0F);
             check(!mob.canPickUpLoot(), "Dungeon mob could pick up reward drops");
-            mob.hurt(level.damageSources().playerAttack(player), Float.MAX_VALUE);
+            mob.hurtServer(level, level.damageSources().playerAttack(player), Float.MAX_VALUE);
             check(!mob.isAlive(), "Dungeon loot fixture did not die");
             check(level.getEntitiesOfClass(ItemEntity.class, area).isEmpty(), "Dungeon mob dropped loot/equipment");
             check(level.getEntitiesOfClass(ExperienceOrb.class, area).isEmpty(), "Dungeon mob dropped experience");
-            var natural = EntityType.COW.create(level);
-            natural.moveTo(Vec3.atCenterOf(pos));
+            var natural = EntityTypes.COW.create(level, EntitySpawnReason.EVENT);
+            natural.snapTo(Vec3.atCenterOf(pos));
             natural.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND));
             natural.setDropChance(EquipmentSlot.MAINHAND, 2.0F);
             level.addFreshEntity(natural);
-            natural.hurt(level.damageSources().playerAttack(player), Float.MAX_VALUE);
+            natural.hurtServer(level, level.damageSources().playerAttack(player), Float.MAX_VALUE);
             check(!level.getEntitiesOfClass(ItemEntity.class, area).isEmpty(), "Natural mob loot was suppressed");
             check(!level.getEntitiesOfClass(ExperienceOrb.class, area).isEmpty(), "Natural mob experience was suppressed");
             var playerItem = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Items.EMERALD));
-            var playerDrops = new LivingDropsEvent(player, level.damageSources().generic(), new ArrayList<>(List.of(playerItem)), 0, true);
-            MinecraftForge.EVENT_BUS.post(playerDrops);
+            var playerDrops = new LivingDropsEvent(player, level.damageSources().generic(), new ArrayList<>(List.of(playerItem)), true);
+            NeoForge.EVENT_BUS.post(playerDrops);
             check(!playerDrops.isCanceled() && playerDrops.getDrops().size() == 1, "Player death inventory was suppressed");
             natural.discard();
         } finally {
@@ -134,18 +129,17 @@ public class Rc4GameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
     public static void splitMagmaCubesKeepDungeonLootPolicy(GameTestHelper h) {
         var level = h.getLevel();
         var pos = h.absolutePos(new BlockPos(5, 2, 5));
         var module = new BaseRaidModule("split", new ItemWeightedModule.Builder().add(Items.APPLE, 1).build(),
-                List.of(), List.of(List.of(new EntityInfoModule(EntityType.MAGMA_CUBE, new IntegerAmountModule(1)))), 0, 1);
+                List.of(), List.of(List.of(new EntityInfoModule(EntityTypes.MAGMA_CUBE, new IntegerAmountModule(1)))), 0, 1);
         var raid = new BaseRaid(module, level, pos);
         raid.state = AftermathState.ONGOING;
         AftermathManager.getInstance().getAftermathMap().put(raid.getUUID(), raid);
-        var parent = EntityType.MAGMA_CUBE.create(level);
+        var parent = EntityTypes.MAGMA_CUBE.create(level, EntitySpawnReason.EVENT);
         parent.setSize(4, true);
-        parent.moveTo(Vec3.atCenterOf(pos));
+        parent.snapTo(Vec3.atCenterOf(pos));
         raid.insertTag(parent);
         level.addFreshEntity(parent);
         try {
@@ -159,8 +153,8 @@ public class Rc4GameTests {
                 BattleEntityState.clear(child, raid.getUUID());
                 check(RaidMobLoot.isDungeonMob(child), "Cleanup restored child loot");
             }
-            var wild = EntityType.MAGMA_CUBE.create(level);
-            wild.moveTo(Vec3.atCenterOf(pos.east(3)));
+            var wild = EntityTypes.MAGMA_CUBE.create(level, EntitySpawnReason.EVENT);
+            wild.snapTo(Vec3.atCenterOf(pos.east(3)));
             level.addFreshEntity(wild);
             check(!RaidMobLoot.isDungeonMob(wild) && !raid.getEnemies().contains(wild.getUUID()), "Nearby wild magma cube was enrolled as a dungeon mob");
         } finally {
@@ -170,7 +164,6 @@ public class Rc4GameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
     public static void buildingMusicStopsWhenLastListenerLeaves(GameTestHelper h) throws Exception {
         var level = h.getLevel();
         var origin = h.absolutePos(new BlockPos(1, 2, 1));
@@ -183,13 +176,13 @@ public class Rc4GameTests {
             try {
                 RaidMusic.start(level, origin, id);
                 check(RaidMusic.playbackId(level, origin).orElseThrow().equals(id), "Victory song did not start");
-                first.moveTo(Vec3.atCenterOf(center.east(RaidMusic.RADIUS + 2)));
+                first.snapTo(Vec3.atCenterOf(center.east(RaidMusic.RADIUS + 2)));
                 RaidMusic.tick(level);
                 check(RaidMusic.playbackId(level, origin).isPresent(), "First departure stopped the other listener's music");
-                second.moveTo(Vec3.atCenterOf(center.west(RaidMusic.RADIUS + 2)));
+                second.snapTo(Vec3.atCenterOf(center.west(RaidMusic.RADIUS + 2)));
                 RaidMusic.tick(level);
                 check(RaidMusic.playbackId(level, origin).isEmpty(), "Last listener departure did not end playback");
-                first.moveTo(Vec3.atCenterOf(center));
+                first.snapTo(Vec3.atCenterOf(center));
                 RaidMusic.tick(level);
                 check(RaidMusic.playbackId(level, origin).isEmpty(), "Returning to an empty building restarted music");
                 UUID next = UUID.randomUUID();
@@ -207,11 +200,10 @@ public class Rc4GameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
     public static void musicPacketAndSpatialAsset(GameTestHelper h) throws Exception {
         var buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
-            var start = new AftermathNetwork.MusicPacket(UUID.randomUUID(), h.getLevel().dimension().location(), new BlockPos(-13, 75, 28), 1234);
+            var start = new AftermathNetwork.MusicPacket(UUID.randomUUID(), h.getLevel().dimension().identifier(), new BlockPos(-13, 75, 28), 1234);
             start.encode(buffer);
             check(AftermathNetwork.MusicPacket.decode(buffer).equals(start), "Music source/elapsed time changed in transit");
             var stop = new AftermathNetwork.MusicPacket(start.id(), null, BlockPos.ZERO, 0);

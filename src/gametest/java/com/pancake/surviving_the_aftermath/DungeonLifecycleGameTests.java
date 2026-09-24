@@ -17,7 +17,7 @@ import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.*;
@@ -33,21 +33,21 @@ import net.minecraft.world.level.levelgen.structure.*;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.portal.PortalShape;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.PlayLevelSoundEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.gametest.*;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.PlayLevelSoundEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.gametest.*;
 import java.util.*;
 
-@GameTestHolder(SurvivingTheAftermath.MOD_ID)
-@PrefixGameTestTemplate(false)
+
+
 public class DungeonLifecycleGameTests {
     private static final AftermathManager MANAGER = AftermathManager.getInstance();
-    private static void check(boolean condition, String message) { if (!condition) throw new GameTestAssertException(message); }
+    private static void check(boolean condition, String message) { if (!condition) throw new GameTestAssertException(net.minecraft.network.chat.Component.literal(message), 0); }
     private static BaseRaidModule module() {
         var wave = List.<com.pancake.surviving_the_aftermath.api.module.IEntityInfoModule>of(
-                new EntityInfoModule(EntityType.ZOMBIE, new IntegerAmountModule(1)));
+                new EntityInfoModule(net.minecraft.world.entity.EntityTypes.ZOMBIE, new IntegerAmountModule(1)));
         return new BaseRaidModule("dungeon_regression", new ItemWeightedModule.Builder().add(Items.APPLE, 1).build(),
                 List.of(), List.of(wave, wave), 0, 3);
     }
@@ -58,16 +58,16 @@ public class DungeonLifecycleGameTests {
         Sounds(ServerLevel level) { this.level = level; }
         @SubscribeEvent public void sound(PlayLevelSoundEvent.AtPosition event) {
             if (event.getLevel() != level || event.getSound() == null) return;
-            if (event.getSound().value() == SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get()) horns++;
+            if (event.getSound().value() == SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).value()) horns++;
         }
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void eachWaveTransformsBeforeSpawningAndVictoryRewardsImmediately(GameTestHelper h) {
         int[] transforms = {0}, rewards = {0};
         Sounds sounds = new Sounds(h.getLevel());
         var listener = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "music_timing"));
-        listener.moveTo(Vec3.atCenterOf(h.absolutePos(new BlockPos(5, 2, 5))));
+        listener.snapTo(Vec3.atCenterOf(h.absolutePos(new BlockPos(5, 2, 5))));
         h.getLevel().addNewPlayer(listener);
         var raid = new NetherRaid(AftermathState.ONGOING, module(), Set.of(UUID.randomUUID()), 0f,
                 h.absolutePos(new BlockPos(5, 2, 5)), 0, 3, Set.of(), Set.of(), -1, 0, List.of()) {
@@ -80,7 +80,7 @@ public class DungeonLifecycleGameTests {
             @Override public void createRewards() { rewards[0]++; }
         };
         raid.setLevel(h.getLevel());
-        MinecraftForge.EVENT_BUS.register(sounds);
+        NeoForge.EVENT_BUS.register(sounds);
         try {
             raid.tick();
             check(transforms[0] == 1 && sounds.horns == 1 && raid.getCurrentWave() == 0, "First wave did not transform once");
@@ -97,34 +97,34 @@ public class DungeonLifecycleGameTests {
         } finally {
             RaidMusic.stop(h.getLevel(), raid.getStartPos());
             h.getLevel().removePlayerImmediately(listener, Entity.RemovalReason.DISCARDED);
-            raid.end(); MinecraftForge.EVENT_BUS.unregister(sounds); }
+            raid.end(); NeoForge.EVENT_BUS.unregister(sounds); }
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void diamondRecipeRequiresBothIngredients(GameTestHelper h) {
         var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "recipe_test"));
         var grid = new TransientCraftingContainer(new CraftingMenu(0, player.getInventory()), 2, 2);
         grid.setItem(0, new ItemStack(Items.DIAMOND));
-        check(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, h.getLevel()).isEmpty(), "Diamond alone crafted the tool");
+        check(h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).isEmpty(), "Diamond alone crafted the tool");
         grid.setItem(3, new ItemStack(Items.FLINT_AND_STEEL));
-        check(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, h.getLevel()).isEmpty(), "Old flint-and-steel ingredient still accepted");
+        check(h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).isEmpty(), "Old flint-and-steel ingredient still accepted");
         grid.setItem(3, new ItemStack(Items.FLINT));
-        var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, h.getLevel()).orElseThrow();
-        var result = recipe.assemble(grid, h.getLevel().registryAccess());
+        var recipe = h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).orElseThrow();
+        var result = recipe.value().assemble(grid.asCraftInput());
         check(result.is(ModItems.DIAMOND_FLINT_AND_STEEL.get()) && result.getCount() == 1 && result.getMaxDamage() == 64,
                 "Diamond flint and steel recipe or durability incorrect");
         grid.setItem(1, new ItemStack(Items.IRON_INGOT));
-        check(!recipe.matches(grid, h.getLevel()), "Recipe accepted an extra ingredient");
+        check(!recipe.value().matches(grid.asCraftInput(), h.getLevel()), "Recipe accepted an extra ingredient");
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void victoryEndsDeathAndEscapePenalties(GameTestHelper h) {
         var level = h.getLevel();
         var player = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "victory_safety"));
         BlockPos pos = h.absolutePos(new BlockPos(5, 2, 5));
-        player.moveTo(pos.east(150).getCenter());
+        player.snapTo(net.minecraft.world.phys.Vec3.atCenterOf(pos.east(150)));
         var raid = new BaseRaid(module(), level, pos);
         raid.state = AftermathState.ONGOING;
         raid.getPlayers().add(player.getUUID());
@@ -133,21 +133,21 @@ public class DungeonLifecycleGameTests {
         tracker.getDeathMap().put(player.getUUID(), 3);
         tracker.getEscapeMap().put(player.getUUID(), level.getGameTime() - 101);
         MANAGER.getAftermathMap().put(raid.getUUID(), raid);
-        MinecraftForge.EVENT_BUS.register(tracker);
+        NeoForge.EVENT_BUS.register(tracker);
         try {
             AftermathEventUtil.victory(raid, raid.getPlayers(), level);
             check(tracker.getDeathMap().isEmpty() && tracker.getEscapeMap().isEmpty(), "Victory retained combat penalties");
             // No new death bookkeeping may start after the victory event.
-            tracker.onDeath(new net.minecraftforge.event.entity.living.LivingDeathEvent(player, level.damageSources().generic()));
-            tracker.onPlayerRespawn(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent(player, false));
+            tracker.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(player, level.damageSources().generic()));
+            tracker.onPlayerRespawn(new net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent(player, false));
             check(tracker.getDeathMap().isEmpty() && raid.state == AftermathState.VICTORY, "Post-victory death interrupted rewards");
             // A stale countdown from an old celebrating save must also be discarded.
             raid.state = AftermathState.CELEBRATING;
             tracker.getEscapeMap().put(player.getUUID(), level.getGameTime() - 101);
-            tracker.onPlayerEscape(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END, player));
-            check(!player.hasEffect(ModMobEffects.COWARDICE.get()) && tracker.getEscapeMap().isEmpty(), "Post-victory escape applied punishment");
+            tracker.onPlayerEscape(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player));
+            check(!player.hasEffect(ModMobEffects.COWARDICE) && tracker.getEscapeMap().isEmpty(), "Post-victory escape applied punishment");
         } finally {
-            raid.end(); MinecraftForge.EVENT_BUS.unregister(tracker); MANAGER.getAftermathMap().remove(raid.getUUID());
+            raid.end(); NeoForge.EVENT_BUS.unregister(tracker); MANAGER.getAftermathMap().remove(raid.getUUID());
         }
         h.succeed();
     }
@@ -156,7 +156,7 @@ public class DungeonLifecycleGameTests {
     static AutoCloseable arena(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
-        var structure = level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ModStructures.NETHER_RAID);
+        var structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.NETHER_RAID).value();
         var piece = new AbstractStructure.Piece(ModStructurePieceTypes.NETHER_RAID.get(), level.getStructureManager(),
                 SurvivingTheAftermath.asResource("stability_empty"), origin, Rotation.NONE);
         var startChunk = level.getChunkAt(origin);
@@ -169,7 +169,7 @@ public class DungeonLifecycleGameTests {
                 var old = new HashMap<>(chunk.getAllReferences());
                 old.replaceAll((key, refs) -> new LongOpenHashSet(refs));
                 restore.add(() -> chunk.setAllReferences(old));
-                chunk.addReferenceForStructure(structure, startChunk.getPos().toLong());
+                chunk.addReferenceForStructure(structure, startChunk.getPos().pack());
             }
         }
         startChunk.setStartForStructure(structure, new StructureStart(structure, startChunk.getPos(), 0, new PiecesContainer(List.of(piece))));
@@ -193,10 +193,10 @@ public class DungeonLifecycleGameTests {
                 new BlockHitResult(Vec3.atCenterOf(clicked), face, clicked, false)));
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void diamondPortalLifecycleX(GameTestHelper h) throws Exception { portalLifecycle(h, Direction.Axis.X); }
 
-    @GameTest(template = "stability_empty")
+
     public static void diamondPortalLifecycleZ(GameTestHelper h) throws Exception { portalLifecycle(h, Direction.Axis.Z); }
 
     private static void portalLifecycle(GameTestHelper h, Direction.Axis axis) throws Exception {
@@ -204,18 +204,18 @@ public class DungeonLifecycleGameTests {
         BlockPos pos = h.absolutePos(new BlockPos(6, 3, 6));
         Set<BlockPos> plane = frame(level, pos, axis);
         var modules = AftermathModuleLoader.AFTERMATH_MODULE_MAP;
-        ResourceLocation key = SurvivingTheAftermath.asResource(BaseRaid.IDENTIFIER);
+        Identifier key = SurvivingTheAftermath.asResource(BaseRaid.IDENTIFIER);
         var oldModules = List.copyOf(modules.get(key));
         var battleModule = module();
         modules.removeAll(key); modules.put(key, battleModule);
         Set<UUID> oldBattles = new HashSet<>(MANAGER.getAftermathMap().keySet());
         var player = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "portal_test"));
-        player.moveTo(pos.south(2).getCenter());
+        player.snapTo(net.minecraft.world.phys.Vec3.atCenterOf(pos.south(2)));
         player.setGameMode(GameType.SURVIVAL);
         level.addNewPlayer(player);
         ItemStack tool = new ItemStack(ModItems.DIAMOND_FLINT_AND_STEEL.get());
         Sounds sounds = new Sounds(level);
-        MinecraftForge.EVENT_BUS.register(sounds);
+        NeoForge.EVENT_BUS.register(sounds);
         try (var ignored = arena(h)) {
             check(RaidPortal.isArena(level, pos), "Fixture structure not recognized");
             for (Item ordinary : List.of(Items.FLINT_AND_STEEL, Items.FIRE_CHARGE)) {
@@ -225,8 +225,8 @@ public class DungeonLifecycleGameTests {
                 level.removeBlock(pos, false);
             }
             var shape = PortalShape.findEmptyPortalShape(level, pos, axis).orElseThrow();
-            var natural = new net.minecraftforge.event.level.BlockEvent.PortalSpawnEvent(level, pos, Blocks.FIRE.defaultBlockState(), shape);
-            check(MinecraftForge.EVENT_BUS.post(natural), "Natural fire bypassed diamond requirement");
+            var natural = new net.neoforged.neoforge.event.level.BlockEvent.PortalSpawnEvent(level, pos, Blocks.FIRE.defaultBlockState(), shape);
+            check(NeoForge.EVENT_BUS.post(natural).isCanceled(), "Natural fire bypassed diamond requirement");
             battleModule.setConditions(List.of(new XpConditionModule(2)));
             player.experienceLevel = 0;
             check(ignite(player, tool, pos.below(), Direction.UP) == InteractionResult.FAIL && tool.getDamageValue() == 0,
@@ -267,7 +267,7 @@ public class DungeonLifecycleGameTests {
             ((NetherRaid) repeated).end();
 
             // Older versions may leave a lit portal without an active encounter.
-            PortalShape.findEmptyPortalShape(level, pos, axis).orElseThrow().createPortalBlocks();
+            PortalShape.findEmptyPortalShape(level, pos, axis).orElseThrow().createPortalBlocks(level);
             check(ignite(player, tool, pos, Direction.UP).consumesAction() && tool.getDamageValue() == 3,
                     "Legacy already-lit portal could not be reactivated");
             var legacy = (NetherRaid) MANAGER.getAftermathMap().values().stream().filter(a -> !oldBattles.contains(a.getUUID()) && !a.isEnd()).findFirst().orElseThrow();
@@ -283,7 +283,7 @@ public class DungeonLifecycleGameTests {
             MANAGER.getAftermathMap().values().stream().filter(a -> !oldBattles.contains(a.getUUID())).toList().forEach(a -> {
                 ((NetherRaid) a).end(); a.getTrackers().forEach(ITracker::unregister); MANAGER.getAftermathMap().remove(a.getUUID());
             });
-            MinecraftForge.EVENT_BUS.unregister(sounds);
+            NeoForge.EVENT_BUS.unregister(sounds);
             RaidMusic.stop(level, pos);
             modules.removeAll(key); modules.putAll(key, oldModules);
             level.removePlayerImmediately(player, Entity.RemovalReason.DISCARDED);
@@ -291,7 +291,7 @@ public class DungeonLifecycleGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "stability_empty")
+
     public static void ordinaryPortalsOutsideDungeonStillWork(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos pos = h.absolutePos(new BlockPos(6, 3, 6));

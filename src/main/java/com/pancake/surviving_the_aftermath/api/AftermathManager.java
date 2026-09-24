@@ -7,7 +7,7 @@ import com.pancake.surviving_the_aftermath.api.module.IAftermathModule;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -16,7 +16,7 @@ import java.util.*;
 
 public class AftermathManager {
     private final Map<UUID, IAftermath> AFTERMATH_MAP = new LinkedHashMap<>();
-    public final Multimap<ResourceLocation, IAftermathModule> AFTERMATH_MODULE_MAP = ArrayListMultimap.create();
+    public final Multimap<Identifier, IAftermathModule> AFTERMATH_MODULE_MAP = ArrayListMultimap.create();
     private static final AftermathManager INSTANCE = new AftermathManager();
     public static AftermathManager getInstance() { return INSTANCE; }
     private AftermathManager() {}
@@ -69,8 +69,8 @@ public class AftermathManager {
         AFTERMATH_MODULE_MAP.clear();
     }
 
-    public Multimap<ResourceLocation, IAftermathModule> getAftermathModuleMap() { return AFTERMATH_MODULE_MAP; }
-    public void fillAftermathModuleMap(Multimap<ResourceLocation, IAftermathModule> map) {
+    public Multimap<Identifier, IAftermathModule> getAftermathModuleMap() { return AFTERMATH_MODULE_MAP; }
+    public void fillAftermathModuleMap(Multimap<Identifier, IAftermathModule> map) {
         AFTERMATH_MODULE_MAP.clear();
         AFTERMATH_MODULE_MAP.putAll(map);
     }

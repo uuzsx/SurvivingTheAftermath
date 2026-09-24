@@ -1,17 +1,21 @@
 {
-  "carvers": {},
+  "attributes": {
+    "minecraft:visual/ambient_particles": [
+      {
+        "particle": {
+          "type": "minecraft:white_ash"
+        },
+        "probability": 0.118093334
+      }
+    ],
+    "minecraft:visual/fog_color": "#c0d8ff",
+    "minecraft:visual/sky_color": "#6eb1ff",
+    "minecraft:visual/water_fog_color": "#050533"
+  },
+  "carvers": [],
   "downfall": 0.9,
   "effects": {
-    "fog_color": 12638463,
-    "particle": {
-      "options": {
-        "type": "minecraft:white_ash"
-      },
-      "probability": 0.118093334
-    },
-    "sky_color": 7254527,
-    "water_color": 4159204,
-    "water_fog_color": 329011
+    "water_color": "#3f76e4"
   },
   "features": [],
   "has_precipitation": true,

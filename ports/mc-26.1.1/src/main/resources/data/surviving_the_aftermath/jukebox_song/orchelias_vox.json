@@ -1,8 +1,0 @@
-{
-  "sound_event": "surviving_the_aftermath:orchelias_vox",
-  "description": {
-    "translate": "item.surviving_the_aftermath.music_disk_orchelias_vox.desc"
-  },
-  "length_in_seconds": 269.599,
-  "comparator_output": 15
-}

@@ -2,7 +2,7 @@ package com.pancake.surviving_the_aftermath.common.init;
 
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
@@ -28,7 +28,7 @@ public class ModStructureSets {
         return ResourceKey.create(Registries.STRUCTURE_SET, SurvivingTheAftermath.asResource(name));
     }
 
-    public static void bootstrap(BootstapContext<StructureSet> context) {
+    public static void bootstrap(BootstrapContext<StructureSet> context) {
         int[] wagonCargoSalt = new int[]{0, 1365330241, 161766032, 1733648479, 2081980804, 418595573, 947847921};
         int[] burntSalt = new int[] {0, 104706480, 705540248, 1838764692, 1669956657, 1334899266, 2119656745};
         context.register(CITY_SET, new StructureSet(context.lookup(Registries.STRUCTURE).getOrThrow(CITY),
