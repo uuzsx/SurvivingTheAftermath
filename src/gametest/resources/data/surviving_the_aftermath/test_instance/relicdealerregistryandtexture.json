@@ -1,0 +1,1 @@
+{"type": "minecraft:function", "function": "surviving_the_aftermath:relicdealerregistryandtexture", "environment": "surviving_the_aftermath:relic_generation", "structure": "surviving_the_aftermath:stability_empty", "max_ticks": 600, "required": true}
