@@ -13,6 +13,8 @@ import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -25,6 +27,11 @@ public class CityStructure extends AbstractStructure {
 	public CityStructure(StructureSettings settings) {
 		super(settings);
 	}
+
+    @Override
+    protected Piece createPiece(StructureTemplateManager manager, BlockPos origin, Rotation rotation) {
+        return new Piece(manager, origin, rotation);
+    }
 
     @Override
     protected java.util.Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
@@ -53,6 +60,10 @@ public class CityStructure extends AbstractStructure {
 
 	public static class Piece extends AbstractStructure.Piece {
 
+        public Piece(StructureTemplateManager manager, BlockPos origin, Rotation rotation) {
+            super(ModStructurePieceTypes.CITY.get(), manager, SurvivingTheAftermath.asResource("city"), origin, rotation);
+        }
+
 		public Piece(StructurePieceSerializationContext context, CompoundTag tag) {
 			super(ModStructurePieceTypes.CITY.get(), context.structureTemplateManager(), tag);
 		}
@@ -74,7 +85,9 @@ public class CityStructure extends AbstractStructure {
                 BlockState state2 = level.getBlockState(feet.above());
 				if (state1.isAir() && state2.isAir() && level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), net.minecraft.core.Direction.UP)) {
 					Villager villager = EntityType.VILLAGER.create(level.getLevel(), net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
-					villager.snapTo(spawnPos.getX(), y, spawnPos.getZ());
+					if (villager == null) return;
+                    villager.snapTo(spawnPos.getX() + 0.5D, y, spawnPos.getZ() + 0.5D);
+                    if (!level.noCollision(villager)) continue;
 					BuiltInRegistries.VILLAGER_TYPE.getRandom(rand).ifPresent((profession) ->
 							villager.setVillagerData(villager.getVillagerData().withType(profession)));
 					BuiltInRegistries.VILLAGER_PROFESSION.getRandom(rand).ifPresent((profession) ->

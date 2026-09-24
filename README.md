@@ -10,7 +10,7 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
 使用钻石打火石开启 11 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 
-当前分支 **`26.1.2`** 对应 **Minecraft 26.1.2 / NeoForge 26.1.2.109 / Java 25**，模组版本为 **0.0.4-rc.13**。
+当前分支 **`26.1.2`** 对应 **Minecraft 26.1.2 / NeoForge 26.1.2.109 / Java 25**，模组版本为 **0.0.4-rc.14**。
 每个版本都在自己的分支根目录独立构建；默认分支 `main` 为 1.20.1。
 
 ## 版本与分支
@@ -33,6 +33,8 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 - 胜利音乐以建筑中心为声源，在 48 格内随距离衰减。成功重新激活，或最后一名玩家离开范围时停止；回来不会续播。
 
 ## 更新记录
+
+rc.14 修复新城市跳过村民生成的问题；核实遗物商人职业、贴图、随机生成和交易，并检查出生碰撞。见 [遗物商人核对与验证](docs/RELIC-DEALER-rc.14.md)。
 
 rc.13 核对十种附魔和全部 31 种附魔书等级组合，修复处决绕过不死图腾，并统一处决与渴血的结算。皎月/烈阳保留旧版昼夜规则。见 [附魔核对与验证](docs/ENCHANTMENTS-rc.13.md)。
 

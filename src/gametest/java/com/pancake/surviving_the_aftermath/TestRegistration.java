@@ -11,6 +11,8 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("relicdealerregistryandtexture"), wrap(RelicGenerationGameTests::relicDealerRegistryAndTexture));
+   helper.register(SurvivingTheAftermath.asResource("naturalcitycreatesrelicdealers"), wrap(RelicGenerationGameTests::naturalCityCreatesRelicDealers));
    helper.register(SurvivingTheAftermath.asResource("enchantmentbooksworkinanvil"), wrap(EnchantmentAuditGameTests::enchantmentBooksWorkInAnvil));
    helper.register(SurvivingTheAftermath.asResource("enchantmentexecuterespectstotems"), wrap(EnchantmentAuditGameTests::enchantmentExecuteRespectsTotems));
    helper.register(SurvivingTheAftermath.asResource("enchantmentequipmentandgrowthlifecycle"), wrap(EnchantmentAuditGameTests::enchantmentEquipmentAndGrowthLifecycle));
