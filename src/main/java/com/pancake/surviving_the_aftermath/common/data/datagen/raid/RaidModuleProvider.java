@@ -42,7 +42,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
                 .add(Items.GOLDEN_BOOTS,1)
                 .build();
 
-        StructureConditionModule structureConditionModule = new StructureConditionModule(ModStructures.NETHER_RAID.location().toString());
+        StructureConditionModule structureConditionModule = new StructureConditionModule(ModStructures.NETHER_RAID.identifier().toString());
 
 
         List<IEntityInfoModule> wave1 = Lists.newArrayList();

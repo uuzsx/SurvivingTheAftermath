@@ -4,7 +4,7 @@ import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.init.ModStructurePieceTypes;
 import com.pancake.surviving_the_aftermath.common.init.ModStructureTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
@@ -41,7 +41,7 @@ public class BurntStructure extends AbstractStructure {
     }
 
     @Override
-    public ResourceLocation location() {
+    public Identifier location() {
         return SurvivingTheAftermath.asResource("burnt_structure" + this.index);
     }
 

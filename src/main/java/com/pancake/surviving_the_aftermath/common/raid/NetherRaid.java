@@ -16,7 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -33,7 +33,7 @@ import net.minecraft.world.level.portal.PortalShape;
 import java.util.*;
 
 public class NetherRaid extends BaseRaid {
-    public static final ResourceLocation BARS_RESOURCE = new ResourceLocation("surviving_the_aftermath:textures/gui/nether_raid_bars.png");
+    public static final Identifier BARS_RESOURCE = Identifier.parse("surviving_the_aftermath:textures/gui/nether_raid_bars.png");
     public static final String IDENTIFIER = "nether_raid";
     public static final Codec<NetherRaid> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             AftermathState.CODEC.fieldOf("state").forGetter(BaseRaid::getState),
@@ -133,21 +133,21 @@ public class NetherRaid extends BaseRaid {
     @Override
     protected void onWaveStarted() {
         updateStructure();
-        level.playSound(null, startPos, SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(),
+        level.playSound(null, startPos, SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).value(),
                 SoundSource.NEUTRAL, 3.0F, 1.0F);
     }
 
 
 
     protected void updateStructure() {
-        StructureStart start = this.level.structureManager().getStructureAt(startPos, Objects.requireNonNull(this.level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ModStructures.NETHER_RAID)));
+        StructureStart start = this.level.structureManager().getStructureAt(startPos, Objects.requireNonNull(this.level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.NETHER_RAID).value()));
         if (start != StructureStart.INVALID_START) {
             Optional<StructureTemplate> template = this.level.getStructureManager().get(NetherRaidStructure.STRUCTURE_TRANSFORMED);
             template.ifPresent(t -> {
                 if (start.getPieces().get(0) instanceof TemplateStructurePiece piece) {
                     BlockPos pos = piece.templatePosition();
-                    StructurePlaceSettings settings = com.pancake.surviving_the_aftermath.common.util.RaidStructureTransformation.settings(piece.getRotation(), this.level.random);
-                    t.placeInWorld(this.level, pos, pos, settings, this.level.random, 2);
+                    StructurePlaceSettings settings = com.pancake.surviving_the_aftermath.common.util.RaidStructureTransformation.settings(piece.getRotation(), this.level.getRandom());
+                    t.placeInWorld(this.level, pos, pos, settings, this.level.getRandom(), 2);
                 }
             });
         }
@@ -160,7 +160,7 @@ public class NetherRaid extends BaseRaid {
     }
 
     @Override
-    public ResourceLocation getBarsResource() {
+    public Identifier getBarsResource() {
         return BARS_RESOURCE;
     }
 

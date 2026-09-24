@@ -6,21 +6,21 @@ import com.pancake.surviving_the_aftermath.api.module.IWeightedModule;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.util.CodecUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
 
 public class AttributeWeightedModule extends BaseWeightedModule<AttributeWeightedModule.AttributeInfo>{
     public static final String IDENTIFIER = "attribute_weighted";
 
-    public static final Codec<AttributeWeightedModule> CODEC = Codec.list(WeightedEntry.Wrapper.codec(AttributeInfo.CODEC))
+    public static final Codec<AttributeWeightedModule> CODEC = Codec.list(Weighted.codec(AttributeInfo.CODEC))
             .xmap(AttributeWeightedModule::new, AttributeWeightedModule::getList);
 
-    public AttributeWeightedModule(List<WeightedEntry.Wrapper<AttributeInfo>> list) {
+    public AttributeWeightedModule(List<Weighted<AttributeInfo>> list) {
         super(list);
     }
 
@@ -38,24 +38,24 @@ public class AttributeWeightedModule extends BaseWeightedModule<AttributeWeighte
         return ModAftermathModule.ATTRIBUTE_WEIGHTED.get();
     }
 
-    public record AttributeInfo(Attribute attribute, AttributeModifier attributeModifier) {
+    public record AttributeInfo(net.minecraft.core.Holder<Attribute> attribute, AttributeModifier attributeModifier) {
         public final static Codec<AttributeInfo> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BuiltInRegistries.ATTRIBUTE.byNameCodec().fieldOf("attribute").forGetter(AttributeInfo::attribute),
+                BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(AttributeInfo::attribute),
                 CodecUtils.ATTRIBUTE_MODIFIER_CODEC.fieldOf("attribute_modifier").forGetter(AttributeInfo::attributeModifier)
         ).apply(instance, AttributeInfo::new));
     }
 
     public static class Builder {
-        private List<WeightedEntry.Wrapper<AttributeInfo>> attributes;
+        private List<Weighted<AttributeInfo>> attributes = new java.util.ArrayList<>();
 
-        public Builder add(Attribute attribute, AttributeModifier modifier, int weight){
-            attributes.add(WeightedEntry.wrap(new AttributeInfo(attribute,modifier), weight));
+        public Builder add(net.minecraft.core.Holder<Attribute> attribute, AttributeModifier modifier, int weight){
+            attributes.add(new Weighted<>(new AttributeInfo(attribute,modifier), weight));
             return this;
         }
 
         public Builder add(String attribute, String name, double amount, int operation, int weight){
-            attributes.add(WeightedEntry.wrap(new AttributeInfo(ForgeRegistries.ATTRIBUTES.getValue(ResourceLocation.tryParse(attribute)),
-                    new AttributeModifier(name, amount, AttributeModifier.Operation.fromValue(operation))),
+            attributes.add(new Weighted<>(new AttributeInfo(net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.get(Identifier.parse(attribute)).orElseThrow(),
+                    new AttributeModifier(CodecUtils.modifierId(name), amount, AttributeModifier.Operation.BY_ID.apply(operation))),
                     weight)
             );
             return this;

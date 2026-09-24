@@ -27,7 +27,7 @@ public abstract class BaseAftermath implements IAftermath {
     public AftermathState state = AftermathState.START;
     protected Set<UUID> players = new HashSet<>();
     protected List<ITracker> trackers = new ArrayList<>();
-    protected final ServerBossEvent progress = new ServerBossEvent(Component.empty(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
+    protected final ServerBossEvent progress = new ServerBossEvent(java.util.UUID.randomUUID(), Component.empty(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
     protected UUID uuid = UUID.randomUUID();
     protected float progressPercent = progress.getProgress();
 
@@ -54,7 +54,7 @@ public abstract class BaseAftermath implements IAftermath {
             List<IAftermathModule> available = AftermathModuleLoader.AFTERMATH_MODULE_MAP.get(getRegistryName()).stream()
                     .filter(candidate -> candidate.isCreate(level, pos, player)).toList();
             if (available.isEmpty()) return false;
-            module = available.get(level.random.nextInt(available.size()));
+            module = available.get(level.getRandom().nextInt(available.size()));
         }
         return module.isCreate(level, pos, player);
     }
@@ -124,7 +124,7 @@ public abstract class BaseAftermath implements IAftermath {
 
     public IAftermathModule getRandomAftermathModule() {
         List<IAftermathModule> modules = new ArrayList<>(AftermathModuleLoader.AFTERMATH_MODULE_MAP.get(getRegistryName()));
-        return modules.isEmpty() ? null : modules.get(level.random.nextInt(modules.size()));
+        return modules.isEmpty() ? null : modules.get(level.getRandom().nextInt(modules.size()));
     }
 
     public void end() {

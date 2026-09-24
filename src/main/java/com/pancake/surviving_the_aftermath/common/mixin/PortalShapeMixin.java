@@ -37,5 +37,3 @@ public class PortalShapeMixin implements PortalShapeAccessor {
         return rightDir;
     }
 }
-
-

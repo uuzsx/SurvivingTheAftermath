@@ -6,10 +6,10 @@ import com.pancake.surviving_the_aftermath.common.init.ModStructureTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -37,7 +37,7 @@ public class CityStructure extends AbstractStructure {
 	}
 
 	@Override
-	public ResourceLocation location() {
+	public Identifier location() {
 		return SurvivingTheAftermath.asResource("city");
 	}
 
@@ -57,15 +57,15 @@ public class CityStructure extends AbstractStructure {
 				BlockState state1 = this.getBlock(level, spawnPos.getX(), y, spawnPos.getZ(), box);
 				BlockState state2 = this.getBlock(level, spawnPos.getX(), y + 1, spawnPos.getZ(), box);
 				if (state1.isAir() && state2.isAir()) {
-					Villager villager = EntityType.VILLAGER.create(level.getLevel());
-					villager.moveTo(spawnPos.getX(), y, spawnPos.getZ());
+					Villager villager = EntityType.VILLAGER.create(level.getLevel(), net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
+					villager.snapTo(spawnPos.getX(), y, spawnPos.getZ());
 					BuiltInRegistries.VILLAGER_TYPE.getRandom(rand).ifPresent((profession) ->
-							villager.setVillagerData(villager.getVillagerData().setType(profession.value())));
+							villager.setVillagerData(villager.getVillagerData().withType(profession)));
 					BuiltInRegistries.VILLAGER_PROFESSION.getRandom(rand).ifPresent((profession) ->
-							villager.setVillagerData(villager.getVillagerData().setProfession(profession.value())));
+							villager.setVillagerData(villager.getVillagerData().withProfession(profession)));
                     // No workstation existed in the original design. Keep generated relic dealers from
                     // immediately losing their authored profession before the first trade.
-                    if (villager.getVillagerData().getProfession() == com.pancake.surviving_the_aftermath.common.init.ModVillagers.RELIC_DEALER.get()) villager.setVillagerXp(1);
+                    if (villager.getVillagerData().profession().value() == com.pancake.surviving_the_aftermath.common.init.ModVillagers.RELIC_DEALER.get()) villager.setVillagerXp(1);
 					level.addFreshEntity(villager);
 					break;
 				}

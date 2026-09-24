@@ -8,10 +8,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import java.util.*;
 
 /** One spatial playback per building, with a lifetime independent of reward dispensing. */
@@ -25,7 +25,7 @@ public final class RaidMusic {
     private record Playback(UUID id, long started, Map<UUID, ServerPlayer> listeners) {}
 
     public static BlockPos center(ServerLevel level, BlockPos origin) {
-        var structure = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.NETHER_RAID);
+        var structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.NETHER_RAID).value();
         var start = level.structureManager().getStructureAt(origin, structure);
         return start.isValid() ? start.getBoundingBox().getCenter() : origin.immutable();
     }
@@ -81,8 +81,8 @@ public final class RaidMusic {
     }
 
     @SubscribeEvent
-    public static void tick(TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel level) tick(level);
+    public static void tick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel level) tick(level);
     }
 
     public static void tick(ServerLevel level) {

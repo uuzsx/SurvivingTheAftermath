@@ -8,34 +8,34 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 import java.util.*;
 
-@Mod.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID)
+@net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID)
 public final class PlayerRecovery extends SavedData {
     private static final String KEY = "aftermath_spectator_recovery";
     private final Map<UUID, Integer> pending = new HashMap<>();
     private static PlayerRecovery get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(PlayerRecovery::load, PlayerRecovery::new, KEY);
+        return server.overworld().getDataStorage().computeIfAbsent(new net.minecraft.world.level.saveddata.SavedDataType<>(SurvivingTheAftermath.asResource(KEY), PlayerRecovery::new, CompoundTag.CODEC.xmap(PlayerRecovery::load, data -> data.save(new CompoundTag(), null))));
     }
     private static PlayerRecovery load(CompoundTag tag) {
         PlayerRecovery data = new PlayerRecovery();
-        for (String key : tag.getAllKeys()) {
-            try { data.pending.put(UUID.fromString(key), tag.getInt(key)); }
+        for (String key : tag.keySet()) {
+            try { data.pending.put(UUID.fromString(key), tag.getIntOr(key, 0)); }
             catch (IllegalArgumentException ignored) { SurvivingTheAftermath.LOGGER.warn("Invalid pending player recovery id {}", key); }
         }
         return data;
     }
-    @Override public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         pending.forEach((id, mode) -> tag.putInt(id.toString(), mode));
         return tag;
     }
     public static void mark(ServerPlayer player, UUID battle, GameType originalMode) {
-        CompoundTag persistent = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        CompoundTag persistent = player.getPersistentData().getCompoundOrEmpty(Player.PERSISTED_NBT_TAG);
         CompoundTag recovery = new CompoundTag();
-        recovery.putUUID("battle", battle);
+        recovery.store("battle", net.minecraft.core.UUIDUtil.CODEC, battle);
         recovery.putInt("mode", originalMode.getId());
         persistent.put(KEY, recovery);
         player.getPersistentData().put(Player.PERSISTED_NBT_TAG, persistent);
@@ -48,12 +48,12 @@ public final class PlayerRecovery extends SavedData {
         if (player != null) apply(player);
     }
     private static void apply(ServerPlayer player) {
-        PlayerRecovery data = get(player.server);
-        CompoundTag persistent = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
-        CompoundTag marker = persistent.getCompound(KEY);
+        PlayerRecovery data = get(player.level().getServer());
+        CompoundTag persistent = player.getPersistentData().getCompoundOrEmpty(Player.PERSISTED_NBT_TAG);
+        CompoundTag marker = persistent.getCompoundOrEmpty(KEY);
         Integer mode = data.pending.remove(player.getUUID());
-        if (mode == null && marker.hasUUID("battle")
-                && AftermathManager.getInstance().getAftermath(marker.getUUID("battle")).isEmpty()) mode = marker.getInt("mode");
+        if (mode == null && marker.read("battle", net.minecraft.core.UUIDUtil.CODEC).isPresent()
+                && AftermathManager.getInstance().getAftermath(marker.read("battle", net.minecraft.core.UUIDUtil.CODEC).orElseThrow()).isEmpty()) mode = marker.getIntOr("mode", 0);
         if (mode != null) {
             player.setCamera(player);
             player.setGameMode(GameType.byId(mode));

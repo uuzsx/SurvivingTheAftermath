@@ -6,7 +6,7 @@ import com.pancake.surviving_the_aftermath.api.module.IWeightedModule;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.util.RegistryUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
@@ -14,11 +14,11 @@ import java.util.List;
 public class ItemWeightedModule extends BaseWeightedModule<Item> {
     public static final String IDENTIFIER = "item_weighted";
 
-    public static final Codec<ItemWeightedModule> CODEC = Codec.list(WeightedEntry.Wrapper.codec(BuiltInRegistries.ITEM.byNameCodec()))
+    public static final Codec<ItemWeightedModule> CODEC = Codec.list(Weighted.codec(BuiltInRegistries.ITEM.byNameCodec()))
             .xmap(ItemWeightedModule::new, ItemWeightedModule::getList);
 
 
-    public ItemWeightedModule(List<WeightedEntry.Wrapper<Item>> list) {
+    public ItemWeightedModule(List<Weighted<Item>> list) {
         super(list);
     }
 
@@ -36,14 +36,14 @@ public class ItemWeightedModule extends BaseWeightedModule<Item> {
     }
 
     public static class Builder {
-        private final List<WeightedEntry.Wrapper<Item>> list = Lists.newArrayList();
+        private final List<Weighted<Item>> list = Lists.newArrayList();
         public ItemWeightedModule.Builder add(Item item, int weight) {
-            this.list.add(WeightedEntry.wrap(item, weight));
+            this.list.add(new Weighted<>(item, weight));
             return this;
         }
 
         public ItemWeightedModule.Builder add(String item, int weight) {
-            this.list.add(WeightedEntry.wrap(RegistryUtil.getItemFromRegistryName(item), weight));
+            this.list.add(new Weighted<>(RegistryUtil.getItemFromRegistryName(item), weight));
             return this;
         }
         public ItemWeightedModule build() {
