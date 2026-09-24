@@ -29,3 +29,5 @@ run-gametest
 forge*changelog.txt
 
 /logs/
+
+/run-city-audit-*/

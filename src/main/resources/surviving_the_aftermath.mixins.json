@@ -8,7 +8,9 @@
     "PortalShapeMixin",
     "LivingEntityAccessor",
     "VillagerMixin",
-    "NetherCoreEyeMixin"
+    "NetherCoreEyeMixin",
+    "NoiseGeneratorAccessor",
+    "CityTreeFeatureMixin"
   ],
   "client": [],
   "injectors": {

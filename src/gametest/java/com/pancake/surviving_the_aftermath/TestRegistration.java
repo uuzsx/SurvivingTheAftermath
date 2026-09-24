@@ -11,6 +11,9 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("terrainsamplermatchesvanilla"), wrap(CityRegressionGameTests::terrainSamplerMatchesVanilla));
+   helper.register(SurvivingTheAftermath.asResource("undergroundstructuresdonotdisablecitysupport"), wrap(CityRegressionGameTests::undergroundStructuresDoNotDisableCitySupport));
+
    helper.register(SurvivingTheAftermath.asResource("corebackgroundsearchandcancellation"), wrap(NetherCoreGameTests::coreBackgroundSearchAndCancellation));
    helper.register(SurvivingTheAftermath.asResource("corealwaysreturnsandcanbethrownagain"), wrap(NetherCoreGameTests::coreAlwaysReturnsAndCanBeThrownAgain));
    helper.register(SurvivingTheAftermath.asResource("coreflightsurvivessavereload"), wrap(NetherCoreGameTests::coreFlightSurvivesSaveReload));

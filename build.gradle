@@ -17,6 +17,15 @@ neoForge {
     version = neo_version
     runs {
         client { client() }
+        cityAuditServer {
+            server()
+            sourceSet = sourceSets.gametest
+            gameDirectory = file('run-city-audit-' + providers.gradleProperty('auditLabel').getOrElse('local'))
+            programArgument '--nogui'
+            systemProperty 'aftermath.cityAudit', 'true'
+            systemProperty 'aftermath.cityAuditStress', providers.gradleProperty('auditStress').getOrElse('0')
+            jvmArguments.addAll '-Xms512m', '-Xmx2G', '-XX:StartFlightRecording=filename=city-audit.jfr,settings=profile,maxsize=64m,dumponexit=true', '-Xlog:gc*:file=city-gc.log:time,level,tags'
+        }
         server { server(); programArgument '--nogui' }
         gameTestServer {
             type = 'gameTestServer'
