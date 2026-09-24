@@ -27,7 +27,7 @@ public final class ModItems {
     public static final RegistryObject<Item> STACK_OF_EGG_TARTS = ITEMS.register("stack_of_egg_tarts", () -> new Item(properties("stack_of_egg_tarts").food(new FoodProperties.Builder().nutrition(9).saturationMod(6F).effect(() -> new MobEffectInstance(MobEffects.HEALTH_BOOST, 3600, 1), 1.0F).effect(() -> new MobEffectInstance(MobEffects.CONFUSION, 60, 0), 1.0F).build())));
     public static final RegistryObject<Item> HAMBURGER = ITEMS.register("hamburger", () -> new Item(properties("hamburger").food(new FoodProperties.Builder().nutrition(7).saturationMod(4F).effect(() -> new MobEffectInstance(MobEffects.REGENERATION, 6000, 0), 1.0F).build())));
     public static final RegistryObject<Item> TIANJIN_PANCAKE = ITEMS.register("tianjin_pancake", () -> new Item(properties("tianjin_pancake").food(new FoodProperties.Builder().nutrition(8).saturationMod(14F).effect(() -> new MobEffectInstance(MobEffects.SATURATION, 4800, 0), 1.0F).effect(() -> new MobEffectInstance(MobEffects.LUCK, 2400, 0), 1.0F).build())));
-    public static final RegistryObject<Item> NETHER_CORE = ITEMS.register("nether_core", () -> new Item(properties("nether_core")));
+    public static final RegistryObject<Item> NETHER_CORE = ITEMS.register("nether_core", () -> new com.pancake.surviving_the_aftermath.common.item.NetherCoreItem(properties("nether_core")));
     public static final RegistryObject<Item> MUSIC_DISK_ORCHELIAS_VOX = ITEMS.register("music_disk_orchelias_vox", () -> new net.minecraft.world.item.RecordItem(15, ModSoundEvents.ORCHELIAS_VOX, properties("music_disk_orchelias_vox").stacksTo(1).rarity(Rarity.RARE), 269 * 20));
     private static Item.Properties properties(String name) { return new Item.Properties(); }
 

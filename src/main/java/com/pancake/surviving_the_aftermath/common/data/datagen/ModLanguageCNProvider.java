@@ -16,6 +16,12 @@ public class ModLanguageCNProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        add("item.surviving_the_aftermath.nether_core.tooltip", "右键抛出，寻找城市与遗物商人。必定完整掉落，可无限次使用。");
+        add("message.surviving_the_aftermath.nether_core.overworld", "请在主世界使用下界核心寻找遗物商人。");
+        add("message.surviving_the_aftermath.nether_core.searching", "正在寻找城市……请继续手持下界核心。");
+        add("message.surviving_the_aftermath.nether_core.not_found", "附近暂未找到可引导的城市，请换个区域重试。");
+        add("message.surviving_the_aftermath.nether_core.city", "下界核心正指向城市；接近后会寻找存活的遗物商人。");
+        add("message.surviving_the_aftermath.nether_core.dealer", "下界核心正指向附近的遗物商人。");
         add("item.surviving_the_aftermath.raw_falukorv", "生的法伦香肠");
         add("item.surviving_the_aftermath.cooked_falukorv", "熟的法伦香肠");
         add("item.surviving_the_aftermath.egg_tart", "蛋挞");
