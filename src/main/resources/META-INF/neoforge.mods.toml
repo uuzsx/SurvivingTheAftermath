@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+issueTrackerURL="https://github.com/uuzsx/SurvivingTheAftermath/issues"
+[[mods]]
+modId="surviving_the_aftermath"
+version="${mod_version}"
+displayName="Surviving the Aftermath"
+displayURL="https://github.com/uuzsx/SurvivingTheAftermath"
+logoFile="surviving_the_aftermath.png"
+authors="sxuuz"
+description='''
+This Mod supplements the vanilla raid content and adds related API to expand more adventure content.
+Explore ruined structures and cities, face the Nether Raid, and discover powerful enchantments.
+
+劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
+使用钻石打火石开启 11 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
+'''
+[[mixins]]
+config="surviving_the_aftermath.mixins.json"
+[[dependencies.surviving_the_aftermath]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.251,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.surviving_the_aftermath]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"

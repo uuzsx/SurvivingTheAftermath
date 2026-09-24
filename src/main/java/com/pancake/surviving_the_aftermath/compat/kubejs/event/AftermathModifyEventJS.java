@@ -1,12 +1,12 @@
 package com.pancake.surviving_the_aftermath.compat.kubejs.event;
 
 import com.pancake.surviving_the_aftermath.api.module.IAftermathModule;
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 
-public class AftermathModifyEventJS extends EventJS {
+public class AftermathModifyEventJS implements KubeEvent {
     private final ResourceLocation identifier;
     private final Collection<IAftermathModule> aftermathModules;
 

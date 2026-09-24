@@ -7,20 +7,16 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 import java.util.Set;
 
-public class AftermathStageCap implements INBTSerializable<ListTag> {
+public class AftermathStageCap {
     private final Set<String> stages = Sets.newHashSet();
 
-    @Override
     public ListTag serializeNBT() {
         ListTag listTag = new ListTag();
         for (String stage : stages) {
@@ -29,7 +25,6 @@ public class AftermathStageCap implements INBTSerializable<ListTag> {
         return listTag;
     }
 
-    @Override
     public void deserializeNBT(ListTag nbt) {
         for (int i = 0; i < nbt.size(); i++) {
             stages.add(nbt.getString(i));
@@ -61,33 +56,11 @@ public class AftermathStageCap implements INBTSerializable<ListTag> {
         return AftermathStageCap.get(level).map(stageCap -> stageCap.getStages().contains(stage)).orElse(false);
     }
 
-    public static LazyOptional<AftermathStageCap> get(Player player) {
-        return player.getCapability(ModCapability.STAGE_CAP);
+    public static Optional<AftermathStageCap> get(Player player) {
+        return Optional.of(player.getData(ModCapability.STAGE_CAP));
     }
-    public static LazyOptional<AftermathStageCap> get(Level level) {
-        return level.getCapability(ModCapability.STAGE_CAP);
+    public static Optional<AftermathStageCap> get(Level level) {
+        return Optional.of(level.getData(ModCapability.STAGE_CAP));
     }
 
-    public static class Provider implements ICapabilitySerializable<ListTag> {
-        private final LazyOptional<AftermathStageCap> instance;
-
-        public Provider() {
-            instance = LazyOptional.of(AftermathStageCap::new);
-        }
-
-        @Override
-        public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            return ModCapability.STAGE_CAP.orEmpty(cap, instance);
-        }
-
-        @Override
-        public ListTag serializeNBT() {
-            return instance.orElseThrow(() -> new IllegalArgumentException("LazyOptional cannot be empty!")).serializeNBT();
-        }
-
-        @Override
-        public void deserializeNBT(ListTag nbt) {
-            instance.orElseThrow(() -> new IllegalArgumentException("LazyOptional cannot be empty!")).deserializeNBT(nbt);
-        }
-    }
 }

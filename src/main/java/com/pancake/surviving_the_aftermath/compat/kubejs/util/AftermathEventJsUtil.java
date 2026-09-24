@@ -5,7 +5,7 @@ import com.pancake.surviving_the_aftermath.api.module.IAftermathModule;
 import com.pancake.surviving_the_aftermath.compat.kubejs.event.AftermathEventJS;
 import com.pancake.surviving_the_aftermath.compat.kubejs.event.AftermathEvents;
 import com.pancake.surviving_the_aftermath.compat.kubejs.event.AftermathModifyEventJS;
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 
@@ -41,7 +41,7 @@ public class AftermathEventJsUtil {
         return AftermathEvents.MODIFY.post(new AftermathModifyEventJS(location, aftermathModules)).pass();
     }
 
-    public static boolean execute(EventJS kubeJS) {
+    public static boolean execute(KubeEvent kubeJS) {
         if (kubeJS instanceof AftermathEventJS event) {
             if (event instanceof AftermathEventJS.StartJS) {
                 return start(event.getAftermath(), event.getPlayers(), event.getLevel());

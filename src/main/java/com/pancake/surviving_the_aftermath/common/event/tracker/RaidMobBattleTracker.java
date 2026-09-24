@@ -10,11 +10,11 @@ import com.pancake.surviving_the_aftermath.common.util.BattleEntityState;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class RaidMobBattleTracker extends BaseTracker {
-    @SubscribeEvent public void onLivingRestrictedRange(LivingEvent.LivingTickEvent event) {
+    @SubscribeEvent public void onLivingRestrictedRange(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide || !BattleEntityState.belongsTo(mob, uuid)) return;
         manager.getAftermath(uuid).filter(a -> a instanceof BaseRaid).map(a -> (BaseRaid) a).ifPresent(raid -> {
             if (AftermathConfig.enableMobBattleTrackerRestrictedRange.get()

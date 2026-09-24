@@ -6,7 +6,7 @@ import com.pancake.surviving_the_aftermath.common.event.tracker.RaidPlayerBattle
 import com.pancake.surviving_the_aftermath.common.init.ModItems;
 import com.pancake.surviving_the_aftermath.common.item.DiamondFlintAndSteelItem;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.common.data.LanguageProvider;
 
 public class ModLanguageCNProvider extends LanguageProvider {
 

@@ -17,11 +17,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import java.util.*;
 
 public class RaidPlayerBattleTracker extends BaseTracker {
@@ -118,8 +119,8 @@ public class RaidPlayerBattleTracker extends BaseTracker {
     }
 
     @SubscribeEvent
-    public void onPlayerEscape(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer player)) return;
+    public void onPlayerEscape(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
         UUID playerId = player.getUUID();
         if (!escapeMap.containsKey(playerId)) return;
         manager.getAftermath(uuid).filter(a -> a instanceof BaseAftermath && a instanceof IRaid).ifPresent(aftermath -> {
@@ -128,9 +129,9 @@ public class RaidPlayerBattleTracker extends BaseTracker {
             long time = battle.level.getGameTime() - escapeMap.get(playerId);
             double distance = player.level() == battle.level ? Math.sqrt(battle.getStartPos().distSqr(player.blockPosition())) : Double.POSITIVE_INFINITY;
             if (time > 20 * 5) {
-                player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE.get(), 45 * 60 * 20));
+                player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE, 45 * 60 * 20));
                 if (distance > 120) {
-                    player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE.get(), 45 * 60 * 20, 1));
+                    player.addEffect(new MobEffectInstance(ModMobEffects.COWARDICE, 45 * 60 * 20, 1));
                     escapeMap.remove(playerId);
                     restorePlayerGameMode(battle.level);
                 }

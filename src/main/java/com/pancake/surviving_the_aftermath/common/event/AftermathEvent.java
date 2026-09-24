@@ -3,10 +3,9 @@ package com.pancake.surviving_the_aftermath.common.event;
 import com.pancake.surviving_the_aftermath.api.IAftermath;
 import com.pancake.surviving_the_aftermath.api.IAftermathEvent;
 import com.pancake.surviving_the_aftermath.api.module.IAftermathModule;
-import dev.latvian.mods.kubejs.event.EventJS;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.Event;
 
 import java.util.Set;
 import java.util.UUID;
@@ -46,12 +45,11 @@ public abstract class AftermathEvent extends Event implements IAftermathEvent {
     }
 
     @Override
-    public EventJS getKubeJS() {
+    public Object getKubeJS() {
         return null;
     }
 
-    @Cancelable
-    public static class Start extends AftermathEvent {
+    public static class Start extends AftermathEvent implements ICancellableEvent {
         public Start(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
             super(aftermath,players, level);
         }
@@ -62,8 +60,7 @@ public abstract class AftermathEvent extends Event implements IAftermathEvent {
             super(aftermath, players, level);
         }
     }
-    @Cancelable
-    public static class Ready extends AftermathEvent {
+    public static class Ready extends AftermathEvent implements ICancellableEvent {
 
         public Ready(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
             super(aftermath, players, level);
@@ -88,8 +85,7 @@ public abstract class AftermathEvent extends Event implements IAftermathEvent {
             super(aftermath, players, level);
         }
     }
-    @Cancelable
-    public static class Celebrating extends AftermathEvent {
+    public static class Celebrating extends AftermathEvent implements ICancellableEvent {
         public Celebrating(IAftermath aftermath, Set<UUID> players, ServerLevel level) {
             super(aftermath, players, level);
         }

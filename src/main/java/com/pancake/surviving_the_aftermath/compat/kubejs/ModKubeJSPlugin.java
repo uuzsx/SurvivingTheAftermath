@@ -11,17 +11,17 @@ import com.pancake.surviving_the_aftermath.common.raid.BaseRaid;
 import com.pancake.surviving_the_aftermath.common.raid.module.BaseRaidModule;
 import com.pancake.surviving_the_aftermath.compat.kubejs.event.AftermathEvents;
 import com.pancake.surviving_the_aftermath.common.util.StructureUtils;
-import dev.latvian.mods.kubejs.KubeJSPlugin;
-import dev.latvian.mods.kubejs.script.BindingsEvent;
+import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
+import dev.latvian.mods.kubejs.script.BindingRegistry;
 import net.minecraft.resources.ResourceLocation;
 
-public class ModKubeJSPlugin extends KubeJSPlugin {
+public class ModKubeJSPlugin implements KubeJSPlugin {
 
     @Override
-    public void registerEvents() {
-        AftermathEvents.register();
+    public void registerEvents(dev.latvian.mods.kubejs.event.EventGroupRegistry registry) {
+        registry.register(AftermathEvents.GROUP);
     }
-    public void registerBindings(BindingsEvent event) {
+    public void registerBindings(BindingRegistry event) {
         event.add("AftermathManager", AftermathManager.class);
         event.add("StructureUtils", StructureUtils.class);
         event.add("AftermathStageCap", AftermathStageCap.class);

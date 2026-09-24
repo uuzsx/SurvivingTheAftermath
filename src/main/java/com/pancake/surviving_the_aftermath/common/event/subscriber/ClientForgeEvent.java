@@ -2,23 +2,23 @@ package com.pancake.surviving_the_aftermath.common.event.subscriber;
 
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.client.ClientAftermathBars;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 
 
-@Mod.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = net.neoforged.fml.common.EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientForgeEvent {
     @SubscribeEvent
     public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ClientAftermathBars.clear(); com.pancake.surviving_the_aftermath.client.ClientRaidMusic.clear(); }
 
     @SubscribeEvent
-    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-        if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) com.pancake.surviving_the_aftermath.client.ClientRaidMusic.tick();
+    public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
+        com.pancake.surviving_the_aftermath.client.ClientRaidMusic.tick();
     }
 
     @SubscribeEvent

@@ -8,6 +8,6 @@ public final class RaidPortal {
     private RaidPortal() {}
 
     public static boolean isArena(ServerLevel level, BlockPos pos) {
-        return level.structureManager().getStructureWithPieceAt(pos, ModStructures.NETHER_RAID).isValid();
+        return level.structureManager().getStructureWithPieceAt(pos, level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).getOrThrow(ModStructures.NETHER_RAID)).isValid();
     }
 }

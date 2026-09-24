@@ -4,7 +4,7 @@ import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.common.level.biomes.ModBiomesMaker;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -19,7 +19,7 @@ public class ModBiomes {
         return ResourceKey.create(Registries.BIOME, SurvivingTheAftermath.asResource(name));
     }
 
-    public static void bootstrap(BootstapContext<Biome> context) {
+    public static void bootstrap(BootstrapContext<Biome> context) {
         HolderGetter<PlacedFeature> featureGetter = context.lookup(Registries.PLACED_FEATURE);
         HolderGetter<ConfiguredWorldCarver<?>> carverGetter = context.lookup(Registries.CONFIGURED_CARVER);
         BiomeGenerationSettings.Builder builder = new BiomeGenerationSettings.Builder(featureGetter, carverGetter);

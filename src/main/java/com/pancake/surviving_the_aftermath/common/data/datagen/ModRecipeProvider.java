@@ -7,10 +7,10 @@ import net.minecraft.world.item.Items;
 import java.util.function.Consumer;
 
 public class ModRecipeProvider extends RecipeProvider {
-    public ModRecipeProvider(PackOutput output) { super(output); }
+    public ModRecipeProvider(PackOutput output, java.util.concurrent.CompletableFuture<net.minecraft.core.HolderLookup.Provider> provider) { super(output, provider); }
 
     @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
+    protected void buildRecipes(RecipeOutput consumer) {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.DIAMOND_FLINT_AND_STEEL.get())
                 .requires(Items.FLINT).requires(Items.DIAMOND)
                 .unlockedBy("has_diamond", has(Items.DIAMOND)).save(consumer);

@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class BiomesConditionModule extends LevelConditionModule{
     public static final String IDENTIFIER = "biomes_condition";
@@ -27,8 +27,7 @@ public class BiomesConditionModule extends LevelConditionModule{
 
     @Override
     public boolean checkCondition(Level level, BlockPos pos) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(ResourceLocation.tryParse(biomes));
-        return level.getBiome(pos).get() == biome;
+        return level.getBiome(pos).is(ResourceLocation.parse(biomes));
     }
 
     @Override

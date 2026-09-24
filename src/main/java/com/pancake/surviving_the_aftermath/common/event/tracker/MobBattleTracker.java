@@ -7,14 +7,14 @@ import com.pancake.surviving_the_aftermath.common.config.AftermathConfig;
 import com.pancake.surviving_the_aftermath.common.init.ModAftermathModule;
 import com.pancake.surviving_the_aftermath.common.util.BattleEntityState;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class MobBattleTracker extends BaseTracker {
-    @SubscribeEvent public void onLivingAddHighlight(LivingEvent.LivingTickEvent event) {
+    @SubscribeEvent public void onLivingAddHighlight(EntityTickEvent.Post event) {
         Entity entity = event.getEntity();
         if (!entity.level().isClientSide && AftermathConfig.enableMobBattleTrackerHighlight.get()
                 && BattleEntityState.belongsTo(entity, uuid)) BattleEntityState.highlight(entity);

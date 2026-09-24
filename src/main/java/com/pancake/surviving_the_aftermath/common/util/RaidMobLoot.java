@@ -6,12 +6,13 @@ import com.pancake.surviving_the_aftermath.common.raid.BaseRaid;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
+import net.neoforged.neoforge.event.entity.living.MobSplitEvent;
 
 @EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID)
 public final class RaidMobLoot {
@@ -50,12 +51,14 @@ public final class RaidMobLoot {
         }
     }
 
-    /** Called for the actual children of a splitting slime, never for nearby wild mobs. */
-    public static void inherit(Mob parent, Mob child) {
-        if (!isDungeonMob(parent)) return;
-        mark(child);
-        if (parent.getPersistentData().hasUUID("raid_uuid")) {
-            AftermathManager.getInstance().getAftermath(parent.getPersistentData().getUUID("raid_uuid")).ifPresent(encounter -> {
+    @SubscribeEvent
+    public static void split(MobSplitEvent event) {
+        if (!isDungeonMob(event.getParent())) return;
+        var raidId = event.getParent().getPersistentData().hasUUID("raid_uuid") ? java.util.Optional.of(event.getParent().getPersistentData().getUUID("raid_uuid")) : java.util.Optional.<java.util.UUID>empty();
+        for (Mob child : event.getChildren()) {
+            if (child == null) continue;
+            mark(child);
+            raidId.flatMap(AftermathManager.getInstance()::getAftermath).ifPresent(encounter -> {
                 if (encounter instanceof BaseRaid raid && raid.join(child)) raid.insertTag(child);
             });
         }

@@ -1,1 +1,0 @@
-{"type": "minecraft:function", "function": "surviving_the_aftermath:diamondreciperequiresbothingredients", "environment": "minecraft:default", "structure": "surviving_the_aftermath:stability_empty", "max_ticks": 100, "required": true}

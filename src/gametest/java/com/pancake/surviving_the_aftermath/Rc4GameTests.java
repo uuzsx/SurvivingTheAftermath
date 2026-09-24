@@ -28,14 +28,14 @@ import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import java.io.InputStreamReader;
 import java.util.*;
 
-@net.minecraftforge.gametest.GameTestHolder(SurvivingTheAftermath.MOD_ID)
-@net.minecraftforge.gametest.PrefixGameTestTemplate(false)
+@net.neoforged.neoforge.gametest.GameTestHolder(SurvivingTheAftermath.MOD_ID)
+@net.neoforged.neoforge.gametest.PrefixGameTestTemplate(false)
 public class Rc4GameTests {
     private static void check(boolean value, String message) {
         if (!value) throw new GameTestAssertException(message);
@@ -51,7 +51,7 @@ public class Rc4GameTests {
         var location = SurvivingTheAftermath.asResource("aftermath/common.json");
         try (var stream = h.getLevel().getServer().getResourceManager().getResourceOrThrow(location).open();
              var reader = new InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8)) {
-            return BaseRaidModule.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow(false, message -> { throw new IllegalStateException(message); });
+            return BaseRaidModule.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow();
         }
     }
 
@@ -62,7 +62,7 @@ public class Rc4GameTests {
         int piglins = 0;
         for (int repeat = 0; repeat < 12; repeat++) for (var wave : module.getWaves()) for (var group : wave) {
             for (var created : group.spawnEntity(h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)))) {
-                Entity entity = created.orElseThrow(IllegalStateException::new);
+                Entity entity = created.orElseThrow();
                 if (entity instanceof AbstractPiglin piglin) {
                     piglins++;
                     check(!piglin.getMainHandItem().isEmpty(), "An actual configured wave produced an unarmed piglin");
@@ -81,7 +81,7 @@ public class Rc4GameTests {
         var armor = new EquipmentPredicate.Builder().add(Items.NETHERITE_CHESTPLATE, 1).canDrop(false).build();
         var module = new EntityInfoWithPredicateModule(EntityType.PIGLIN, new IntegerAmountModule(32), List.of(weapon, armor));
         for (var created : module.spawnEntity(h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)))) {
-            var mob = (Mob) created.orElseThrow(IllegalStateException::new);
+            var mob = (Mob) created.orElseThrow();
             check(mob.getMainHandItem().is(Items.NETHERITE_SWORD), "Default initialization overwrote configured weapon");
             check(mob.getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE), "Configured armor was rejected by pickup AI");
             mob.discard();
@@ -121,8 +121,8 @@ public class Rc4GameTests {
             check(!level.getEntitiesOfClass(ItemEntity.class, area).isEmpty(), "Natural mob loot was suppressed");
             check(!level.getEntitiesOfClass(ExperienceOrb.class, area).isEmpty(), "Natural mob experience was suppressed");
             var playerItem = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Items.EMERALD));
-            var playerDrops = new LivingDropsEvent(player, level.damageSources().generic(), new ArrayList<>(List.of(playerItem)), 0, true);
-            MinecraftForge.EVENT_BUS.post(playerDrops);
+            var playerDrops = new LivingDropsEvent(player, level.damageSources().generic(), new ArrayList<>(List.of(playerItem)), true);
+            NeoForge.EVENT_BUS.post(playerDrops);
             check(!playerDrops.isCanceled() && playerDrops.getDrops().size() == 1, "Player death inventory was suppressed");
             natural.discard();
         } finally {
