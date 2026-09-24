@@ -70,9 +70,11 @@ public final class CityVegetationCleanup {
                 if (!(piece instanceof TemplateStructurePiece template)) continue;
                 var footprint = template.template().getBoundingBox(template.placeSettings(), template.templatePosition());
                 var area = piece.getBoundingBox();
+                var buildings = CityStructureAvoidance.protectedBuildings(level.structureManager(), chunk.getPos(), footprint.minY());
                 int minY = Math.max(level.getMinY(), footprint.minY() - SurfaceStructurePlacement.CITY_BLEND_RADIUS);
                 for (int x = Math.max(area.minX(), chunk.getPos().getMinBlockX()); x <= Math.min(area.maxX(), chunk.getPos().getMaxBlockX()); x++) {
                     for (int z = Math.max(area.minZ(), chunk.getPos().getMinBlockZ()); z <= Math.min(area.maxZ(), chunk.getPos().getMaxBlockZ()); z++) {
+                        if (CityStructureAvoidance.protectedColumn(buildings, x, z)) continue;
                         int distance = Math.max(Math.max(footprint.minX() - x, x - footprint.maxX()),
                                 Math.max(footprint.minZ() - z, z - footprint.maxZ()));
                         // This edge is deliberately untouched by gradeCity, including its trees.
