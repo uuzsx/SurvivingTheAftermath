@@ -46,13 +46,7 @@ public final class SurfaceStructurePlacement {
         }
         // Try nearby clearings in deterministic order. Cache overlapping noise queries so the
         // stricter dry-site policy does not require excavating rivers or making cities scarce.
-        Map<Long,Integer> heights = new HashMap<>();
-        ToIntBiFunction<Integer,Integer> ground = (x,z) -> heights.computeIfAbsent(((long)x << 32) ^ (z & 0xffffffffL), key -> {
-            var generator = context.chunkGenerator();
-            int surface = generator.getFirstOccupiedHeight(x,z,Heightmap.Types.WORLD_SURFACE_WG,context.heightAccessor(),context.randomState());
-            int floor = generator.getFirstOccupiedHeight(x,z,Heightmap.Types.OCEAN_FLOOR_WG,context.heightAccessor(),context.randomState());
-            return surface == floor ? surface : INVALID_GROUND;
-        });
+        ToIntBiFunction<Integer,Integer> ground = new SurfaceHeightSampler(context);
         boolean city = template.getSize().getX() * template.getSize().getZ() >= 4096;
         int[][] offsets = city ? new int[][]{{0,0},{24,0},{-24,0},{0,24},{0,-24},{24,24},{24,-24},{-24,24},{-24,-24}}
                 : new int[][]{{0,0}};
@@ -77,7 +71,7 @@ public final class SurfaceStructurePlacement {
                 centerZ - Math.floorDiv(local.minZ() + local.maxZ(), 2));
         var bounds = template.getBoundingBox(settings, anchor);
         boolean city = size.getX() * size.getZ() >= 4096;
-        int relief = city ? 12 : Math.min(6, Math.max(1, size.getY() - 1));
+        int relief = city ? 16 : Math.min(6, Math.max(1, size.getY() - 1));
         int lowest = Integer.MAX_VALUE, highest = Integer.MIN_VALUE;
         Map<Long, Integer> sampled = new HashMap<>();
         // Cheap early rejection of oceans and steep hills before querying the finer footprint grid.
