@@ -25,7 +25,7 @@ public class ModTagProviders {
 
         @Override
         protected void addTags(HolderLookup.Provider provider) {
-            tag(ModTags.HAS_CITY).add(Biomes.PLAINS);
+            tag(ModTags.HAS_CITY).add(Biomes.PLAINS, Biomes.SUNFLOWER_PLAINS, Biomes.FOREST, Biomes.BIRCH_FOREST);
             tag(ModTags.HAS_NETHER_RAID).add(Biomes.PLAINS);
             tag(ModTags.HAS_HOUSE_OF_SAKURA).add(Biomes.CHERRY_GROVE);
             tag(ModTags.HAS_EXPANSION_BUILD).addTag(BiomeTags.IS_FOREST).add(Biomes.PLAINS);
