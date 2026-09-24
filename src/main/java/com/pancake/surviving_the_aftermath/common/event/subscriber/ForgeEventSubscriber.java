@@ -1,6 +1,7 @@
 package com.pancake.surviving_the_aftermath.common.event.subscriber;
 
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
+import com.pancake.surviving_the_aftermath.common.util.CityVegetationCleanup;
 import com.pancake.surviving_the_aftermath.api.AftermathManager;
 import com.pancake.surviving_the_aftermath.api.IAftermath;
 import com.pancake.surviving_the_aftermath.api.ITracker;
@@ -39,12 +40,19 @@ public class ForgeEventSubscriber {
 		Level level = event.level;
 		if (event.phase == TickEvent.Phase.END && !level.isClientSide()) {
 			AftermathCap.get(level).ifPresent(AftermathCap::tick);
+            if (level instanceof ServerLevel server) CityVegetationCleanup.tick(server);
 		}
 	}
 	@SubscribeEvent
 	public static void onLevel(LevelEvent.Unload event) {
+        if (event.getLevel() instanceof ServerLevel unloading) CityVegetationCleanup.clear(unloading);
         if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
         AftermathManager.getInstance().clear();
+    }
+
+    @SubscribeEvent
+    public static void onCityChunkLoad(net.minecraftforge.event.level.ChunkEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel level) CityVegetationCleanup.queue(level, event.getChunk().getPos(), event.isNewChunk());
     }
 
     @SubscribeEvent
