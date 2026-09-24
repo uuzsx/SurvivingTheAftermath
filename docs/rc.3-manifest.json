@@ -1,0 +1,65 @@
+{
+  "mod_version": "0.0.4-rc.3",
+  "targets": [
+    {
+      "minecraft": "1.21.1",
+      "neoforge": "21.1.251",
+      "java": 21,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.3.jar",
+      "sha256": "81888bc2aad1e7519ae1ebe0a3483cecaafd3ac3ddec40d05e11e84f6015c47e",
+      "gametest_total": 26,
+      "mod_tests": 26,
+      "kubejs_tested": "2101.7.2-build.377"
+    },
+    {
+      "minecraft": "1.21.2",
+      "neoforge": "21.2.1-beta",
+      "java": 21,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.3.jar",
+      "sha256": "6f18f9f7fd7d34993eedde292236417e554b863b2166e14d849d6cdbf3814ed4",
+      "gametest_total": 26,
+      "mod_tests": 26,
+      "kubejs_tested": null
+    },
+    {
+      "minecraft": "26.1.1",
+      "neoforge": "26.1.1.15-beta",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.3.jar",
+      "sha256": "e8c397a7a849bd74cb93875e3e1f78207f8863e164699c474a6c97cdae6fe47a",
+      "gametest_total": 27,
+      "mod_tests": 26,
+      "kubejs_tested": null
+    },
+    {
+      "minecraft": "26.1.2",
+      "neoforge": "26.1.2.109",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.3.jar",
+      "sha256": "bceaf11ca00c67cbe43cea9f44f5f3bb56f301f9cc171d0478b52bd2936c5b71",
+      "gametest_total": 27,
+      "mod_tests": 26,
+      "kubejs_tested": "26.1.2-8.0.6"
+    },
+    {
+      "minecraft": "26.2",
+      "neoforge": "26.2.0.88",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.3.jar",
+      "sha256": "58351f243e66e5e5fd5678f2158de165d76ab253fda463f19dff42072c7a4432",
+      "gametest_total": 27,
+      "mod_tests": 26,
+      "kubejs_tested": null
+    },
+    {
+      "minecraft": "26.3",
+      "neoforge": "26.3.0.16-beta",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.3.jar",
+      "sha256": "268ce6ffb6b63a597825ac95ac42781e2cbadb4364088ad10cc08312c4d378b9",
+      "gametest_total": 27,
+      "mod_tests": 26,
+      "kubejs_tested": null
+    }
+  ]
+}

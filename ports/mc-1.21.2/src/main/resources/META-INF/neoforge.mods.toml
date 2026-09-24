@@ -1,0 +1,22 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+[[mods]]
+modId="surviving_the_aftermath"
+version="${mod_version}"
+displayName="Surviving the Aftermath"
+description="Dungeon challenges and structures."
+[[mixins]]
+config="surviving_the_aftermath.mixins.json"
+[[dependencies.surviving_the_aftermath]]
+modId="neoforge"
+type="required"
+versionRange="[21.2.1-beta,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.surviving_the_aftermath]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.2]"
+ordering="NONE"
+side="BOTH"

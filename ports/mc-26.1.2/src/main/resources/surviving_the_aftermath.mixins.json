@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.pancake.surviving_the_aftermath.common.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "MoveControlMixin",
+    "PortalShapeMixin",
+    "LivingEntityAccessor"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

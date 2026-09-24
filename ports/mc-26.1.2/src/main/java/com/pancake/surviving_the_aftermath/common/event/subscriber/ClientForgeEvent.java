@@ -1,0 +1,49 @@
+package com.pancake.surviving_the_aftermath.common.event.subscriber;
+
+import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
+import com.pancake.surviving_the_aftermath.client.ClientAftermathBars;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.resources.Identifier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+
+
+@net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, value = Dist.CLIENT)
+public class ClientForgeEvent {
+    @SubscribeEvent
+    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ClientAftermathBars.clear(); }
+
+    @SubscribeEvent
+    public static void netherRaidProgress(CustomizeGuiOverlayEvent.BossEventProgress event) {
+        LerpingBossEvent bossEvent = event.getBossEvent();
+        var aftermath = ClientAftermathBars.get(bossEvent.getId());
+        if (aftermath != null) {
+            var graphics = event.getGuiGraphics();
+            Identifier resource = aftermath.texture();
+            int[] offset = aftermath.offsets();
+
+            if (resource == null || offset == null) {
+                return;
+            }
+
+            int frameWidth = offset[0];
+            int frameHeight = offset[1];
+            int barWidth = offset[2];
+            int barHeight = offset[3];
+            int frameOffset = offset[4];
+            int barOffset = offset[5];
+
+            //渲染进度条框
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, resource, (graphics.guiWidth() - frameWidth) / 2, event.getY() - 10,
+                    0, frameOffset, frameWidth, frameHeight, 256, 256);
+            //渲染进度条
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, resource, (graphics.guiWidth() - barWidth) / 2, event.getY() - 10 + barOffset,
+                    0, 0, (int) (barWidth * event.getBossEvent().getProgress()), barHeight, 256, 256);
+            event.setIncrement(frameHeight);
+            event.setCanceled(true);
+        }
+    }
+}

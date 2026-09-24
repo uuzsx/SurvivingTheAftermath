@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "description": "Surviving the Aftermath resources",
+    "pack_format": 57,
+    "supported_formats": {
+      "min_inclusive": 42,
+      "max_inclusive": 57
+    }
+  }
+}
