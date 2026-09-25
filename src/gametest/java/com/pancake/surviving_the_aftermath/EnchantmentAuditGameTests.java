@@ -222,8 +222,15 @@ public final class EnchantmentAuditGameTests {
             v.setVillagerData(v.getVillagerData().withProfession(BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(ModVillagers.RELIC_DEALER.get())).withLevel(5));
             check(v.getOffers().size()==15,"Master must have exactly 15 offers");
             for(var offer:v.getOffers()) {
-                if(!offer.getResult().is(Items.ENCHANTED_BOOK)){foods.add(offer.getResult().getItem());continue;}
+                if(!offer.getResult().is(Items.ENCHANTED_BOOK)){
+                    var food=offer.getResult().getItem();foods.add(food);
+                    int expected=food==ModItems.RAW_FALUKORV.get() || food==ModItems.COOKED_FALUKORV.get() || food==ModItems.EGG_TART.get() ? 1 : 2;
+                    check(offer.getBaseCostA().getCount()==expected,"Master food price not reduced");continue;
+                }
                 var book=books.stream().filter(b->ItemStack.isSameItemSameComponents(b.stack(),offer.getResult())).findFirst().orElseThrow();
+                check(offer.getBaseCostA().getCount()==new int[]{2,4,5,7,9}[book.rank()-1],"Wrong discounted book price");
+                var budget=new ItemStack(ModItems.NETHER_CORE.get(),10);var ordinaryBook=new ItemStack(Items.BOOK);
+                check(offer.take(budget,ordinaryBook) && ordinaryBook.isEmpty(),"Normal guaranteed cores cannot buy this book");
                 if(seen.add(book.name()+":"+book.rank())) {
                     var applied=anvil(customer,new ItemStack(itemFor(book.name())),offer.getResult());
                     check(!applied.isEmpty() && LegacyEnchantments.level(applied,book.name())==book.rank(),"Unusable relic book "+book.name()+book.rank());
@@ -238,7 +245,7 @@ public final class EnchantmentAuditGameTests {
     public static void relicCatalogueProgression(GameTestHelper h) throws Exception {
         var v=(Villager)mob(h,EntityTypes.VILLAGER);
         v.setVillagerData(v.getVillagerData().withProfession(BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(ModVillagers.RELIC_DEALER.get())));v.setVillagerXp(1);
-        int[] sizes={3,6,9,12,15};int[] costs={14,13,12,11,11};
+        int[] sizes={3,6,9,12,15};int[] costs={3,2,2,2,2};
         var upgrade=Villager.class.getDeclaredMethod("increaseMerchantCareer",net.minecraft.server.level.ServerLevel.class);upgrade.setAccessible(true);
         for(int tier=1;tier<=5;tier++) {
             check(v.getVillagerData().level()==tier,"Career did not advance");
@@ -275,6 +282,8 @@ public final class EnchantmentAuditGameTests {
         var legacy=new MerchantOffer(new ItemCost(ModItems.NETHER_CORE.get(),25),Optional.of(new ItemCost(Items.BOOK)),rankFour,12,30,.2F);
         for(int i=0;i<3;i++)legacy.increaseUses();
         v.getOffers().clear();v.getOffers().add(legacy);
+        var expensiveFood=new MerchantOffer(new ItemCost(ModItems.NETHER_CORE.get(),10),Optional.empty(),new ItemStack(ModItems.HAMBURGER.get()),16,5,0F);
+        expensiveFood.increaseUses();expensiveFood.increaseUses();v.getOffers().add(expensiveFood);
         var output=net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING,h.getLevel().registryAccess());
         v.saveWithoutId(output);var saved=output.buildResult();v.discard();
         var loaded=EntityTypes.VILLAGER.create(h.getLevel(), EntitySpawnReason.EVENT);
@@ -283,7 +292,8 @@ public final class EnchantmentAuditGameTests {
         var customer=player(h);update.invoke(loaded,customer);
         check(loaded.getOffers().size()==3,"Legacy high-rank book lost or new stock absent");
         check(loaded.getOffers().get(0).getUses()==3,"Migration reset purchases");
-        check(loaded.getOffers().get(0).getBaseCostA().getCount()==32,"Legacy price not normalized");
+        check(loaded.getOffers().get(0).getBaseCostA().getCount()==9,"Legacy price not normalized");
+        check(loaded.getOffers().get(1).getBaseCostA().getCount()==3 && loaded.getOffers().get(1).getUses()==2,"Legacy food price/stock not migrated");
         update.invoke(loaded,customer);update.invoke(loaded,customer);
         check(loaded.getOffers().size()==3 && loaded.getOffers().get(0).getUses()==3,"Opening duplicated/refilled stock");
         loaded.getOffers().get(0).setToOutOfStock();update.invoke(loaded,customer);

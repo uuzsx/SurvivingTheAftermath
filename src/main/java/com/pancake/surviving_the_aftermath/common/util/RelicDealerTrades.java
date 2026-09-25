@@ -21,7 +21,7 @@ public final class RelicDealerTrades {
         var books = ModEnchantedBooks.all(villager.registryAccess());
         Item[] foods = {ModItems.RAW_FALUKORV.get(), ModItems.COOKED_FALUKORV.get(), ModItems.EGG_TART.get(),
                 ModItems.STACK_OF_EGG_TARTS.get(), ModItems.HAMBURGER.get(), ModItems.TIANJIN_PANCAKE.get()};
-        int[] foodPrice = {4, 6, 6, 10, 8, 10};
+        int[] foodPrice = {1, 2, 2, 3, 3, 3};
         int[] foodCount = {4, 2, 2, 1, 1, 1};
         var usedBooks = new HashSet<String>();
         var usedFoods = new HashSet<Item>();
@@ -33,7 +33,7 @@ public final class RelicDealerTrades {
             if (book.isPresent() && offer.getCostB().is(Items.BOOK) && offer.getCostB().getCount() == 1) {
                 existing++;
                 usedBooks.add(book.get().name());
-                merge(offers, offer.getResult(), true, 8 + 6 * book.get().rank(), level, 1);
+                merge(offers, offer.getResult(), true, bookPrice(book.get().rank()), level, 1);
             } else if (offer.getCostB().isEmpty()) {
                 for (int i = 0; i < foods.length; i++) {
                     if (offer.getResult().is(foods[i])) {
@@ -64,10 +64,14 @@ public final class RelicDealerTrades {
                 int tier = slot / 3 + 1;
                 var ranks = books.stream().filter(b -> b.name().equals(name) && b.rank() <= tier).toList();
                 var book = ranks.get(random.nextInt(ranks.size()));
-                merge(offers, book.stack(), true, 8 + 6 * book.rank(), level, 1);
+                merge(offers, book.stack(), true, bookPrice(book.rank()), level, 1);
                 usedBooks.add(name);
             }
         }
+    }
+
+    private static int bookPrice(int rank) {
+        return switch (rank) { case 1 -> 3; case 2 -> 5; case 3 -> 7; case 4 -> 9; default -> 12; };
     }
 
     private static void merge(MerchantOffers offers, ItemStack result, boolean book, int basePrice, int level, int unlock) {
