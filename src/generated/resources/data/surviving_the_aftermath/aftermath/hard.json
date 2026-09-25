@@ -6,6 +6,7 @@
       "value": "surviving_the_aftermath:nether_invasion_portal"
     }
   ],
+  "guaranteed_cores": 20,
   "name": "hard",
   "ready_time": 100,
   "reward_time": 100,
