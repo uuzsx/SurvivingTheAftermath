@@ -11,6 +11,13 @@ public class TestRegistration {
  }
  @SubscribeEvent public static void register(RegisterEvent event) {
   event.register(Registries.TEST_FUNCTION, helper -> {
+   helper.register(SurvivingTheAftermath.asResource("goldenportallifecycle"), wrap(DungeonLifecycleGameTests::goldenPortalLifecycle));
+   helper.register(SurvivingTheAftermath.asResource("netheriteportallifecycle"), wrap(DungeonLifecycleGameTests::netheritePortalLifecycle));
+   helper.register(SurvivingTheAftermath.asResource("goldenreciperequiresbothingredients"), wrap(DungeonLifecycleGameTests::goldenRecipeRequiresBothIngredients));
+   helper.register(SurvivingTheAftermath.asResource("netheritereciperequiresbothingredients"), wrap(DungeonLifecycleGameTests::netheriteRecipeRequiresBothIngredients));
+   helper.register(SurvivingTheAftermath.asResource("tooldifficultyselectsmatchingdatapack"), wrap(DungeonLifecycleGameTests::toolDifficultySelectsMatchingDataPack));
+   helper.register(SurvivingTheAftermath.asResource("difficultylivewavesandpersistence"), wrap(RaidDifficultyGameTests::difficultyLiveWavesAndPersistence));
+   helper.register(SurvivingTheAftermath.asResource("combatbuffsareeffectiveandinherited"), wrap(RaidDifficultyGameTests::combatBuffsAreEffectiveAndInherited));
    helper.register(SurvivingTheAftermath.asResource("reliccreativebookplacement"), wrap(EnchantmentAuditGameTests::relicCreativeBookPlacement));
    helper.register(SurvivingTheAftermath.asResource("reliclegacysavemigration"), wrap(EnchantmentAuditGameTests::relicLegacySaveMigration));
    helper.register(SurvivingTheAftermath.asResource("reliccatalogueprogression"), wrap(EnchantmentAuditGameTests::relicCatalogueProgression));

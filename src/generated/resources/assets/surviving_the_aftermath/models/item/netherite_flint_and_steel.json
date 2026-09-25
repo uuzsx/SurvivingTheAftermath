@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "surviving_the_aftermath:item/netherite_flint_and_steel"
+  }
+}

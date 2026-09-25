@@ -58,6 +58,7 @@ public final class RaidMobLoot {
         for (Mob child : event.getChildren()) {
             if (child == null) continue;
             mark(child);
+            com.pancake.surviving_the_aftermath.common.raid.RaidCombat.inheritEffects(event.getParent(), child);
             raidId.flatMap(AftermathManager.getInstance()::getAftermath).ifPresent(encounter -> {
                 if (encounter instanceof BaseRaid raid && raid.join(child)) raid.insertTag(child);
             });
