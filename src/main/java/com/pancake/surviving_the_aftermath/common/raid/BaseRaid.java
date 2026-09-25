@@ -171,12 +171,22 @@ public class BaseRaid extends BaseAftermath implements IRaid {
         Direction dir = Direction.Plane.HORIZONTAL.stream().filter(d -> level.isEmptyBlock(blockPos.relative(d))
                 && !spawnPos.contains(blockPos.relative(d))).findFirst().orElse(Direction.UP);
         Vec3 vec = Vec3.atCenterOf(blockPos);
-        getModule().getRewards().getWeightedList().getRandom(level.getRandom()).ifPresent(reward -> {
-            ItemEntity itemEntity = new ItemEntity(level, vec.x, vec.y, vec.z, new ItemStack(reward),
-                    dir.getStepX() * 0.2, 0.2, dir.getStepZ() * 0.2f);
-            itemEntity.setPermanentlyInvulnerable(true);
-            level.addFreshEntity(itemEntity);
-        });
+        // The saved countdown is consumed in this same server tick. Resuming a celebration
+        // cannot issue the completion bonus again; legacy modules default to zero bonus.
+        if (state == AftermathState.CELEBRATING && rewardTime > 0
+                && rewardTime == getModule().getRewardTime() && getModule().getGuaranteedCores() > 0) {
+            spawnReward(new ItemStack(com.pancake.surviving_the_aftermath.common.init.ModItems.NETHER_CORE.get(),
+                    getModule().getGuaranteedCores()), vec, dir);
+        }
+        getModule().getRewards().getWeightedList().getRandom(level.getRandom())
+                .ifPresent(reward -> spawnReward(new ItemStack(reward), vec, dir));
+    }
+
+    private void spawnReward(ItemStack stack, Vec3 pos, Direction direction) {
+        ItemEntity item = new ItemEntity(level, pos.x, pos.y, pos.z, stack,
+                direction.getStepX() * 0.2, 0.2, direction.getStepZ() * 0.2);
+        item.setPermanentlyInvulnerable(true);
+        level.addFreshEntity(item);
     }
 
     @Override

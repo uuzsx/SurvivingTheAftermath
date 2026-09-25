@@ -94,6 +94,7 @@ public class RaidModuleProvider extends AftermathModuleProviders<BaseRaidModule>
 
     private BaseRaidModule create(RaidDifficulty difficulty, int rewardTime, ItemWeightedModule rewards) {
         var builder = new BaseRaidModule.Builder(difficulty.moduleName()).readyTime(100).rewardTime(rewardTime)
+                .guaranteedCores(switch (difficulty) { case EASY -> 4; case NORMAL -> 10; case HARD -> 20; })
                 .rewards(rewards).addCondition(new StructureConditionModule(ModStructures.NETHER_RAID.identifier().toString()));
         for (int index = 0; index < difficulty.waves(); index++) {
             int wave = index + 1;
