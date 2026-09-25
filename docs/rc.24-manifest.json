@@ -1,0 +1,107 @@
+{
+  "version": "0.0.4-rc.24",
+  "repository": "https://github.com/uuzsx/SurvivingTheAftermath",
+  "scope": "Difficulty above the raid bar with a smooth red/orange/gold color cycle; localized wave count below, with stacked-bar spacing. Client HUD only.",
+  "validation": [
+    {
+      "minecraft": "1.20.1",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    },
+    {
+      "minecraft": "1.21.1",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    },
+    {
+      "minecraft": "1.21.2",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    },
+    {
+      "minecraft": "26.1.1",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    },
+    {
+      "minecraft": "26.1.2",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    },
+    {
+      "minecraft": "26.2",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    },
+    {
+      "minecraft": "26.3",
+      "passed": true,
+      "checks": "data generation, client compilation, production build and bundled bilingual HUD resources"
+    }
+  ],
+  "artifacts": [
+    {
+      "minecraft": "1.20.1",
+      "branch": "main",
+      "loader": "Forge 47.2.1",
+      "java": 17,
+      "file": "SurvivingTheAftermath-1.20.1-0.0.4-rc.24.jar",
+      "bytes": 3276820,
+      "sha256": "bb5fbb4b15c14e19af485a261a4276830c1109cbb82fb532922bc5e45596d668"
+    },
+    {
+      "minecraft": "1.21.1",
+      "branch": "1.21.1",
+      "loader": "NeoForge 21.1.251",
+      "java": 21,
+      "file": "SurvivingTheAftermath-1.21.1-0.0.4-rc.24.jar",
+      "bytes": 3267769,
+      "sha256": "3b09ee330d1ade283aecfa35d50cdb722710ccd368a414725c5b64a0e25527d9"
+    },
+    {
+      "minecraft": "1.21.2",
+      "branch": "1.21.2",
+      "loader": "NeoForge 21.2.1-beta",
+      "java": 21,
+      "file": "SurvivingTheAftermath-1.21.2-0.0.4-rc.24.jar",
+      "bytes": 3255045,
+      "sha256": "9b269cfd86e651025d169d27c132fb494c4d0d7ca9ce82db45b872c574edeb3a"
+    },
+    {
+      "minecraft": "26.1.1",
+      "branch": "26.1.1",
+      "loader": "NeoForge 26.1.1.15-beta",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.1.1-0.0.4-rc.24.jar",
+      "bytes": 3261355,
+      "sha256": "aabccdd90f5568f8f4402129661aecac32edd79606be7a906645c8279f5ad096"
+    },
+    {
+      "minecraft": "26.1.2",
+      "branch": "26.1.2",
+      "loader": "NeoForge 26.1.2.109",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.1.2-0.0.4-rc.24.jar",
+      "bytes": 3275713,
+      "sha256": "9252b5fa8807969b6fc8f746cc6b7bf8860099166f2d158071b20f26a6e84b1f"
+    },
+    {
+      "minecraft": "26.2",
+      "branch": "26.2",
+      "loader": "NeoForge 26.2.0.88",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.2-0.0.4-rc.24.jar",
+      "bytes": 3261578,
+      "sha256": "96b7ea15fd38115e8929b34a52830ccf2b912ca3b1df1de2c90e21afa7bb488a"
+    },
+    {
+      "minecraft": "26.3",
+      "branch": "26.3",
+      "loader": "NeoForge 26.3.0.16-beta",
+      "java": 25,
+      "file": "SurvivingTheAftermath-26.3-0.0.4-rc.24.jar",
+      "bytes": 3258799,
+      "sha256": "771f48eef290257dc0526b22efeceac6a4b993c1964aec5db80ece99e7b16c09"
+    }
+  ]
+}
