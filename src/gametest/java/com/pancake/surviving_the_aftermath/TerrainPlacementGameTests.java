@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 public final class TerrainPlacementGameTests {
     private static void check(boolean value, String message) { if (!value) throw new GameTestAssertException(Component.literal(message), 0); }
     private static List<String> templates() {
@@ -216,14 +218,52 @@ public final class TerrainPlacementGameTests {
         for (int x = area.minX() >> 4; x <= area.maxX() >> 4; x++) for (int z = area.minZ() >> 4; z <= area.maxZ() >> 4; z++) chunks.add(new ChunkPos(x, z));
         java.util.Collections.shuffle(chunks, new java.util.Random(109));
         var context = StructurePieceSerializationContext.fromLevel(level);
+        var originalSelection = AbstractStructure.selectedCityBarrels(piece, level.getSeed());
+        var city = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
+                .getOrThrow(com.pancake.surviving_the_aftermath.common.init.ModStructures.CITY).value();
         for (var pos : chunks) {
+            check(originalSelection.equals(AbstractStructure.selectedCityBarrels(piece, level.getSeed())), "City selection shifted before chunk " + pos);
             var clip = new BoundingBox(pos.getMinBlockX(), level.getMinY(), pos.getMinBlockZ(), pos.getMaxBlockX(), level.getMinY() + level.getHeight() - 1, pos.getMaxBlockZ());
             piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), RandomSource.create(109), clip, pos, origin);
+            check(originalSelection.equals(AbstractStructure.selectedCityBarrels(piece, level.getSeed())), "City selection changed under the active chunk clip " + pos);
+            city.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), RandomSource.create(109), clip, pos, new PiecesContainer(List.of(piece)));
+            for (long selectedPos : originalSelection) {
+                var barrelPos = BlockPos.of(selectedPos);
+                if (!clip.isInside(barrelPos) || !level.getBlockState(barrelPos).is(Blocks.BARREL)) continue;
+                var barrel = (RandomizableContainerBlockEntity) level.getBlockEntity(barrelPos);
+                check(barrel != null && AbstractStructure.STRUCTURE_SUPPLIES.equals(barrel.getLootTable()),
+                        "Selected barrel was not assigned when its chunk was processed at " + barrelPos + " chunk=" + pos
+                                + " inventory=" + (barrel == null ? "null" : barrel.saveWithoutMetadata(level.registryAccess())));
+            }
             var saved = piece.createTag(context);
             check(saved.getBooleanOr("CityTerrainBlend", false), "City grading mode was not persisted");
             piece = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), context, saved);
             check(piece.getBoundingBox().equals(area), "City apron was lost after placement/reload");
+            check(originalSelection.equals(AbstractStructure.selectedCityBarrels(piece, level.getSeed())), "City selection shifted after chunk " + pos);
         }
+        int selectedBarrels = 0, decorativeBarrels = 0, lootChests = 0;
+        var selected = AbstractStructure.selectedCityBarrels(piece, level.getSeed());
+        check(selected.size() == 21, "City did not select exactly 21 of its barrels");
+        for (var info : template.filterBlocks(piece.templatePosition(), piece.placeSettings(), Blocks.BARREL)) {
+            var barrel = (RandomizableContainerBlockEntity) level.getBlockEntity(info.pos());
+            check(barrel != null, "City barrel missing at " + info.pos());
+            if (barrel.getLootTable() == null) {
+                decorativeBarrels++;
+                check(!selected.contains(info.pos().asLong()), "Selected city barrel has no loot table at " + info.pos()
+                        + ", marker=" + barrel.getPersistentData().contains("surviving_the_aftermath:structure_loot_processed")
+                        + ", nbt=" + barrel.saveWithoutMetadata(level.registryAccess()));
+            } else {
+                selectedBarrels++;
+                check(selected.contains(info.pos().asLong()) && barrel.getLootTable().equals(AbstractStructure.STRUCTURE_SUPPLIES), "Unexpected city barrel loot table");
+            }
+        }
+        for (var info : template.filterBlocks(piece.templatePosition(), piece.placeSettings(), Blocks.CHEST)) {
+            var chest = (RandomizableContainerBlockEntity) level.getBlockEntity(info.pos());
+            check(chest != null && AbstractStructure.STRUCTURE_SUPPLIES.equals(chest.getLootTable()), "City chest missing structure loot at " + info.pos());
+            lootChests++;
+        }
+        check(selectedBarrels == 21 && decorativeBarrels == 188 && lootChests == 27,
+                "City loot totals mismatch: barrels=" + selectedBarrels + "/" + decorativeBarrels + ", chests=" + lootChests);
         int checked = 0;
         for (int x = footprint.minX(); x <= footprint.maxX(); x++) for (int z = footprint.minZ(); z <= footprint.maxZ(); z++) {
             for (int y = floor - 32; y < floor; y++) {
@@ -248,7 +288,7 @@ public final class TerrainPlacementGameTests {
         }
         check(level.getBlockState(new BlockPos(treeX,treeGround+1,treeZ)).is(Blocks.OAK_LOG),"City cut a nearby tree trunk");
         check(level.getBlockState(new BlockPos(treeX,treeGround+11,treeZ)).is(Blocks.OAK_LEAVES),"City cut a nearby tree crown");
-        System.out.println("FULL CITY CHECK: chunks=" + chunks.size() + ", foundation_blocks=" + checked + ", shuffled placement and reload per chunk passed");
+        System.out.println("FULL CITY CHECK: chunks=" + chunks.size() + ", foundation_blocks=" + checked + ", loot=27 chests+21 barrels, 188 decorative barrels, shuffled placement and reload per chunk passed");
         h.succeed();
     }
 
