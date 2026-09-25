@@ -17,6 +17,7 @@ public class TestRegistration {
    helper.register(SurvivingTheAftermath.asResource("netheritereciperequiresbothingredients"), wrap(DungeonLifecycleGameTests::netheriteRecipeRequiresBothIngredients));
    helper.register(SurvivingTheAftermath.asResource("tooldifficultyselectsmatchingdatapack"), wrap(DungeonLifecycleGameTests::toolDifficultySelectsMatchingDataPack));
    helper.register(SurvivingTheAftermath.asResource("difficultylivewavesandpersistence"), wrap(RaidDifficultyGameTests::difficultyLiveWavesAndPersistence));
+   helper.register(SurvivingTheAftermath.asResource("weightedequipmentprogression"), wrap(RaidDifficultyGameTests::weightedEquipmentProgression));
    helper.register(SurvivingTheAftermath.asResource("combatbuffsareeffectiveandinherited"), wrap(RaidDifficultyGameTests::combatBuffsAreEffectiveAndInherited));
    helper.register(SurvivingTheAftermath.asResource("reliccreativebookplacement"), wrap(EnchantmentAuditGameTests::relicCreativeBookPlacement));
    helper.register(SurvivingTheAftermath.asResource("reliclegacysavemigration"), wrap(EnchantmentAuditGameTests::relicLegacySaveMigration));
