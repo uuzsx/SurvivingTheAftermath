@@ -17,6 +17,7 @@ public final class BattleEntityState {
     }
     public static void clear(Entity entity, UUID id) {
         if (!belongsTo(entity, id)) return;
+        if (entity instanceof net.minecraft.world.entity.Mob mob) PortalEntrance.finish(mob);
         CompoundTag tag = entity.getPersistentData();
         entity.setGlowingTag(tag.getBooleanOr(PREVIOUS_GLOW, false));
         tag.remove(PREVIOUS_GLOW);

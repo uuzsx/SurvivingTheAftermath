@@ -100,6 +100,9 @@ public class TestRegistration {
    helper.register(SurvivingTheAftermath.asResource("escapedplayerisremovedfrompenaltyqueue"), wrap(StabilityGameTests::escapedPlayerIsRemovedFromPenaltyQueue));
    helper.register(SurvivingTheAftermath.asResource("completioncoreguaranteesurvivesreload"), wrap(EconomyGameTests::completionCoreGuaranteeSurvivesReload));
    helper.register(SurvivingTheAftermath.asResource("incompleteandlegacyraidsdonotgrantbonus"), wrap(EconomyGameTests::incompleteAndLegacyRaidsDoNotGrantBonus));
+   helper.register(SurvivingTheAftermath.asResource("entranceauthentictemplateandwalk"), wrap(PortalEntranceGameTests::entranceAuthenticTemplateAndWalk));
+   helper.register(SurvivingTheAftermath.asResource("entrancequeuecountsequipmentandreload"), wrap(PortalEntranceGameTests::entranceQueueCountsEquipmentAndReload));
+   helper.register(SurvivingTheAftermath.asResource("entranceobstructionandairecovery"), wrap(PortalEntranceGameTests::entranceObstructionAndAiRecovery));
   });
  }
 }
