@@ -1,8 +1,6 @@
 package com.pancake.surviving_the_aftermath.common.item;
 
 import com.pancake.surviving_the_aftermath.common.util.NetherCoreLocator;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -11,7 +9,6 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 
 public class NetherCoreItem extends Item {
-    public static final String TOOLTIP = "item.surviving_the_aftermath.nether_core.tooltip";
     public NetherCoreItem(Properties properties) { super(properties); }
 
     @Override
@@ -20,8 +17,4 @@ public class NetherCoreItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
-    }
 }

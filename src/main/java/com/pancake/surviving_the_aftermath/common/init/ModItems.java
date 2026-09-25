@@ -37,5 +37,11 @@ public final class ModItems {
     @SubscribeEvent
     public static void creativeTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) event.accept(DIAMOND_FLINT_AND_STEEL.get());
+        if (event.getTabKey().equals(CreativeModeTabs.INGREDIENTS)) {
+            var books = new java.util.ArrayList<net.minecraft.world.item.ItemStack>(event.getParentEntries());
+            books.addAll(event.getSearchEntries());
+            books.stream().filter(com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks::isModBook)
+                    .forEach(book -> event.remove(book, net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
+        }
     }
 }

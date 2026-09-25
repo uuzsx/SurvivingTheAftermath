@@ -3,7 +3,6 @@ package com.pancake.surviving_the_aftermath.common.item;
 import com.pancake.surviving_the_aftermath.api.AftermathManager;
 import com.pancake.surviving_the_aftermath.common.raid.NetherRaid;
 import com.pancake.surviving_the_aftermath.common.util.RaidPortal;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -17,13 +16,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.portal.PortalShape;
-import org.jetbrains.annotations.Nullable;
-import java.util.List;
 
 public class DiamondFlintAndSteelItem extends FlintAndSteelItem {
     public static final String REQUIRED = "message.surviving_the_aftermath.nether_raid.diamond_required";
     public static final String UNAVAILABLE = "message.surviving_the_aftermath.nether_raid.unavailable";
-    public static final String TOOLTIP = "item.surviving_the_aftermath.diamond_flint_and_steel.tooltip";
 
     public DiamondFlintAndSteelItem(Properties properties) { super(properties); }
 
@@ -48,8 +44,4 @@ public class DiamondFlintAndSteelItem extends FlintAndSteelItem {
         return InteractionResult.CONSUME;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
-    }
 }
