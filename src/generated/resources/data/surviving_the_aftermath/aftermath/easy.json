@@ -27,21 +27,179 @@
     [
       {
         "amount_module": {
+          "amount": "surviving_the_aftermath:random_amount",
+          "max": 2,
+          "min": 1
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 0,
+          "min_pieces": 0,
+          "weapon": "minecraft:golden_sword"
+        }
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:random_amount",
+          "max": 2,
+          "min": 1
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 0,
+          "min_pieces": 0,
+          "weapon": "minecraft:crossbow"
+        }
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 0,
+          "min_pieces": 0,
+          "weapon": "minecraft:golden_sword"
+        }
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 0,
+          "min_pieces": 0,
+          "weapon": "minecraft:crossbow"
+        }
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 0,
+          "min_pieces": 0,
+          "weapon": "minecraft:golden_sword"
+        }
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 0,
+          "min_pieces": 0,
+          "weapon": "minecraft:crossbow"
+        }
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 1
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:hoglin"
+      }
+    ],
+    [
+      {
+        "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
           "value": 3
         },
         "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin"
-      }
-    ],
-    [
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            1,
+            2,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 2,
+          "min_pieces": 1,
+          "weapon": "minecraft:golden_sword"
+        }
+      },
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 4
+          "value": 3
         },
         "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin"
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            1,
+            2,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 2,
+          "min_pieces": 1,
+          "weapon": "minecraft:crossbow"
+        }
       },
       {
         "amount_module": {
@@ -56,78 +214,42 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 4
+          "value": 3
         },
         "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin"
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 4,
+          "min_pieces": 4,
+          "weapon": "minecraft:golden_sword"
+        }
       },
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
+          "value": 3
         },
         "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:hoglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:magma_cube"
-      }
-    ],
-    [
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 5
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:hoglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:magma_cube"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:blaze"
-      }
-    ],
-    [
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 5
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin_brute"
+        "entity_type": "minecraft:piglin",
+        "raid_equipment": {
+          "armor_quotas": [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          "max_pieces": 4,
+          "min_pieces": 4,
+          "weapon": "minecraft:crossbow"
+        }
       },
       {
         "amount_module": {
@@ -136,22 +258,6 @@
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:hoglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:magma_cube"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:blaze"
       }
     ]
   ]
