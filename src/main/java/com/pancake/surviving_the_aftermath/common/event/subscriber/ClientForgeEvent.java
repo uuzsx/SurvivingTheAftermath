@@ -2,6 +2,7 @@ package com.pancake.surviving_the_aftermath.common.event.subscriber;
 
 import com.pancake.surviving_the_aftermath.SurvivingTheAftermath;
 import com.pancake.surviving_the_aftermath.client.ClientAftermathBars;
+import com.pancake.surviving_the_aftermath.client.RaidBarText;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +31,7 @@ public class ClientForgeEvent {
             ResourceLocation resource = aftermath.texture();
             int[] offset = aftermath.offsets();
 
-            if (resource == null || offset == null) {
+            if (resource == null || offset == null || offset.length != 6) {
                 return;
             }
 
@@ -41,15 +42,29 @@ public class ClientForgeEvent {
             int frameOffset = offset[4];
             int barOffset = offset[5];
 
+            var font = net.minecraft.client.Minecraft.getInstance().font;
+            var labels = RaidBarText.split(bossEvent.getName());
+            int titleY = Math.max(4, event.getY() - 10);
+            int frameY = labels == null ? event.getY() - 10 : titleY + font.lineHeight + 3;
+            int waveY = frameY + frameHeight + 2;
+
+            // Keep the frame and fill aligned while reserving both text rows.
             //渲染进度条框
-            graphics.blit(resource, (graphics.guiWidth() - frameWidth) / 2, event.getY() - 10,
+            graphics.blit(resource, (graphics.guiWidth() - frameWidth) / 2, frameY,
                     0, frameOffset, frameWidth, frameHeight);
             //渲染进度条
-            graphics.blit(resource, (graphics.guiWidth() - barWidth) / 2, event.getY() - 10 + barOffset,
+            graphics.blit(resource, (graphics.guiWidth() - barWidth) / 2, frameY + barOffset,
                     0, 0, (int) (barWidth * event.getBossEvent().getProgress()), barHeight);
-            graphics.drawCenteredString(net.minecraft.client.Minecraft.getInstance().font,
-                    bossEvent.getName(), graphics.guiWidth() / 2, event.getY() + 2, 0xFFFFFFFF);
-            event.setIncrement(frameHeight);
+            if (labels != null) {
+                graphics.drawCenteredString(font, labels.difficulty(), graphics.guiWidth() / 2, titleY,
+                        RaidBarText.difficultyColor(System.nanoTime() / 1_000_000L));
+                graphics.drawCenteredString(font, labels.wave(), graphics.guiWidth() / 2, waveY, 0xFFFFFFFF);
+                // The next boss bar starts below the wave label, including its own title space.
+                event.setIncrement(waveY + font.lineHeight + 6 + 10 - event.getY());
+            } else {
+                graphics.drawCenteredString(font, bossEvent.getName(), graphics.guiWidth() / 2, event.getY() + 2, 0xFFFFFFFF);
+                event.setIncrement(frameHeight);
+            }
             event.setCanceled(true);
         }
     }
