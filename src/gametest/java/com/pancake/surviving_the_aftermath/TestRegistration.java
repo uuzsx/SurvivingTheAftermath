@@ -98,6 +98,8 @@ public class TestRegistration {
    helper.register(SurvivingTheAftermath.asResource("kubejslifecyclecancellation"), wrap(StabilityGameTests::kubeJsLifecycleCancellation));
    helper.register(SurvivingTheAftermath.asResource("missingenemydoesnotcompleteoccupiedwave"), wrap(StabilityGameTests::missingEnemyDoesNotCompleteOccupiedWave));
    helper.register(SurvivingTheAftermath.asResource("escapedplayerisremovedfrompenaltyqueue"), wrap(StabilityGameTests::escapedPlayerIsRemovedFromPenaltyQueue));
+   helper.register(SurvivingTheAftermath.asResource("completioncoreguaranteesurvivesreload"), wrap(EconomyGameTests::completionCoreGuaranteeSurvivesReload));
+   helper.register(SurvivingTheAftermath.asResource("incompleteandlegacyraidsdonotgrantbonus"), wrap(EconomyGameTests::incompleteAndLegacyRaidsDoNotGrantBonus));
   });
  }
 }
