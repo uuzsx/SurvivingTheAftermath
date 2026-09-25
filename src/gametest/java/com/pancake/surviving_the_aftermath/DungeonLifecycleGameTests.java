@@ -48,7 +48,7 @@ public class DungeonLifecycleGameTests {
     private static BaseRaidModule module() {
         var wave = List.<com.pancake.surviving_the_aftermath.api.module.IEntityInfoModule>of(
                 new EntityInfoModule(EntityType.ZOMBIE, new IntegerAmountModule(1)));
-        return new BaseRaidModule("dungeon_regression", new ItemWeightedModule.Builder().add(Items.APPLE, 1).build(),
+        return new BaseRaidModule("common", new ItemWeightedModule.Builder().add(Items.APPLE, 1).build(),
                 List.of(), List.of(wave, wave), 0, 3);
     }
 
@@ -200,6 +200,10 @@ public class DungeonLifecycleGameTests {
     public static void diamondPortalLifecycleZ(GameTestHelper h) throws Exception { portalLifecycle(h, Direction.Axis.Z); }
 
     private static void portalLifecycle(GameTestHelper h, Direction.Axis axis) throws Exception {
+        portalLifecycle(h, axis, ModItems.DIAMOND_FLINT_AND_STEEL.get(), RaidDifficulty.NORMAL);
+    }
+
+    private static void portalLifecycle(GameTestHelper h, Direction.Axis axis, Item item, RaidDifficulty difficulty) throws Exception {
         ServerLevel level = h.getLevel();
         BlockPos pos = h.absolutePos(new BlockPos(6, 3, 6));
         Set<BlockPos> plane = frame(level, pos, axis);
@@ -207,13 +211,14 @@ public class DungeonLifecycleGameTests {
         ResourceLocation key = SurvivingTheAftermath.asResource(BaseRaid.IDENTIFIER);
         var oldModules = List.copyOf(modules.get(key));
         var battleModule = module();
+        battleModule = new BaseRaidModule(difficulty.moduleName(), battleModule.getRewards(), battleModule.getConditions(), battleModule.getWaves(), 0, 3);
         modules.removeAll(key); modules.put(key, battleModule);
         Set<UUID> oldBattles = new HashSet<>(MANAGER.getAftermathMap().keySet());
         var player = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "portal_test"));
         player.moveTo(pos.south(2).getCenter());
         player.setGameMode(GameType.SURVIVAL);
         level.addNewPlayer(player);
-        ItemStack tool = new ItemStack(ModItems.DIAMOND_FLINT_AND_STEEL.get());
+        ItemStack tool = new ItemStack(item);
         Sounds sounds = new Sounds(level);
         NeoForge.EVENT_BUS.register(sounds);
         try (var ignored = arena(h)) {
@@ -235,6 +240,7 @@ public class DungeonLifecycleGameTests {
             check(ignite(player, tool, pos.below(), Direction.UP).consumesAction(), "Diamond activation failed");
             check(tool.getDamageValue() == 1 && plane.stream().allMatch(p -> level.getBlockState(p).is(Blocks.NETHER_PORTAL)), "Activation did not create portal or consume exactly one durability");
             NetherRaid raid = (NetherRaid) MANAGER.getAftermathMap().values().stream().filter(a -> !oldBattles.contains(a.getUUID())).findFirst().orElseThrow();
+            check(raid.getDifficulty() == difficulty, "Tool selected wrong difficulty");
             check(raid.getPortalBlocks().equals(plane), "Portal plane was not captured completely");
             check(ignite(player, tool, pos, Direction.UP) == InteractionResult.FAIL && tool.getDamageValue() == 1,
                     "Repeated activation created another battle or consumed durability");
@@ -253,6 +259,7 @@ public class DungeonLifecycleGameTests {
             MANAGER.getAftermathMap().remove(id);
             MANAGER.create(level, id, saved);
             NetherRaid loaded = (NetherRaid) MANAGER.getAftermath(id).orElseThrow();
+            check(loaded.getDifficulty() == difficulty, "Reload lost tool difficulty");
             check(loaded.getPortalBlocks().equals(plane), "Portal plane lost on save/load");
             loaded.tick(); loaded.tick();
             check(loaded.isEnd() && RaidMusic.playbackId(raid.level, raid.getStartPos()).filter(raid.getUUID()::equals).isPresent(), "Reload repeated victory song or failed to finish");
@@ -307,4 +314,59 @@ public class DungeonLifecycleGameTests {
         check(MANAGER.getAftermathMap().keySet().equals(before), "Outside portal incorrectly started a challenge");
         h.succeed();
     }
+    @GameTest(template = "stability_empty")
+    public static void goldenPortalLifecycle(GameTestHelper h) throws Exception { portalLifecycle(h, Direction.Axis.X, ModItems.GOLDEN_FLINT_AND_STEEL.get(), RaidDifficulty.EASY); }
+
+    @GameTest(template = "stability_empty")
+    public static void netheritePortalLifecycle(GameTestHelper h) throws Exception { portalLifecycle(h, Direction.Axis.X, ModItems.NETHERITE_FLINT_AND_STEEL.get(), RaidDifficulty.HARD); }
+
+    @GameTest(template = "stability_empty")
+    public static void goldenRecipeRequiresBothIngredients(GameTestHelper h) {
+        var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "recipe_test"));
+        var grid = new TransientCraftingContainer(new CraftingMenu(0, player.getInventory()), 2, 2);
+        grid.setItem(0, new ItemStack(Items.GOLD_INGOT));
+        check(h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).map(r -> !r.value().assemble(grid.asCraftInput(), h.getLevel().registryAccess()).is(ModItems.GOLDEN_FLINT_AND_STEEL.get())).orElse(true), "Gold alone crafted the igniter");
+        grid.setItem(3, new ItemStack(Items.FLINT_AND_STEEL));
+        check(h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).isEmpty(), "Old flint-and-steel ingredient still accepted");
+        grid.setItem(3, new ItemStack(Items.FLINT));
+        var recipe = h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).orElseThrow();
+        var result = recipe.value().assemble(grid.asCraftInput(), h.getLevel().registryAccess());
+        check(result.is(ModItems.GOLDEN_FLINT_AND_STEEL.get()) && result.getCount() == 1 && result.getMaxDamage() == 64,
+                "Diamond flint and steel recipe or durability incorrect");
+        grid.setItem(1, new ItemStack(Items.IRON_INGOT));
+        check(!recipe.value().matches(grid.asCraftInput(), h.getLevel()), "Recipe accepted an extra ingredient");
+        h.succeed();
+    }
+
+    @GameTest(template = "stability_empty")
+    public static void netheriteRecipeRequiresBothIngredients(GameTestHelper h) {
+        var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "recipe_test"));
+        var grid = new TransientCraftingContainer(new CraftingMenu(0, player.getInventory()), 2, 2);
+        grid.setItem(0, new ItemStack(Items.NETHERITE_INGOT));
+        check(h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).isEmpty(), "Diamond alone crafted the tool");
+        grid.setItem(3, new ItemStack(Items.FLINT_AND_STEEL));
+        check(h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).isEmpty(), "Old flint-and-steel ingredient still accepted");
+        grid.setItem(3, new ItemStack(Items.FLINT));
+        var recipe = h.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), h.getLevel()).orElseThrow();
+        var result = recipe.value().assemble(grid.asCraftInput(), h.getLevel().registryAccess());
+        check(result.is(ModItems.NETHERITE_FLINT_AND_STEEL.get()) && result.getCount() == 1 && result.getMaxDamage() == 64,
+                "Diamond flint and steel recipe or durability incorrect");
+        grid.setItem(1, new ItemStack(Items.IRON_INGOT));
+        check(!recipe.value().matches(grid.asCraftInput(), h.getLevel()), "Recipe accepted an extra ingredient");
+        h.succeed();
+    }
+
+    @GameTest(template = "stability_empty")
+    public static void toolDifficultySelectsMatchingDataPack(GameTestHelper h) throws Exception {
+        var level=h.getLevel();var pos=h.absolutePos(new BlockPos(6,3,6));
+        try(var fixture=arena(h)) {
+            for(var difficulty:RaidDifficulty.values()) {
+                var raid=new NetherRaid(level,pos,difficulty);
+                check(raid.isCreate(level,pos,null),"No matching difficulty module");
+                check(raid.getModule().getModuleName().equals(difficulty.moduleName()) && raid.getModule().getWaves().size()==difficulty.waves(),"Selected wrong wave profile");
+            }
+        }
+        h.succeed();
+    }
+
 }

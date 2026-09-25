@@ -47,6 +47,8 @@ public class ClientForgeEvent {
             //渲染进度条
             graphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, resource, (graphics.guiWidth() - barWidth) / 2, event.getY() - 10 + barOffset,
                     0, 0, (int) (barWidth * event.getBossEvent().getProgress()), barHeight, 256, 256);
+            graphics.drawCenteredString(net.minecraft.client.Minecraft.getInstance().font,
+                    bossEvent.getName(), graphics.guiWidth() / 2, event.getY() + 2, 0xFFFFFFFF);
             event.setIncrement(frameHeight);
             event.setCanceled(true);
         }
