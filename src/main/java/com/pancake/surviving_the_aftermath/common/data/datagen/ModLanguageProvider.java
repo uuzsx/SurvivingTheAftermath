@@ -16,7 +16,6 @@ public class ModLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
-        add("item.surviving_the_aftermath.nether_core.tooltip", "Throw to find a city and its relic dealer. Always falls back intact; reusable without limit.");
         add("message.surviving_the_aftermath.nether_core.overworld", "Use in the Overworld to seek a relic dealer.");
         add("message.surviving_the_aftermath.nether_core.searching", "Searching for a suitable city… Keep holding the core.");
         add("message.surviving_the_aftermath.nether_core.not_found", "No city with a reachable dealer found nearby. Try from another area.");
@@ -46,7 +45,6 @@ public class ModLanguageProvider extends LanguageProvider {
         add("item.surviving_the_aftermath.music_disk_orchelias_vox.desc", "Hagali - Orchelia's vox (offvocal ver_)");
 
 		add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "Diamond Flint and Steel");
-		add(DiamondFlintAndSteelItem.TOOLTIP, "Activates dungeon portals. Uses 1 durability per activation.");
 		add(DiamondFlintAndSteelItem.REQUIRED, "This dungeon requires Diamond Flint and Steel.");
 		add(DiamondFlintAndSteelItem.UNAVAILABLE, "Cannot activate: check the portal frame, challenge conditions, or an unfinished challenge.");
 		add("itemGroup." + SurvivingTheAftermath.MOD_ID, "Surviving the Aftermath");
