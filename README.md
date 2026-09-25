@@ -10,7 +10,7 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
 使用黄金、钻石、下界合金打火石分别开启简单 5 波、普通 9 波、困难 13 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 
-当前分支 **`main`** 对应 **Minecraft 1.20.1 / Forge 47.2.1 / Java 17**，模组版本为 **0.0.4-rc.25**。
+当前分支 **`main`** 对应 **Minecraft 1.20.1 / Forge 47.2.1 / Java 17**，模组版本为 **0.0.4-rc.26**。
 每个版本都在自己的分支根目录独立构建；默认分支 `main` 为 1.20.1。
 
 ## 版本与分支
@@ -33,6 +33,8 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 - 胜利音乐以建筑中心为声源，在 48 格内随距离衰减。成功重新激活，或最后一名玩家离开范围时停止；回来不会续播。
 
 ## 更新记录
+
+rc.26 为新生成结构加入专用战利品表，城市稳定选择 21/209 个木桶有补给，其余结构箱桶全部有补给。详情见 [结构战利品](docs/STRUCTURE_LOOT-rc.26.md)。
 
 rc.25 将进度条上方标题改为「下界入侵 · 简单／普通／困难」，保留整行渐变和下方波次。此次仅修改显示文字并重新构建 JAR，未重跑整套测试。
 
