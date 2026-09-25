@@ -31,22 +31,22 @@ public final class RaidDifficultyGameTests {
         return AftermathModuleLoader.AFTERMATH_MODULE_MAP.get(SurvivingTheAftermath.asResource("raid")).stream()
                 .filter(m -> m.getModuleName().equals(difficulty.moduleName())).map(m -> (BaseRaidModule)m).findFirst().orElseThrow();
     }
-    private static Map<String,Integer> enchantments(ItemStack stack) {
+    static Map<String,Integer> enchantments(ItemStack stack) {
         Map<String,Integer> result = new HashMap<>();
         EnchantmentHelper.getEnchantments(stack).forEach((e,n) -> result.put(BuiltInRegistries.ENCHANTMENT.getKey(e).getPath(),n));
         return result;
     }
-    private static void verify(Mob mob, RaidDifficulty mode, int wave) {
+    static void verify(Mob mob, RaidDifficulty mode, int wave) {
         if (mob instanceof AbstractPiglin) {
             check(!mob.getMainHandItem().isEmpty(), "Unarmed piglin: " + mode + "/" + wave);
             for (EquipmentSlot slot : List.of(EquipmentSlot.MAINHAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
                 var stack=mob.getItemBySlot(slot);
                 var enchs=enchantments(stack);
-                check(Set.of("sharpness","knockback","fire_aspect","protection","thorns").containsAll(enchs.keySet()), "Non-combat enchantment: " + enchs);
+                check(Set.of("sharpness","knockback","fire_aspect","protection","thorns","quick_charge","piercing","multishot").containsAll(enchs.keySet()), "Non-combat enchantment: " + enchs);
                 if (mode==RaidDifficulty.EASY || wave<7) check(enchs.isEmpty(), "Premature enchanted equipment");
                 else {
                     check(!stack.isEmpty() && !enchs.isEmpty(), "Missing enchanted equipment: " + mode + "/" + wave + "/" + slot);
-                    check(enchs.containsKey(slot==EquipmentSlot.MAINHAND ? "sharpness" : "protection"), "Missing effective primary enchantment");
+                    check(enchs.containsKey(slot==EquipmentSlot.MAINHAND ? (stack.is(Items.CROSSBOW) ? "quick_charge" : "sharpness") : "protection"), "Missing effective primary enchantment");
                     check(enchs.values().stream().allMatch(n -> n>0 && n<=5),"Enchantment outside legal levels");
                 }
             }
@@ -54,6 +54,7 @@ public final class RaidDifficultyGameTests {
         int count=mode==RaidDifficulty.HARD && wave>=10 ? Math.min(3,wave-9) : 0;
         check(mob.getActiveEffects().size()==count,"Wrong effect count at " + mode + "/" + wave);
         for(var effect:mob.getActiveEffects()) {
+            if(mob.getMainHandItem().is(Items.CROSSBOW)) check(effect.getEffect()!=MobEffects.DAMAGE_BOOST,"Strength has no effect on crossbow shots");
             check(Set.of(MobEffects.ABSORPTION,MobEffects.REGENERATION,MobEffects.DAMAGE_RESISTANCE,MobEffects.DAMAGE_BOOST,MobEffects.MOVEMENT_SPEED).contains(effect.getEffect()),"Non-combat potion");
             check(effect.getDuration()==-1 && effect.getAmplifier()<=1,"Potion lost persistence or exceeded tier II");
             if (!(mob instanceof AbstractPiglin || mob instanceof net.minecraft.world.entity.monster.hoglin.Hoglin))
@@ -81,16 +82,20 @@ public final class RaidDifficultyGameTests {
                     int previous=0;
                     for (int wave=1;wave<=difficulty.waves();wave++) {
                         raid.tick();
-                        int expected=module.getWaves().get(wave-1).stream().mapToInt(g -> ((EntityInfoModule)g).getAmountModule().getSpawnAmount()).sum();
-                        check(expected>previous && raid.getEnemies().size()==expected && raid.getCurrentWave()==wave-1 && !raid.isEnd(),"Wave skipped or spawn failed: "+difficulty+"/"+wave);
-                        previous=expected;
+                        int expected=new int[]{0,4,5,7,8,10,12,16,19,19,22,22,26}[wave-1];
+                        check((wave==1 ? raid.getEnemies().size()>=2 && raid.getEnemies().size()<=4 : raid.getEnemies().size()==expected)
+                                && raid.getCurrentWave()==wave-1 && !raid.isEnd(),"Wave skipped or spawn failed: "+difficulty+"/"+wave);
+                        previous=raid.getEnemies().size();
                         for(var id:List.copyOf(raid.getEnemies())) {
                             var mob=(Mob)level.getEntity(id);check(mob!=null,"Spawned enemy missing from server");spawned.add(mob);
                             verify(mob,difficulty,wave);check(RaidMobLoot.isDungeonMob(mob) && !mob.canPickUpLoot(),"Difficulty enemies lost no-loot policy");
                         }
+                        RaidRosterGameTests.checkWave(spawned,wave);
                         var tag=(CompoundTag)NetherRaid.CODEC.encodeStart(NbtOps.INSTANCE,raid).result().orElseThrow();
                         var saved=NetherRaid.CODEC.parse(NbtOps.INSTANCE,tag).result().orElseThrow();
                         check(saved.getDifficulty()==difficulty && saved.getCurrentWave()==wave-1 && saved.getModule().getWaves().size()==difficulty.waves() && saved.getEnemies().equals(raid.getEnemies()),"Reload changed difficulty, wave, or tracked enemies");
+                        check(BaseRaidModule.CODEC.encodeStart(NbtOps.INSTANCE,saved.getModule()).result().orElseThrow()
+                                .equals(BaseRaidModule.CODEC.encodeStart(NbtOps.INSTANCE,module).result().orElseThrow()),"Reload changed fixed equipment quotas");
                         if(wave==1) {
                             tag.remove("difficulty");
                             check(NetherRaid.CODEC.parse(NbtOps.INSTANCE,tag).result().orElseThrow().getDifficulty()==RaidDifficulty.NORMAL,"Legacy save cannot load");
