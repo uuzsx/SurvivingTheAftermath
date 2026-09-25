@@ -16,6 +16,7 @@ public class ModLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
+        add("message.surviving_the_aftermath.nether_raid.blocked", "The portal exit is blocked. The challenge has ended; clear the doorway and ground, then reactivate it.");
         add(ModItems.GOLDEN_FLINT_AND_STEEL.get(), "Golden Flint and Steel");
         add(ModItems.NETHERITE_FLINT_AND_STEEL.get(), "Netherite Flint and Steel");
         add("difficulty.surviving_the_aftermath.easy", "Easy");
