@@ -44,6 +44,16 @@ import java.util.*;
 
 
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.monster.cubemob.MagmaCube;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.loot.LootTable;
 public class StabilityGameTests {
     private static final AftermathManager MANAGER = AftermathManager.getInstance();
     private static BaseRaidModule module() {
@@ -249,21 +259,135 @@ public class StabilityGameTests {
         level.setBlockAndUpdate(origin, Blocks.BARREL.defaultBlockState());
         level.setBlockAndUpdate(origin.east(2), Blocks.CHEST.defaultBlockState());
         level.setBlockAndUpdate(origin.east(4), Blocks.CHEST.defaultBlockState());
+        level.setBlockAndUpdate(origin.east(6), Blocks.CHEST.defaultBlockState());
+        level.setBlockAndUpdate(origin.east(8), Blocks.CHEST.defaultBlockState());
         var authored = (RandomizableContainerBlockEntity) level.getBlockEntity(origin.east(4));
         authored.setLootTable(BuiltInLootTables.SIMPLE_DUNGEON, 123L);
+        var fixed = (RandomizableContainerBlockEntity) level.getBlockEntity(origin.east(6));
+        fixed.setItem(0, Items.APPLE.getDefaultInstance());
         Identifier id = SurvivingTheAftermath.asResource("regression_loot");
         var template = level.getStructureTemplateManager().getOrCreate(id);
-        template.fillFromWorld(level, origin, new Vec3i(5, 1, 1), false, List.of(Blocks.STRUCTURE_VOID));
+        template.fillFromWorld(level, origin, new Vec3i(7, 1, 1), false, List.of(Blocks.STRUCTURE_VOID));
         var piece = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), level.getStructureTemplateManager(), id, origin, Rotation.NONE);
         var city = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(ModStructures.CITY).value();
         city.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
-                BoundingBox.fromCorners(origin, origin.offset(5, 1, 1)), ChunkPos.containing(origin), new PiecesContainer(List.of(piece)));
+                BoundingBox.fromCorners(origin, origin.offset(7, 1, 1)), ChunkPos.containing(origin), new PiecesContainer(List.of(piece)));
         check(!level.getBlockEntity(origin).saveWithoutMetadata(level.registryAccess()).contains("LootTable"), "Decorative barrel gained treasure");
-        check(level.getBlockEntity(origin.east(2)).saveWithoutMetadata(level.registryAccess()).getStringOr("LootTable", "").equals(BuiltInLootTables.DESERT_PYRAMID.identifier().toString()), "Treasure chest lost fallback");
+        check(level.getBlockEntity(origin.east(2)).saveWithoutMetadata(level.registryAccess()).getStringOr("LootTable", "").equals(AbstractStructure.STRUCTURE_SUPPLIES.identifier().toString()), "Treasure chest lost structure table");
         check(authored.saveWithoutMetadata(level.registryAccess()).getStringOr("LootTable", "").equals(BuiltInLootTables.SIMPLE_DUNGEON.identifier().toString()), "Authored loot table overwritten");
+        check(fixed.getItem(0).is(Items.APPLE), "Fixed inventory overwritten");
+        check(!level.getBlockEntity(origin.east(8)).saveWithoutMetadata(level.registryAccess()).contains("LootTable"), "Outside chest gained treasure");
+        var opened = (RandomizableContainerBlockEntity) level.getBlockEntity(origin.east(2));
+        opened.getItem(0); // opens and consumes the pending loot table
+        opened.clearContent();
+        CompoundTag saved = opened.saveWithFullMetadata(level.registryAccess());
+        BlockEntity reloaded = BlockEntity.loadStatic(origin.east(2), Blocks.CHEST.defaultBlockState(), saved, level.registryAccess());
+        check(reloaded instanceof RandomizableContainerBlockEntity, "Saved chest failed to reload");
+        level.setBlockEntity(reloaded);
+        city.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
+                BoundingBox.fromCorners(origin, origin.offset(7, 1, 1)), ChunkPos.containing(origin), new PiecesContainer(List.of(piece)));
+        var reopened = (RandomizableContainerBlockEntity) level.getBlockEntity(origin.east(2));
+        check(reopened.isEmpty() && reopened.getLootTable() == null, "Opened chest refilled after reload");
         h.succeed();
     }
 
+
+    public static void cityBarrelSelectionSurvivesRotationAndReload(GameTestHelper h) {
+        var level = h.getLevel();
+        var context = StructurePieceSerializationContext.fromLevel(level);
+        for (Rotation rotation : Rotation.values()) {
+            BlockPos origin = new BlockPos(-100, 90, 200);
+            var piece = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), level.getStructureTemplateManager(),
+                    SurvivingTheAftermath.asResource("city"), origin, rotation);
+            var infos = piece.template().filterBlocks(piece.templatePosition(), piece.placeSettings(), Blocks.BARREL);
+            check(infos.size() == 209, "City template barrel count changed");
+            var positions = new ArrayList<BlockPos>();
+            for (var info : infos) positions.add(info.pos());
+            var original = AbstractStructure.selectBarrels(positions, 123456L);
+            Collections.shuffle(positions, new Random(7541));
+            check(original.equals(AbstractStructure.selectBarrels(positions, 123456L)), "Barrel selection depended on template order");
+            var selected = AbstractStructure.selectedCityBarrels(piece, level.getSeed());
+            check(selected.size() == 21, "City selected other than 21 barrels");
+            var reloaded = new AbstractStructure.Piece(ModStructurePieceTypes.CITY.get(), context, piece.createTag(context));
+            check(selected.equals(AbstractStructure.selectedCityBarrels(reloaded, level.getSeed())), "Barrel selection changed after piece reload");
+        }
+        h.succeed();
+    }
+
+    public static void otherStructureBarrelsReceiveLoot(GameTestHelper h) {
+        var level = h.getLevel();
+        for (int index = 1; index <= 2; index++) {
+            BlockPos origin = h.absolutePos(new BlockPos(2, 2, index * 4));
+            level.setBlockAndUpdate(origin, Blocks.BARREL.defaultBlockState());
+            level.setBlockAndUpdate(origin.east(2), Blocks.BARREL.defaultBlockState());
+            level.setBlockAndUpdate(origin.east(4), Blocks.BARREL.defaultBlockState());
+            Identifier id = SurvivingTheAftermath.asResource("regression_construction_" + index);
+            var template = level.getStructureTemplateManager().getOrCreate(id);
+            template.fillFromWorld(level, origin, new Vec3i(3, 1, 1), false, List.of(Blocks.STRUCTURE_VOID));
+            var type = index == 1 ? ModStructurePieceTypes.CONSTRUCTION_1.get() : ModStructurePieceTypes.CONSTRUCTION_2.get();
+            var key = index == 1 ? ModStructures.CONSTRUCTION_1 : ModStructures.CONSTRUCTION_2;
+            var piece = new AbstractStructure.Piece(type, level.getStructureTemplateManager(), id, origin, Rotation.NONE);
+            var structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(key).value();
+            structure.afterPlace(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
+                    BoundingBox.fromCorners(origin, origin.offset(3, 1, 1)), ChunkPos.containing(origin), new PiecesContainer(List.of(piece)));
+            for (var pos : List.of(origin, origin.east(2))) {
+                var barrel = (RandomizableContainerBlockEntity) level.getBlockEntity(pos);
+                check(barrel != null && AbstractStructure.STRUCTURE_SUPPLIES.equals(barrel.getLootTable()),
+                        "Construction " + index + " barrel missed loot at " + pos);
+            }
+            check(((RandomizableContainerBlockEntity) level.getBlockEntity(origin.east(4))).getLootTable() == null,
+                    "Barrel outside construction template gained loot");
+        }
+        h.succeed();
+    }
+
+    public static void structureLootTablesActuallyGenerate(GameTestHelper h) {
+        var level = h.getLevel();
+        var params = new LootParams.Builder(level)
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(h.absolutePos(new BlockPos(2, 2, 2))))
+                .create(LootContextParamSets.CHEST);
+        LootTable main = level.getServer().reloadableRegistries().getLootTable(AbstractStructure.STRUCTURE_SUPPLIES);
+        ResourceKey<LootTable> booksKey = ResourceKey.create(Registries.LOOT_TABLE, SurvivingTheAftermath.asResource("chests/structure_book"));
+        LootTable books = level.getServer().reloadableRegistries().getLootTable(booksKey);
+        int iron = 0, gold = 0, emerald = 0, diamond = 0, sampledBooks = 0;
+        for (int seed = 1; seed <= 4000; seed++) {
+            var drops = main.getRandomItems(params, seed);
+            check(!drops.isEmpty(), "Structure loot table generated no supplies");
+            for (var stack : drops) {
+                if (stack.is(Items.IRON_INGOT)) iron += stack.getCount();
+                if (stack.is(Items.GOLD_INGOT)) gold += stack.getCount();
+                if (stack.is(Items.EMERALD)) emerald += stack.getCount();
+                if (stack.is(Items.DIAMOND)) diamond += stack.getCount();
+                if (stack.is(Items.ENCHANTED_BOOK)) {
+                    sampledBooks++;
+                    check(stack.get(DataComponents.STORED_ENCHANTMENTS) != null
+                            && stack.get(DataComponents.STORED_ENCHANTMENTS).size() == 1, "Structure produced an invalid enchanted book");
+                }
+            }
+        }
+        check(Math.abs(iron - 2520) < 260 && Math.abs(gold - 1260) < 200
+                && Math.abs(emerald - 2100) < 270 && Math.abs(diamond - 1600) < 250,
+                "Live loot deviates from proposed ore expectations: " + iron + "/" + gold + "/" + diamond + "/" + emerald);
+        check(sampledBooks > 60 && sampledBooks < 180, "Book entry did not use expected probability: " + sampledBooks);
+        Set<String> allowed = Set.of("protection", "projectile_protection", "fire_protection", "feather_falling",
+                "respiration", "efficiency", "unbreaking", "sharpness", "smite", "power", "aqua_affinity",
+                "knockback", "fortune", "looting", "silk_touch");
+        for (int seed = 1; seed <= 500; seed++) {
+            var drops = books.getRandomItems(params, seed);
+            check(drops.size() == 1 && drops.getFirst().is(Items.ENCHANTED_BOOK), "Book subtable returned a non-book");
+            var enchanted = drops.getFirst().get(DataComponents.STORED_ENCHANTMENTS);
+            check(enchanted != null && enchanted.size() == 1, "Book subtable returned no or multiple enchantments");
+            var entry = enchanted.entrySet().iterator().next();
+            String name = entry.getKey().unwrapKey().orElseThrow().identifier().getPath();
+            int rank = entry.getIntValue();
+            check(allowed.contains(name) && rank >= 1 && rank <= 2, "Book whitelist or rank violated: " + name + " " + rank);
+            check(!Set.of("aqua_affinity", "knockback", "fortune", "looting", "silk_touch").contains(name) || rank == 1,
+                    "Fixed rank book exceeded I: " + name);
+        }
+        System.out.println("STRUCTURE LOOT SAMPLE: 4000 containers iron/gold/diamond/emerald="
+                + iron + "/" + gold + "/" + diamond + "/" + emerald + ", books=" + sampledBooks + "; 500 single-enchantment books checked");
+        h.succeed();
+    }
 
     public static void reloadReplacesModules(GameTestHelper h) {
         var old = ArrayListMultimap.create(MANAGER.getAftermathModuleMap());

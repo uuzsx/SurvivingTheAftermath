@@ -1,0 +1,183 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:protection": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:projectile_protection": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:fire_protection": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:feather_falling": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:respiration": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:efficiency": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:unbreaking": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:sharpness": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:smite": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:power": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:aqua_affinity": 1
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "modifier": {
+            "enchantments": {
+              "minecraft:knockback": 1
+            },
+            "type": "minecraft:set_enchantments"
+          }
+        }
+      ]
+    }
+  ]
+}
