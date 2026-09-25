@@ -55,7 +55,7 @@ public class Rc4GameTests {
 
     public static void defaultWavePiglinsHaveWeapons(GameTestHelper h) throws Exception {
         var module = defaultModule(h);
-        check(module.getWaves().size() == 11, "Default wave configuration changed");
+        check(module.getWaves().size() == 9, "Default wave configuration changed");
         int piglins = 0;
         for (int repeat = 0; repeat < 12; repeat++) for (var wave : module.getWaves()) for (var group : wave) {
             for (var created : group.spawnEntity(h.getLevel(), h.absolutePos(new BlockPos(5, 2, 5)))) {

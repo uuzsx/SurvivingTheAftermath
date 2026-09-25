@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:flint",
+    "minecraft:gold_ingot"
+  ],
+  "result": {
+    "id": "surviving_the_aftermath:golden_flint_and_steel"
+  }
+}

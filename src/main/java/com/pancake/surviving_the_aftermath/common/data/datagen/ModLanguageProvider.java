@@ -16,6 +16,12 @@ public class ModLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
+        add(ModItems.GOLDEN_FLINT_AND_STEEL.get(), "Golden Flint and Steel");
+        add(ModItems.NETHERITE_FLINT_AND_STEEL.get(), "Netherite Flint and Steel");
+        add("difficulty.surviving_the_aftermath.easy", "Easy");
+        add("difficulty.surviving_the_aftermath.normal", "Normal");
+        add("difficulty.surviving_the_aftermath.hard", "Hard");
+        add("message.surviving_the_aftermath.nether_raid.wave", "%s - Wave %s/%s");
         add("message.surviving_the_aftermath.nether_core.overworld", "Use in the Overworld to seek a relic dealer.");
         add("message.surviving_the_aftermath.nether_core.searching", "Searching for a suitable city… Keep holding the core.");
         add("message.surviving_the_aftermath.nether_core.not_found", "No city with a reachable dealer found nearby. Try from another area.");
@@ -45,7 +51,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add("item.surviving_the_aftermath.music_disk_orchelias_vox.desc", "Hagali - Orchelia's vox (offvocal ver_)");
 
 		add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "Diamond Flint and Steel");
-		add(DiamondFlintAndSteelItem.REQUIRED, "This dungeon requires Diamond Flint and Steel.");
+		add(DiamondFlintAndSteelItem.REQUIRED, "Use Golden, Diamond, or Netherite Flint and Steel for Easy, Normal, or Hard challenges.");
 		add(DiamondFlintAndSteelItem.UNAVAILABLE, "Cannot activate: check the portal frame, challenge conditions, or an unfinished challenge.");
 		add("itemGroup." + SurvivingTheAftermath.MOD_ID, "Surviving the Aftermath");
 
