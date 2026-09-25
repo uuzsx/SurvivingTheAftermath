@@ -24,6 +24,7 @@ public class ModLanguageCNProvider extends LanguageProvider {
         add("difficulty.surviving_the_aftermath.hard", "困难");
         add("message.surviving_the_aftermath.nether_raid.wave", "%s · 第 %s/%s 波");
         add("message.surviving_the_aftermath.nether_raid.wave_count", "第 %s/%s 波");
+        add("message.surviving_the_aftermath.nether_raid.heading", "下界入侵 · %s");
         add("message.surviving_the_aftermath.nether_core.overworld", "请在主世界使用下界核心寻找遗物商人。");
         add("message.surviving_the_aftermath.nether_core.searching", "正在寻找城市……请继续手持下界核心。");
         add("message.surviving_the_aftermath.nether_core.not_found", "附近暂未找到可引导的城市，请换个区域重试。");
