@@ -13,6 +13,10 @@ public class ModRecipeProvider extends RecipeProvider {
     protected void buildRecipes(RecipeOutput consumer) {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.DIAMOND_FLINT_AND_STEEL.get())
                 .requires(Items.FLINT).requires(Items.DIAMOND)
-                .unlockedBy("has_diamond", has(Items.DIAMOND)).save(consumer);
+                .unlockedBy("has_diamond", has(Items.DIAMOND)).save(consumer);        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.GOLDEN_FLINT_AND_STEEL.get())
+                .requires(Items.FLINT).requires(Items.GOLD_INGOT)
+                .unlockedBy("has_gold_ingot", has(Items.GOLD_INGOT)).save(consumer);        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.NETHERITE_FLINT_AND_STEEL.get())
+                .requires(Items.FLINT).requires(Items.NETHERITE_INGOT)
+                .unlockedBy("has_netherite_ingot", has(Items.NETHERITE_INGOT)).save(consumer);
     }
 }

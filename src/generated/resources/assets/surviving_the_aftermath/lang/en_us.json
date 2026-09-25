@@ -1,4 +1,7 @@
 {
+  "difficulty.surviving_the_aftermath.easy": "Easy",
+  "difficulty.surviving_the_aftermath.hard": "Hard",
+  "difficulty.surviving_the_aftermath.normal": "Normal",
   "effect.surviving_the_aftermath.cowardice": "Cowardice",
   "enchantment.surviving_the_aftermath.bloodthirsty": "Bloodthirsty",
   "enchantment.surviving_the_aftermath.clean_water": "Clean Water",
@@ -15,10 +18,12 @@
   "item.surviving_the_aftermath.cooked_falukorv": "Cooked Falukorv",
   "item.surviving_the_aftermath.diamond_flint_and_steel": "Diamond Flint and Steel",
   "item.surviving_the_aftermath.egg_tart": "Egg Tart",
+  "item.surviving_the_aftermath.golden_flint_and_steel": "Golden Flint and Steel",
   "item.surviving_the_aftermath.hamburger": "Hamburger",
   "item.surviving_the_aftermath.music_disk_orchelias_vox": "Music Disc",
   "item.surviving_the_aftermath.music_disk_orchelias_vox.desc": "Hagali - Orchelia's vox (offvocal ver_)",
   "item.surviving_the_aftermath.nether_core": "Nether Core",
+  "item.surviving_the_aftermath.netherite_flint_and_steel": "Netherite Flint and Steel",
   "item.surviving_the_aftermath.raw_falukorv": "Raw Falukorv",
   "item.surviving_the_aftermath.stack_of_egg_tarts": "Stack of Egg Tarts",
   "item.surviving_the_aftermath.tianjin_pancake": "Tianjin Pancake",
@@ -28,10 +33,11 @@
   "message.surviving_the_aftermath.nether_core.not_found": "No city with a reachable dealer found nearby. Try from another area.",
   "message.surviving_the_aftermath.nether_core.overworld": "Use in the Overworld to seek a relic dealer.",
   "message.surviving_the_aftermath.nether_core.searching": "Searching for a suitable city… Keep holding the core.",
-  "message.surviving_the_aftermath.nether_raid.diamond_required": "This dungeon requires Diamond Flint and Steel.",
+  "message.surviving_the_aftermath.nether_raid.diamond_required": "Use Golden, Diamond, or Netherite Flint and Steel for Easy, Normal, or Hard challenges.",
   "message.surviving_the_aftermath.nether_raid.start": "You feel the air getting hotter .....",
   "message.surviving_the_aftermath.nether_raid.unavailable": "Cannot activate: check the portal frame, challenge conditions, or an unfinished challenge.",
   "message.surviving_the_aftermath.nether_raid.victory": "Looking at the last Mars extinguished, you feel they will not come back, temporarily......",
+  "message.surviving_the_aftermath.nether_raid.wave": "%s - Wave %s/%s",
   "message.surviving_the_aftermath.tracker.escape": "Do not fight process escape, or you will pay the price, the countdown begins......%s",
   "message.surviving_the_aftermath.tracker.personal_fail": "Although you failed, you can continue to trust your teammates."
 }

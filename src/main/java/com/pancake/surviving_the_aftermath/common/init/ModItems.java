@@ -18,6 +18,10 @@ import java.util.function.Supplier;
 @net.neoforged.fml.common.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = net.neoforged.fml.common.EventBusSubscriber.Bus.MOD)
 public final class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(net.minecraft.core.registries.BuiltInRegistries.ITEM, SurvivingTheAftermath.MOD_ID);
+    public static final java.util.function.Supplier<Item> GOLDEN_FLINT_AND_STEEL = ITEMS.register("golden_flint_and_steel",
+            () -> new com.pancake.surviving_the_aftermath.common.item.RaidFlintAndSteelItem(properties("golden_flint_and_steel").durability(64), com.pancake.surviving_the_aftermath.common.raid.RaidDifficulty.EASY));
+    public static final java.util.function.Supplier<Item> NETHERITE_FLINT_AND_STEEL = ITEMS.register("netherite_flint_and_steel",
+            () -> new com.pancake.surviving_the_aftermath.common.item.RaidFlintAndSteelItem(properties("netherite_flint_and_steel").durability(64).fireResistant(), com.pancake.surviving_the_aftermath.common.raid.RaidDifficulty.HARD));
     public static final Supplier<Item> DIAMOND_FLINT_AND_STEEL = ITEMS.register("diamond_flint_and_steel",
             () -> new DiamondFlintAndSteelItem(new Item.Properties().durability(64)));
 
@@ -34,7 +38,11 @@ public final class ModItems {
 
     @SubscribeEvent
     public static void creativeTab(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) event.accept(DIAMOND_FLINT_AND_STEEL.get());
+        if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
+            event.accept(GOLDEN_FLINT_AND_STEEL.get());
+            event.accept(DIAMOND_FLINT_AND_STEEL.get());
+            event.accept(NETHERITE_FLINT_AND_STEEL.get());
+        }
         if (event.getTabKey().equals(CreativeModeTabs.INGREDIENTS)) {
             var books = new java.util.ArrayList<net.minecraft.world.item.ItemStack>(event.getParentEntries());
             books.addAll(event.getSearchEntries());
