@@ -1,4 +1,7 @@
 {
+  "difficulty.surviving_the_aftermath.easy": "简单",
+  "difficulty.surviving_the_aftermath.hard": "困难",
+  "difficulty.surviving_the_aftermath.normal": "普通",
   "effect.surviving_the_aftermath.cowardice": "懦弱",
   "enchantment.surviving_the_aftermath.bloodthirsty": "渴血",
   "enchantment.surviving_the_aftermath.clean_water": "净水",
@@ -15,10 +18,12 @@
   "item.surviving_the_aftermath.cooked_falukorv": "熟的法伦香肠",
   "item.surviving_the_aftermath.diamond_flint_and_steel": "钻石打火石",
   "item.surviving_the_aftermath.egg_tart": "蛋挞",
+  "item.surviving_the_aftermath.golden_flint_and_steel": "黄金打火石",
   "item.surviving_the_aftermath.hamburger": "汉堡",
   "item.surviving_the_aftermath.music_disk_orchelias_vox": "音乐唱片",
   "item.surviving_the_aftermath.music_disk_orchelias_vox.desc": "Hagali - Orchelia's vox (offvocal ver_)",
   "item.surviving_the_aftermath.nether_core": "下界核心",
+  "item.surviving_the_aftermath.netherite_flint_and_steel": "下界合金打火石",
   "item.surviving_the_aftermath.raw_falukorv": "生的法伦香肠",
   "item.surviving_the_aftermath.stack_of_egg_tarts": "蛋挞堆",
   "item.surviving_the_aftermath.tianjin_pancake": "煎饼果子",
@@ -28,10 +33,11 @@
   "message.surviving_the_aftermath.nether_core.not_found": "附近暂未找到可引导的城市，请换个区域重试。",
   "message.surviving_the_aftermath.nether_core.overworld": "请在主世界使用下界核心寻找遗物商人。",
   "message.surviving_the_aftermath.nether_core.searching": "正在寻找城市……请继续手持下界核心。",
-  "message.surviving_the_aftermath.nether_raid.diamond_required": "此副本需要使用钻石打火石激活。",
+  "message.surviving_the_aftermath.nether_raid.diamond_required": "使用黄金、钻石或下界合金打火石，分别开启简单、普通或困难挑战。",
   "message.surviving_the_aftermath.nether_raid.start": "你感受到空气愈发炎热......",
   "message.surviving_the_aftermath.nether_raid.unavailable": "无法激活：请检查门框、挑战条件，或等待当前挑战发奖结束。",
   "message.surviving_the_aftermath.nether_raid.victory": "望着最后一颗火星熄灭，你感觉它们不会再回来了，暂时......",
+  "message.surviving_the_aftermath.nether_raid.wave": "%s · 第 %s/%s 波",
   "message.surviving_the_aftermath.tracker.escape": "请勿战斗过程逃跑，否则你将付出代价，倒计时开始......%s",
   "message.surviving_the_aftermath.tracker.personal_fail": "你虽然失败了但是可以继续相信你的队友"
 }
