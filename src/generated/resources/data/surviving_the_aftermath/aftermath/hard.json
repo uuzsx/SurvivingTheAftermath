@@ -6,29 +6,33 @@
       "value": "surviving_the_aftermath:nether_invasion_portal"
     }
   ],
-  "name": "common",
+  "name": "hard",
   "ready_time": 100,
-  "reward_time": 60,
+  "reward_time": 100,
   "rewards": [
     {
       "data": "minecraft:gold_ingot",
-      "weight": 60
+      "weight": 40
     },
     {
       "data": "minecraft:diamond",
-      "weight": 10
-    },
-    {
-      "data": "minecraft:emerald",
       "weight": 20
     },
     {
-      "data": "minecraft:netherite_scrap",
+      "data": "minecraft:emerald",
+      "weight": 15
+    },
+    {
+      "data": "minecraft:enchanted_golden_apple",
       "weight": 2
     },
     {
-      "data": "surviving_the_aftermath:nether_core",
+      "data": "minecraft:netherite_scrap",
       "weight": 8
+    },
+    {
+      "data": "surviving_the_aftermath:nether_core",
+      "weight": 15
     }
   ],
   "waves": [
@@ -36,7 +40,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 4
+          "value": 5
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin"
@@ -54,33 +58,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 5
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:piglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:hoglin"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:magma_cube"
-      }
-    ],
-    [
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 5
+          "value": 6
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin"
@@ -96,7 +74,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 2
+          "value": 1
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:hoglin"
@@ -122,7 +100,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
+          "value": 2
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin_brute"
@@ -156,7 +134,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 6
+          "value": 7
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin"
@@ -206,7 +184,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 2
+          "value": 3
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin_brute"
@@ -230,25 +208,17 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
+          "value": 2
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:blaze"
-      },
-      {
-        "amount_module": {
-          "amount": "surviving_the_aftermath:integer_amount",
-          "value": 1
-        },
-        "entity_info": "surviving_the_aftermath:entity_info",
-        "entity_type": "minecraft:ghast"
       }
     ],
     [
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 7
+          "value": 8
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin"
@@ -306,7 +276,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 3
+          "value": 4
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin_brute"
@@ -348,7 +318,7 @@
       {
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
-          "value": 8
+          "value": 9
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:piglin"
@@ -389,6 +359,256 @@
         "amount_module": {
           "amount": "surviving_the_aftermath:integer_amount",
           "value": 1
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:ghast"
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 9
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 5
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin_brute"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:hoglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:magma_cube"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:blaze"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 1
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:ghast"
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 10
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 5
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin_brute"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:hoglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:magma_cube"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:blaze"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 1
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:ghast"
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 10
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 6
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin_brute"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:hoglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:magma_cube"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:blaze"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:ghast"
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 11
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 6
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin_brute"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:hoglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:magma_cube"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 3
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:blaze"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:ghast"
+      }
+    ],
+    [
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 11
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 7
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:piglin_brute"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 5
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:hoglin"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:magma_cube"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 4
+        },
+        "entity_info": "surviving_the_aftermath:entity_info",
+        "entity_type": "minecraft:blaze"
+      },
+      {
+        "amount_module": {
+          "amount": "surviving_the_aftermath:integer_amount",
+          "value": 2
         },
         "entity_info": "surviving_the_aftermath:entity_info",
         "entity_type": "minecraft:ghast"

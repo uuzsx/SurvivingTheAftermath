@@ -55,7 +55,8 @@ public final class CityBoundaryGameTests {
             level.getChunk(cx,cz).setAllReferences(new HashMap<>());
         for(int x=area.minX()-3;x<=area.maxX()+3;x++)for(int z=area.minZ()-3;z<=area.maxZ()+3;z++) {
             int top=Math.max(floor+20,level.getHeight(Heightmap.Types.WORLD_SURFACE,x,z));
-            for(int y=soil-8;y<=top;y++) level.setBlock(new BlockPos(x,y,z),
+            // Cover the entire obstacle scan depth, including ore-bearing natural terrain below the fixture.
+            for(int y=soil-24;y<=top;y++) level.setBlock(new BlockPos(x,y,z),
                     (y==soil?Blocks.GRASS_BLOCK:y<soil?Blocks.STONE:Blocks.AIR).defaultBlockState(),18);
         }
         // Shoreline crosses a chunk boundary, with both source and flowing water.

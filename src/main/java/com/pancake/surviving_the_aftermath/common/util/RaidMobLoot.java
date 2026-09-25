@@ -54,6 +54,7 @@ public final class RaidMobLoot {
     public static void inherit(Mob parent, Mob child) {
         if (!isDungeonMob(parent)) return;
         mark(child);
+        com.pancake.surviving_the_aftermath.common.raid.RaidCombat.inheritEffects(parent, child);
         if (parent.getPersistentData().hasUUID("raid_uuid")) {
             AftermathManager.getInstance().getAftermath(parent.getPersistentData().getUUID("raid_uuid")).ifPresent(encounter -> {
                 if (encounter instanceof BaseRaid raid && raid.join(child)) raid.insertTag(child);

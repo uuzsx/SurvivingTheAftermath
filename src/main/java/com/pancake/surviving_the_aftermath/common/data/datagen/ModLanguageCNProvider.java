@@ -16,6 +16,12 @@ public class ModLanguageCNProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        add(ModItems.GOLDEN_FLINT_AND_STEEL.get(), "黄金打火石");
+        add(ModItems.NETHERITE_FLINT_AND_STEEL.get(), "下界合金打火石");
+        add("difficulty.surviving_the_aftermath.easy", "简单");
+        add("difficulty.surviving_the_aftermath.normal", "普通");
+        add("difficulty.surviving_the_aftermath.hard", "困难");
+        add("message.surviving_the_aftermath.nether_raid.wave", "%s · 第 %s/%s 波");
         add("message.surviving_the_aftermath.nether_core.overworld", "请在主世界使用下界核心寻找遗物商人。");
         add("message.surviving_the_aftermath.nether_core.searching", "正在寻找城市……请继续手持下界核心。");
         add("message.surviving_the_aftermath.nether_core.not_found", "附近暂未找到可引导的城市，请换个区域重试。");
@@ -45,7 +51,7 @@ public class ModLanguageCNProvider extends LanguageProvider {
         add("item.surviving_the_aftermath.music_disk_orchelias_vox.desc", "Hagali - Orchelia's vox (offvocal ver_)");
 
         add(ModItems.DIAMOND_FLINT_AND_STEEL.get(), "钻石打火石");
-        add(DiamondFlintAndSteelItem.REQUIRED, "此副本需要使用钻石打火石激活。");
+        add(DiamondFlintAndSteelItem.REQUIRED, "使用黄金、钻石或下界合金打火石，分别开启简单、普通或困难挑战。");
         add(DiamondFlintAndSteelItem.UNAVAILABLE, "无法激活：请检查门框、挑战条件，或等待当前挑战发奖结束。");
         add("itemGroup." + SurvivingTheAftermath.MOD_ID, "劫后余生");
         add(RaidEventSubscriber.NETHER_RAID_START, "你感受到空气愈发炎热......");

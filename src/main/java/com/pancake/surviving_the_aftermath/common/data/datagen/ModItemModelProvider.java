@@ -13,5 +13,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         singleTexture("diamond_flint_and_steel", mcLoc("item/handheld"), "layer0", modLoc("item/diamond_flint_and_steel"));
+        singleTexture("golden_flint_and_steel", mcLoc("item/handheld"), "layer0", modLoc("item/golden_flint_and_steel"));
+        singleTexture("netherite_flint_and_steel", mcLoc("item/handheld"), "layer0", modLoc("item/netherite_flint_and_steel"));
     }
 }

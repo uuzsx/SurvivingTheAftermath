@@ -48,7 +48,8 @@ public class NetherRaid extends BaseRaid {
             Codec.INT.fieldOf("currentWave").forGetter(BaseRaid::getCurrentWave),
             Codec.INT.fieldOf("totalEnemy").forGetter(BaseRaid::getTotalEnemy),
             Codec.list(ITracker.CODEC.get()).fieldOf("trackers").forGetter(NetherRaid::getTrackers),
-            CodecUtils.setOf(BlockPos.CODEC).optionalFieldOf("portal_blocks", Set.of()).forGetter(NetherRaid::getPortalBlocks)
+            CodecUtils.setOf(BlockPos.CODEC).optionalFieldOf("portal_blocks", Set.of()).forGetter(NetherRaid::getPortalBlocks),
+            RaidDifficulty.CODEC.optionalFieldOf("difficulty", RaidDifficulty.NORMAL).forGetter(NetherRaid::getDifficulty)
     ).apply(instance, NetherRaid::new));
 
     public NetherRaid(AftermathState state, BaseRaidModule module, Set<UUID> players, Float progressPercent, BlockPos startPos, Integer readyTime, Integer rewardTime,
@@ -65,6 +66,45 @@ public class NetherRaid extends BaseRaid {
             this.portalBlocks.addAll(portalBlocks);
         }
     }
+    public NetherRaid(AftermathState state, BaseRaidModule module, Set<UUID> players, Float progressPercent, BlockPos startPos, Integer readyTime, Integer rewardTime,
+                      Set<BlockPos> spawnPos, Set<UUID> enemies, Integer currentWave, Integer totalEnemy, List<ITracker> trackers, Set<BlockPos> portalBlocks, RaidDifficulty difficulty) {
+        this(state, module, players, progressPercent, startPos, readyTime, rewardTime, spawnPos, enemies, currentWave, totalEnemy, trackers, portalBlocks);
+        this.difficulty = difficulty;
+    }
+
+    private RaidDifficulty difficulty = RaidDifficulty.NORMAL;
+    public RaidDifficulty getDifficulty() { return difficulty; }
+
+    public NetherRaid(ServerLevel level, BlockPos startPos, RaidDifficulty difficulty) {
+        this(level, startPos);
+        this.difficulty = difficulty;
+    }
+
+    @Override
+    public boolean isCreate(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
+        if (module == null) {
+            module = com.pancake.surviving_the_aftermath.common.data.pack.AftermathModuleLoader.AFTERMATH_MODULE_MAP
+                    .get(getRegistryName()).stream()
+                    .filter(candidate -> candidate instanceof BaseRaidModule raidModule
+                            && difficulty.moduleName().equals(raidModule.getModuleName()))
+                    .filter(candidate -> candidate.isCreate(level, pos, player)).findFirst().orElse(null);
+            if (module == null) return false;
+        }
+        return super.isCreate(level, pos, player);
+    }
+
+    private void updateTitle() {
+        if (module != null) progress.setName(net.minecraft.network.chat.Component.translatable(
+                "message.surviving_the_aftermath.nether_raid.wave",
+                net.minecraft.network.chat.Component.translatable(difficulty.translationKey()),
+                Math.max(0, currentWave + 1), getModule().getWaves().size()));
+    }
+
+    @Override public void restore(ServerLevel level, UUID savedId) {
+        super.restore(level, savedId);
+        updateTitle();
+    }
+
     private PortalShape portalShape;
     private final Set<BlockPos> portalBlocks = new HashSet<>();
 
@@ -88,6 +128,7 @@ public class NetherRaid extends BaseRaid {
                 .relative(shape.survivingTheAftermath$getRightDir(), shape.survivingTheAftermath$getWidth() - 1);
         BlockPos.betweenClosed(bottomLeft, topRight).forEach(pos -> portalBlocks.add(pos.immutable()));
         super.init();
+        updateTitle();
         // Only a successful restart stops the previous victory song.
         if (!isEnd()) com.pancake.surviving_the_aftermath.common.util.RaidMusic.stop(level, startPos);
     }
@@ -127,11 +168,13 @@ public class NetherRaid extends BaseRaid {
         if (mob instanceof Hoglin hoglin) {
             hoglin.setImmuneToZombification(true);
         }
+        RaidCombat.prepare(level, mob, difficulty, currentWave + 1);
         super.setMobSpawn(level, mob);
     }
 
     @Override
     protected void onWaveStarted() {
+        updateTitle();
         updateStructure();
         level.playSound(null, startPos, SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2).get(),
                 SoundSource.NEUTRAL, 3.0F, 1.0F);

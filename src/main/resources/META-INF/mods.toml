@@ -15,7 +15,7 @@ This Mod supplements the vanilla raid content and adds related API to expand mor
 Explore ruined structures and cities, face the Nether Raid, and discover powerful enchantments.
 
 劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
-使用钻石打火石开启 11 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
+使用黄金、钻石、下界合金打火石分别开启简单 5 波、普通 9 波、困难 13 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 '''
 
 [[dependencies.${mod_id}]]

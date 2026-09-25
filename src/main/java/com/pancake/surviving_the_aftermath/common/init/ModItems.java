@@ -17,6 +17,10 @@ import net.minecraftforge.registries.*;
 @Mod.EventBusSubscriber(modid = SurvivingTheAftermath.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SurvivingTheAftermath.MOD_ID);
+    public static final RegistryObject<Item> GOLDEN_FLINT_AND_STEEL = ITEMS.register("golden_flint_and_steel",
+            () -> new com.pancake.surviving_the_aftermath.common.item.RaidFlintAndSteelItem(properties("golden_flint_and_steel").durability(64), com.pancake.surviving_the_aftermath.common.raid.RaidDifficulty.EASY));
+    public static final RegistryObject<Item> NETHERITE_FLINT_AND_STEEL = ITEMS.register("netherite_flint_and_steel",
+            () -> new com.pancake.surviving_the_aftermath.common.item.RaidFlintAndSteelItem(properties("netherite_flint_and_steel").durability(64).fireResistant(), com.pancake.surviving_the_aftermath.common.raid.RaidDifficulty.HARD));
     public static final RegistryObject<Item> DIAMOND_FLINT_AND_STEEL = ITEMS.register("diamond_flint_and_steel",
             () -> new DiamondFlintAndSteelItem(new Item.Properties().durability(64)));
 

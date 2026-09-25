@@ -1,0 +1,104 @@
+package com.pancake.surviving_the_aftermath.common.raid;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.hoglin.Hoglin;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.monster.piglin.PiglinBrute;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
+import java.util.ArrayList;
+import java.util.List;
+
+/** Explicit combat-only lists; random enchanting can roll useless underwater/tool enchantments. */
+public final class RaidCombat {
+    private RaidCombat() {}
+    private static final EquipmentSlot[] ARMOR = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+    private static final Item[][] SETS = {
+        {Items.GOLDEN_HELMET, Items.GOLDEN_CHESTPLATE, Items.GOLDEN_LEGGINGS, Items.GOLDEN_BOOTS},
+        {Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS},
+        {Items.DIAMOND_HELMET, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_LEGGINGS, Items.DIAMOND_BOOTS},
+        {Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS}
+    };
+    private static final Item[] SWORDS = {Items.GOLDEN_SWORD, Items.IRON_SWORD, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD};
+    private static final Item[] AXES = {Items.GOLDEN_AXE, Items.IRON_AXE, Items.DIAMOND_AXE, Items.NETHERITE_AXE};
+
+    /** Runs once after vanilla spawn initialization, before adding the mob to the world. Wave is one-based. */
+    public static void prepare(ServerLevel level, Mob mob, RaidDifficulty difficulty, int wave) {
+        if (mob instanceof Piglin piglin) piglin.setBaby(false);
+        if (mob instanceof Hoglin hoglin) hoglin.setBaby(false);
+        // Bound cube sizes: four giant cubes and their descendants are already substantial pressure.
+        if (mob instanceof MagmaCube cube) cube.setSize(difficulty == RaidDifficulty.HARD && wave >= 7 ? 4 : 2, true);
+        if (mob instanceof AbstractPiglin) equip(level, mob, difficulty, wave);
+        if (difficulty == RaidDifficulty.HARD && wave >= 10) addEffects(mob, wave);
+    }
+
+    private static void equip(ServerLevel level, Mob mob, RaidDifficulty difficulty, int wave) {
+        int material = switch (difficulty) {
+            case EASY -> 0;
+            case NORMAL -> wave >= 8 ? 2 : wave >= 4 ? 1 : 0;
+            case HARD -> wave >= 12 ? 3 : wave >= 7 ? 2 : wave >= 3 ? 1 : 0;
+        };
+        int pieces = difficulty == RaidDifficulty.EASY ? (wave < 3 ? 1 : wave < 5 ? 2 : 4)
+                : difficulty == RaidDifficulty.NORMAL ? (wave < 4 ? 2 : 4) : (wave < 3 ? 2 : 4);
+        boolean brute = mob instanceof PiglinBrute;
+        ItemStack weapon = new ItemStack(brute ? AXES[material] : SWORDS[material]);
+        mob.setItemSlot(EquipmentSlot.MAINHAND, weapon);
+        mob.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
+        for (int i = 0; i < ARMOR.length; i++) {
+            // Normal finale gets diamond helmet/chest but keeps iron legs/boots.
+            int armorMaterial = difficulty == RaidDifficulty.NORMAL && material == 2 && i >= 2 ? 1 : material;
+            mob.setItemSlot(ARMOR[i], i < pieces ? new ItemStack(SETS[armorMaterial][i]) : ItemStack.EMPTY);
+        }
+        if (wave < 7 || difficulty == RaidDifficulty.EASY) return;
+        var random = mob.getRandom();
+        int min = difficulty == RaidDifficulty.NORMAL ? 1 : wave >= 10 ? 3 : 1;
+        int max = difficulty == RaidDifficulty.NORMAL ? 2 : wave >= 12 ? 5 : wave >= 10 ? 4 : 3;
+        enchant(level, weapon, Enchantments.SHARPNESS, min + random.nextInt(max - min + 1));
+        if (!brute && difficulty == RaidDifficulty.HARD) {
+            if (random.nextBoolean()) enchant(level, weapon, Enchantments.KNOCKBACK, wave >= 10 ? 2 : 1);
+            if (random.nextInt(3) == 0) enchant(level, weapon, Enchantments.FIRE_ASPECT, wave >= 12 ? 2 : 1);
+        }
+        for (EquipmentSlot slot : ARMOR) {
+            ItemStack armor = mob.getItemBySlot(slot);
+            if (armor.isEmpty()) continue;
+            int protection = difficulty == RaidDifficulty.NORMAL ? 1 : wave >= 10 ? 3 + random.nextInt(2) : 1 + random.nextInt(2);
+            enchant(level, armor, Enchantments.ALL_DAMAGE_PROTECTION, protection);
+            if (slot == EquipmentSlot.CHEST && difficulty == RaidDifficulty.HARD && random.nextBoolean())
+                enchant(level, armor, Enchantments.THORNS, wave >= 10 ? 2 + random.nextInt(2) : 1);
+        }
+    }
+
+    private static void enchant(ServerLevel level, ItemStack stack,
+            net.minecraft.world.item.enchantment.Enchantment key, int rank) {
+        stack.enchant(key, rank);
+    }
+
+    private static void addEffects(Mob mob, int wave) {
+        // Strength is ineffective for fireballs and cube collision damage; speed is only chosen for ground mobs.
+        var pool = new ArrayList<>(List.of(MobEffects.ABSORPTION, MobEffects.REGENERATION, MobEffects.DAMAGE_RESISTANCE));
+        if (mob instanceof AbstractPiglin || mob instanceof Hoglin) {
+            pool.add(MobEffects.DAMAGE_BOOST);
+            pool.add(MobEffects.MOVEMENT_SPEED);
+        }
+        int count = Math.min(3, wave - 9);
+        for (int i = 0; i < count; i++) {
+            var effect = pool.remove(mob.getRandom().nextInt(pool.size()));
+            int amplifier = wave >= 12 && mob.getRandom().nextBoolean() ? 1 : 0;
+            // Infinite, so saving/reloading or a long fight does not silently remove the challenge.
+            mob.addEffect(new MobEffectInstance(effect, -1, amplifier));
+        }
+    }
+
+    public static void inheritEffects(Mob parent, Mob child) {
+        parent.getActiveEffects().forEach(effect -> child.addEffect(new MobEffectInstance(effect)));
+    }
+}
