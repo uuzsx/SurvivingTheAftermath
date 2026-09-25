@@ -111,7 +111,7 @@ public final class ContentGameTests {
         var v=(Villager)mob(h,EntityTypes.VILLAGER);
         v.setVillagerData(v.getVillagerData().withProfession(BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(ModVillagers.RELIC_DEALER.get())));
         var offers=v.getOffers();
-        check(offers.size()==1 && offers.getFirst().getBaseCostA().is(ModItems.NETHER_CORE.get()) && offers.getFirst().getResult().is(Items.ENCHANTED_BOOK),"Relic dealer cannot exchange cores for enchanted books");
+        check(offers.size()==3 && offers.getFirst().getBaseCostA().is(ModItems.NETHER_CORE.get()) && offers.getFirst().getResult().is(Items.ENCHANTED_BOOK),"Relic dealer cannot exchange cores for enchanted books");
         check(!offers.getFirst().getResult().get(DataComponents.STORED_ENCHANTMENTS).isEmpty(), "Relic dealer sold an unenchanted book");
         offers.clear(); offers.add(new MerchantOffer(new ItemCost(Items.EMERALD,16),new ItemStack(Items.BREAD),12,1,.05F));
         var p=player(h); var update=Villager.class.getDeclaredMethod("updateSpecialPrices",Player.class);update.setAccessible(true);
