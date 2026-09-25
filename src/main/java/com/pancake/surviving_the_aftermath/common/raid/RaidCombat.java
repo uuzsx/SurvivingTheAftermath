@@ -88,7 +88,10 @@ public final class RaidCombat {
         if (mob instanceof Hoglin hoglin) hoglin.setBaby(false);
         // Bound cube sizes: four giant cubes and their descendants are already substantial pressure.
         if (mob instanceof MagmaCube cube) cube.setSize(difficulty == RaidDifficulty.HARD && wave >= 7 ? 4 : 2, true);
-        if (mob instanceof AbstractPiglin) equip(level, mob, difficulty, wave);
+        if (mob instanceof AbstractPiglin) {
+            if (!mob.getPersistentData().contains(RaidEquipmentProfile.PRESET_TAG)) equip(level, mob, difficulty, wave);
+            enchantEquipment(level, mob, difficulty, wave);
+        }
         if (difficulty == RaidDifficulty.HARD && wave >= 10) addEffects(mob, wave);
     }
 
@@ -104,12 +107,24 @@ public final class RaidCombat {
         for (int i = 0; i < ARMOR.length; i++) {
             mob.setItemSlot(ARMOR[i], i < pieces ? new ItemStack(SETS[material][i]) : ItemStack.EMPTY);
         }
+    }
+
+    private static void enchantEquipment(ServerLevel level, Mob mob, RaidDifficulty difficulty, int wave) {
+        ItemStack weapon = mob.getMainHandItem();
+        boolean brute = mob instanceof PiglinBrute;
         if (wave < 7 || difficulty == RaidDifficulty.EASY) return;
         var random = mob.getRandom();
         int min = difficulty == RaidDifficulty.NORMAL ? 1 : wave >= 10 ? 3 : 1;
         int max = difficulty == RaidDifficulty.NORMAL ? 2 : wave >= 12 ? 5 : wave >= 10 ? 4 : 3;
-        enchant(level, weapon, Enchantments.SHARPNESS, min + random.nextInt(max - min + 1));
-        if (!brute && difficulty == RaidDifficulty.HARD) {
+        boolean crossbow = weapon.is(Items.CROSSBOW);
+        if (crossbow) {
+            int charge = difficulty == RaidDifficulty.NORMAL ? 1 : wave >= 10 ? 2 + random.nextInt(2) : 1 + random.nextInt(2);
+            enchant(level, weapon, Enchantments.QUICK_CHARGE, charge);
+            // Piercing and Multishot are mutually exclusive; neither is combined with melee enchantments.
+            if (difficulty == RaidDifficulty.HARD && random.nextBoolean()) enchant(level, weapon, Enchantments.MULTISHOT, 1);
+            else enchant(level, weapon, Enchantments.PIERCING, difficulty == RaidDifficulty.NORMAL ? 1 : wave >= 10 ? 3 + random.nextInt(2) : 1 + random.nextInt(2));
+        } else enchant(level, weapon, Enchantments.SHARPNESS, min + random.nextInt(max - min + 1));
+        if (!crossbow && !brute && difficulty == RaidDifficulty.HARD) {
             if (random.nextBoolean()) enchant(level, weapon, Enchantments.KNOCKBACK, wave >= 10 ? 2 : 1);
             if (random.nextInt(3) == 0) enchant(level, weapon, Enchantments.FIRE_ASPECT, wave >= 12 ? 2 : 1);
         }
@@ -129,10 +144,10 @@ public final class RaidCombat {
     }
 
     private static void addEffects(Mob mob, int wave) {
-        // Strength is ineffective for fireballs and cube collision damage; speed is only chosen for ground mobs.
+        // Strength is ineffective for crossbow shots, fireballs and cube collision damage.
         var pool = new ArrayList<>(List.of(MobEffects.ABSORPTION, MobEffects.REGENERATION, MobEffects.RESISTANCE));
         if (mob instanceof AbstractPiglin || mob instanceof Hoglin) {
-            pool.add(MobEffects.STRENGTH);
+            if (!mob.getMainHandItem().is(Items.CROSSBOW)) pool.add(MobEffects.STRENGTH);
             pool.add(MobEffects.SPEED);
         }
         int count = Math.min(3, wave - 9);
