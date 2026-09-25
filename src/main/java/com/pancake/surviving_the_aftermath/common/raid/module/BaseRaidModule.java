@@ -23,18 +23,34 @@ public class BaseRaidModule extends BaseAftermathModule implements IRaidModule {
             Codec.list(IConditionModule.CODEC.get()).fieldOf("conditions").forGetter(BaseRaidModule::getConditions),
             Codec.list(Codec.list(IEntityInfoModule.CODEC.get())).fieldOf("waves").forGetter(BaseRaidModule::getWaves),
             Codec.INT.fieldOf("ready_time").forGetter(BaseRaidModule::getReadyTime),
-            Codec.INT.fieldOf("reward_time").forGetter(BaseRaidModule::getRewardTime)
+            Codec.INT.fieldOf("reward_time").forGetter(BaseRaidModule::getRewardTime),
+            Codec.intRange(0, 64).optionalFieldOf("guaranteed_cores", 0).forGetter(BaseRaidModule::getGuaranteedCores)
     ).apply(instance, BaseRaidModule::new));
 
     protected List<List<IEntityInfoModule>> waves;
     protected int readyTime;
     protected int rewardTime;
+    private int guaranteedCores;
 
     public BaseRaidModule(String name,ItemWeightedModule rewards, List<IConditionModule> conditions, List<List<IEntityInfoModule>> waves, int readyTime, int rewardTime) {
         super(name,rewards, conditions);
         this.waves = waves;
         this.readyTime = readyTime;
         this.rewardTime = rewardTime;
+    }
+
+    public BaseRaidModule(String name, ItemWeightedModule rewards, List<IConditionModule> conditions,
+                          List<List<IEntityInfoModule>> waves, int readyTime, int rewardTime, int guaranteedCores) {
+        this(name, rewards, conditions, waves, readyTime, rewardTime);
+        setGuaranteedCores(guaranteedCores);
+    }
+
+    public int getGuaranteedCores() { return guaranteedCores; }
+
+    public BaseRaidModule setGuaranteedCores(int count) {
+        if (count < 0 || count > 64) throw new IllegalArgumentException("Guaranteed cores must be between 0 and 64");
+        this.guaranteedCores = count;
+        return this;
     }
 
     public BaseRaidModule() {
@@ -88,6 +104,7 @@ public class BaseRaidModule extends BaseAftermathModule implements IRaidModule {
         private List<List<IEntityInfoModule>> waves = Lists.newArrayList();
         private int readyTime;
         private int rewardTime;
+        private int guaranteedCores;
 
         public Builder(String name) {
             this.name = name;
@@ -120,8 +137,13 @@ public class BaseRaidModule extends BaseAftermathModule implements IRaidModule {
             return this;
         }
 
+        public Builder guaranteedCores(int count) {
+            this.guaranteedCores = count;
+            return this;
+        }
+
         public BaseRaidModule build() {
-            return new BaseRaidModule(name,rewards,conditions,waves,readyTime,rewardTime);
+            return new BaseRaidModule(name,rewards,conditions,waves,readyTime,rewardTime,guaranteedCores);
         }
 
     }
