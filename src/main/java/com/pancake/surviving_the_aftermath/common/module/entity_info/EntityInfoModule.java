@@ -19,11 +19,22 @@ public class EntityInfoModule implements IEntityInfoModule {
     public static final String IDENTIFIER = "entity_info";
     public static final Codec<EntityInfoModule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfoModule::getEntityType),
-            IAmountModule.CODEC.get().fieldOf("amount_module").forGetter(EntityInfoModule::getAmountModule)
+            IAmountModule.CODEC.get().fieldOf("amount_module").forGetter(EntityInfoModule::getAmountModule),
+            com.pancake.surviving_the_aftermath.common.raid.RaidEquipmentProfile.CODEC.optionalFieldOf("raid_equipment").forGetter(EntityInfoModule::getEquipmentProfile)
 
     ).apply(instance, EntityInfoModule::new));
     protected EntityType<?> entityType;
     protected IAmountModule amountModule;
+    protected java.util.Optional<com.pancake.surviving_the_aftermath.common.raid.RaidEquipmentProfile> equipmentProfile = java.util.Optional.empty();
+
+    public java.util.Optional<com.pancake.surviving_the_aftermath.common.raid.RaidEquipmentProfile> getEquipmentProfile() { return equipmentProfile; }
+
+    public EntityInfoModule(EntityType<?> entityType, IAmountModule amountModule,
+                            java.util.Optional<com.pancake.surviving_the_aftermath.common.raid.RaidEquipmentProfile> equipmentProfile) {
+        this(entityType, amountModule);
+        this.equipmentProfile = equipmentProfile;
+    }
+
 
     public EntityInfoModule(EntityType<?> entityType, IAmountModule amountModule) {
         this.entityType = entityType;
@@ -65,6 +76,13 @@ public class EntityInfoModule implements IEntityInfoModule {
             }
             arrayList.add(entity == null ? Optional.empty() : Optional.ofNullable(entity));
         }
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel && equipmentProfile.isPresent()) {
+            var mobs = new java.util.ArrayList<net.minecraft.world.entity.Mob>();
+            arrayList.forEach(entry -> entry.ifPresent(entity -> {
+                if (entity instanceof net.minecraft.world.entity.Mob mob) mobs.add(mob);
+            }));
+            equipmentProfile.get().apply(mobs, serverLevel.getRandom());
+        }
         return arrayList;
     }
     public EntityType<?> getEntityType() {
@@ -88,7 +106,6 @@ public class EntityInfoModule implements IEntityInfoModule {
     public static class Builder {
         protected final EntityType<?> entityType;
         protected IAmountModule amountModule;
-
         public Builder(String entityType) {
             this.entityType = RegistryUtil.getEntityTypeFromRegistryName(entityType);
         }
