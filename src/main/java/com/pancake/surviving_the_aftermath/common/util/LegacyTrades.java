@@ -16,17 +16,8 @@ public final class LegacyTrades {
     public static void addOffers(Villager villager) {
         var profession = villager.getVillagerData().profession().value();
         int level = villager.getVillagerData().level();
-        if (profession == ModVillagers.RELIC_DEALER.get() && level == 1) {
-            // The old pool had one listing; two draws therefore yielded one book offer.
-            var names = LegacyEnchantments.NAMES;
-            String name = names.get(villager.getRandom().nextInt(names.size()));
-            var enchantment = villager.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
-                    .getOrThrow(net.minecraft.resources.ResourceKey.create(Registries.ENCHANTMENT, SurvivingTheAftermath.asResource(name)));
-            int rank = 1 + villager.getRandom().nextInt(enchantment.value().getMaxLevel());
-            int cost = Math.min(64, 2 + villager.getRandom().nextInt(5 + rank * 10) + 3 * rank);
-            ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
-            book.enchant(enchantment, rank);
-            villager.getOffers().add(new MerchantOffer(new ItemCost(ModItems.NETHER_CORE.get(), cost), Optional.of(new ItemCost(Items.BOOK)), book, 12, 30, .2F));
+        if (RelicDealerTrades.isDealer(villager)) {
+            RelicDealerTrades.synchronize(villager);
         } else if (level == 4 || level == 5) {
             var id = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
             if (id != null && id.equals(net.minecraft.resources.Identifier.withDefaultNamespace("butcher"))) {
