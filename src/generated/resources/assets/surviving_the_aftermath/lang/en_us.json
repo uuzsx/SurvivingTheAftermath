@@ -35,6 +35,7 @@
   "message.surviving_the_aftermath.nether_core.searching": "Searching for a suitable city… Keep holding the core.",
   "message.surviving_the_aftermath.nether_raid.blocked": "The portal exit is blocked. The challenge has ended; clear the doorway and ground, then reactivate it.",
   "message.surviving_the_aftermath.nether_raid.diamond_required": "Use Golden, Diamond, or Netherite Flint and Steel for Easy, Normal, or Hard challenges.",
+  "message.surviving_the_aftermath.nether_raid.heading": "Nether Invasion · %s",
   "message.surviving_the_aftermath.nether_raid.start": "You feel the air getting hotter .....",
   "message.surviving_the_aftermath.nether_raid.unavailable": "Cannot activate: check the portal frame, challenge conditions, or an unfinished challenge.",
   "message.surviving_the_aftermath.nether_raid.victory": "Looking at the last Mars extinguished, you feel they will not come back, temporarily......",
