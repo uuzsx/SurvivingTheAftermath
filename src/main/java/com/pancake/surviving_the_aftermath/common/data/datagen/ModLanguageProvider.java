@@ -23,6 +23,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add("difficulty.surviving_the_aftermath.normal", "Normal");
         add("difficulty.surviving_the_aftermath.hard", "Hard");
         add("message.surviving_the_aftermath.nether_raid.wave", "%s - Wave %s/%s");
+        add("message.surviving_the_aftermath.nether_raid.wave_count", "Wave %s/%s");
         add("message.surviving_the_aftermath.nether_core.overworld", "Use in the Overworld to seek a relic dealer.");
         add("message.surviving_the_aftermath.nether_core.searching", "Searching for a suitable city… Keep holding the core.");
         add("message.surviving_the_aftermath.nether_core.not_found", "No city with a reachable dealer found nearby. Try from another area.");
