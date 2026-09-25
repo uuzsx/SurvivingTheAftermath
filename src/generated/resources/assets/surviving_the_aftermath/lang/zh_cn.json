@@ -35,6 +35,7 @@
   "message.surviving_the_aftermath.nether_core.searching": "正在寻找城市……请继续手持下界核心。",
   "message.surviving_the_aftermath.nether_raid.blocked": "传送门出口被堵住，挑战已中止。请清理门口地面和通道后重新激活。",
   "message.surviving_the_aftermath.nether_raid.diamond_required": "使用黄金、钻石或下界合金打火石，分别开启简单、普通或困难挑战。",
+  "message.surviving_the_aftermath.nether_raid.heading": "下界入侵 · %s",
   "message.surviving_the_aftermath.nether_raid.start": "你感受到空气愈发炎热......",
   "message.surviving_the_aftermath.nether_raid.unavailable": "无法激活：请检查门框、挑战条件，或等待当前挑战发奖结束。",
   "message.surviving_the_aftermath.nether_raid.victory": "望着最后一颗火星熄灭，你感觉它们不会再回来了，暂时......",
