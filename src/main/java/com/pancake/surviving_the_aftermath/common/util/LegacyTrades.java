@@ -15,15 +15,8 @@ public final class LegacyTrades {
     public static void addOffers(Villager villager) {
         var profession = villager.getVillagerData().getProfession();
         int level = villager.getVillagerData().getLevel();
-        if (profession == ModVillagers.RELIC_DEALER.get() && level == 1) {
-            // The old pool had one listing; two draws therefore yielded one book offer.
-            var names = LegacyEnchantments.NAMES;
-            String name = names.get(villager.getRandom().nextInt(names.size()));
-            var enchantment = ModEnchantments.get(name);
-            int rank = 1 + villager.getRandom().nextInt(enchantment.getMaxLevel());
-            int cost = Math.min(64, 2 + villager.getRandom().nextInt(5 + rank * 10) + 3 * rank);
-            ItemStack book = net.minecraft.world.item.EnchantedBookItem.createForEnchantment(new net.minecraft.world.item.enchantment.EnchantmentInstance(enchantment, rank));
-            villager.getOffers().add(new MerchantOffer(new ItemStack(ModItems.NETHER_CORE.get(), cost), new ItemStack(Items.BOOK), book, 12, 30, .2F));
+        if (RelicDealerTrades.isDealer(villager)) {
+            RelicDealerTrades.synchronize(villager);
         } else if (level == 4 || level == 5) {
             var id = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
             if (id != null && id.equals(new net.minecraft.resources.ResourceLocation("butcher"))) {

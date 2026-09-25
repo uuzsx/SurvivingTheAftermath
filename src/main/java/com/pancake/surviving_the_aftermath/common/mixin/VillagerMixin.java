@@ -11,6 +11,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Villager.class)
 public abstract class VillagerMixin {
+    @Inject(method = "updateSpecialPrices", at = @At("HEAD"))
+    private void aftermath$refreshRelicCatalogue(Player player, CallbackInfo ci) {
+        com.pancake.surviving_the_aftermath.common.util.RelicDealerTrades.synchronize((Villager) (Object) this);
+    }
+
+    @Inject(method = "customServerAiStep", at = @At("RETURN"))
+    private void aftermath$restockRelicDealer(CallbackInfo ci) {
+        var villager = (Villager) (Object) this;
+        // This generated profession has no workstation. Keep vanilla's saved restock limits.
+        if (villager.tickCount % 200 == 0 && !villager.isTrading()
+                && com.pancake.surviving_the_aftermath.common.util.RelicDealerTrades.isDealer(villager)
+                && villager.shouldRestock()) villager.restock();
+    }
+
     @Inject(method = "updateSpecialPrices", at = @At("RETURN"))
     private void aftermath$cowardicePrices(Player player, CallbackInfo ci) {
         if (player.hasEffect(ModMobEffects.COWARDICE.get())) {

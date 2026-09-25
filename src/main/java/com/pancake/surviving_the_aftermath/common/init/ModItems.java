@@ -34,5 +34,11 @@ public final class ModItems {
     @SubscribeEvent
     public static void creativeTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) event.accept(DIAMOND_FLINT_AND_STEEL);
+        if (event.getTabKey().equals(CreativeModeTabs.INGREDIENTS)) {
+            var entries = event.getEntries().iterator();
+            while (entries.hasNext()) {
+                if (com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks.isModBook(entries.next().getKey())) entries.remove();
+            }
+        }
     }
 }

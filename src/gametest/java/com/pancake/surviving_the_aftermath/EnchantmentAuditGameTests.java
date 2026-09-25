@@ -217,21 +217,94 @@ public final class EnchantmentAuditGameTests {
     }
     @GameTest(template = "stability_empty", timeoutTicks = 200)
     public static void enchantmentRelicBookPool(GameTestHelper h) {
-        var v=(Villager)mob(h,EntityType.VILLAGER);
-        v.setVillagerData(v.getVillagerData().setProfession(ModVillagers.RELIC_DEALER.get()));
-        v.getRandom().setSeed(919);
-        var names=new HashSet<String>();var customer=player(h);
-        for(int i=0;i<384;i++) {
-            v.getOffers().clear();com.pancake.surviving_the_aftermath.common.util.LegacyTrades.addOffers(v);
-            check(v.getOffers().size()==1,"Relic trade missing");
-            var offered=v.getOffers().get(0).getResult();
-            check(offered.is(Items.ENCHANTED_BOOK),"Relic result is not a book");
-            for(String name:LegacyEnchantments.NAMES) {
-                var applied=anvil(customer,new ItemStack(itemFor(name)),offered);
-                if(!applied.isEmpty() && LegacyEnchantments.level(applied,name)>0)names.add(name);
+        var customer=player(h);
+        var books = com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks.all(h.getLevel().registryAccess());
+        var seen=new HashSet<String>();var foods=new HashSet<Item>();var identities=new Random(919);
+        for(int sample=0;sample<256;sample++) {
+            var v=EntityType.VILLAGER.create(h.getLevel());
+            v.setUUID(new UUID(identities.nextLong(),identities.nextLong()));
+            v.setVillagerData(v.getVillagerData().setProfession(ModVillagers.RELIC_DEALER.get()).setLevel(5));
+            check(v.getOffers().size()==15,"Master must have exactly 15 offers");
+            for(var offer:v.getOffers()) {
+                if(!offer.getResult().is(Items.ENCHANTED_BOOK)){foods.add(offer.getResult().getItem());continue;}
+                var book=books.stream().filter(b->ItemStack.isSameItemSameTags(b.stack(),offer.getResult())).findFirst().orElseThrow();
+                if(seen.add(book.name()+":"+book.rank())) {
+                    var applied=anvil(customer,new ItemStack(itemFor(book.name())),offer.getResult());
+                    check(!applied.isEmpty() && LegacyEnchantments.level(applied,book.name())==book.rank(),"Unusable relic book "+book.name()+book.rank());
+                }
             }
+            v.discard();
         }
-        check(names.containsAll(LegacyEnchantments.NAMES),"Relic pool omitted enchantments: "+names);v.discard();
-        System.out.println("ENCHANTMENT AUDIT: relic dealer offers all ten usable enchanted books");h.succeed();
+        check(seen.size()==31 && foods.size()==6,"Random merchant pool omitted ranks or foods: "+seen+" food count="+foods.size());
+        System.out.println("ENCHANTMENT AUDIT: relic dealer pool covers all ten usable enchanted books, all 31 ranks and six foods across 256 merchants");h.succeed();
+    }
+
+    @GameTest(template = "stability_empty", timeoutTicks = 200)
+    public static void relicCatalogueProgression(GameTestHelper h) throws Exception {
+        var v=(Villager)mob(h,EntityType.VILLAGER);
+        v.setVillagerData(v.getVillagerData().setProfession(ModVillagers.RELIC_DEALER.get()));v.setVillagerXp(1);
+        int[] sizes={3,6,9,12,15};int[] costs={14,13,12,11,11};
+        var upgrade=Villager.class.getDeclaredMethod("increaseMerchantCareer");upgrade.setAccessible(true);
+        for(int tier=1;tier<=5;tier++) {
+            check(v.getVillagerData().getLevel()==tier,"Career did not advance");
+            check(v.getOffers().size()==sizes[tier-1],"Unexpected catalogue size at tier "+tier);
+            check(v.getOffers().get(0).getBaseCostA().getCount()==costs[tier-1],"Prior item not discounted at tier "+tier);
+            check(v.getOffers().stream().allMatch(o->o.getBaseCostA().is(ModItems.NETHER_CORE.get())),"Currency changed");
+            if(tier==1) {
+                var offer=v.getOffers().get(0);var cores=offer.getCostA().copy();var paper=offer.getCostB().copy();
+                check(offer.take(cores,paper) && cores.isEmpty() && paper.isEmpty(),"Core/book payment cannot complete");
+                v.notifyTrade(offer);check(v.getVillagerXp()==11,"Trading did not award career XP");
+            }
+            check(v.getOffers().get(0).getUses()==1,"Upgrade reset purchased stock");
+            for(int a=0;a<v.getOffers().size();a++)for(int b=a+1;b<v.getOffers().size();b++)
+                check(!ItemStack.isSameItemSameTags(v.getOffers().get(a).getResult(),v.getOffers().get(b).getResult()),"Duplicate stock");
+            if(tier<5)upgrade.invoke(v );
+        }
+        check(v.getOffers().stream().filter(o->!o.getResult().is(Items.ENCHANTED_BOOK)).count()==5,"Dealer should have five foods");
+        var tick=Villager.class.getDeclaredMethod("customServerAiStep");tick.setAccessible(true);
+        // Avoid vanilla's legitimate initial catch-up restock; exercise its daily interval instead.
+        var restockTime=Villager.class.getDeclaredField("lastRestockGameTime");restockTime.setAccessible(true);
+        restockTime.setLong(v,h.getLevel().getGameTime());
+        v.tickCount=200;tick.invoke(v );
+        check(v.getOffers().get(0).getUses()==0,"Dealer without workstation never restocks");
+        v.getOffers().get(0).increaseUses();v.tickCount=400;tick.invoke(v );
+        check(v.getOffers().get(0).getUses()==1,"Restock limit bypassed");
+        v.discard();System.out.println("RELIC CATALOGUE CHECK: five tiers 3/6/9/12/15, discounts, inventory retention and timed restock");h.succeed();
+    }
+
+    @GameTest(template = "stability_empty", timeoutTicks = 200)
+    public static void relicLegacySaveMigration(GameTestHelper h) throws Exception {
+        var v=(Villager)mob(h,EntityType.VILLAGER);
+        v.setVillagerData(v.getVillagerData().setProfession(ModVillagers.RELIC_DEALER.get()));v.setVillagerXp(1);
+        var rankFour=com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks.all(h.getLevel().registryAccess()).stream().filter(b->b.rank()==4).findFirst().orElseThrow().stack();
+        var legacy=new MerchantOffer(new ItemStack(ModItems.NETHER_CORE.get(),25),new ItemStack(Items.BOOK),rankFour,12,30,.2F);
+        for(int i=0;i<3;i++)legacy.increaseUses();
+        v.getOffers().clear();v.getOffers().add(legacy);
+        var saved=new net.minecraft.nbt.CompoundTag();v.saveWithoutId(saved);v.discard();
+        var loaded=EntityType.VILLAGER.create(h.getLevel());loaded.load(saved);
+        var update=Villager.class.getDeclaredMethod("updateSpecialPrices",Player.class);update.setAccessible(true);
+        var customer=player(h);update.invoke(loaded,customer);
+        check(loaded.getOffers().size()==3,"Legacy high-rank book lost or new stock absent");
+        check(loaded.getOffers().get(0).getUses()==3,"Migration reset purchases");
+        check(loaded.getOffers().get(0).getBaseCostA().getCount()==32,"Legacy price not normalized");
+        update.invoke(loaded,customer);update.invoke(loaded,customer);
+        check(loaded.getOffers().size()==3 && loaded.getOffers().get(0).getUses()==3,"Opening duplicated/refilled stock");
+        loaded.getOffers().get(0).setToOutOfStock();update.invoke(loaded,customer);
+        check(loaded.getOffers().get(0).isOutOfStock(),"Reopening refilled exhausted offer");
+        loaded.discard();System.out.println("RELIC MIGRATION CHECK: real entity save/load, old high-rank books and used stock retained, no reroll/refill on reopen");h.succeed();
+    }
+
+    @GameTest(template = "stability_empty", timeoutTicks = 200)
+    public static void relicCreativeBookPlacement(GameTestHelper h) {
+        for(boolean operator:new boolean[]{false,true,false}) {
+            CreativeModeTabs.tryRebuildTabContents(h.getLevel().enabledFeatures(),operator,h.getLevel().registryAccess());
+            var mod=ModTabs.TAB.get();
+            var ingredients=BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.INGREDIENTS);
+            check(mod.getDisplayItems().stream().filter(com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks::isModBook).count()==31,"Mod tab missing book ranks after rebuild");
+            check(ingredients.getDisplayItems().stream().noneMatch(com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks::isModBook),"Mod books remain in ingredients");
+            check(ingredients.getDisplayItems().stream().anyMatch(i->i.is(Items.ENCHANTED_BOOK)),"Vanilla books removed");
+            check(CreativeModeTabs.searchTab().getDisplayItems().stream().filter(com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks::isModBook).count()==31,"Search lost mod books");
+        }
+        System.out.println("RELIC CREATIVE CHECK: all 31 ranks in mod tab and search, no mod books in ingredients, vanilla preserved through rebuilds");h.succeed();
     }
 }

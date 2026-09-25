@@ -9,5 +9,9 @@ public final class ModTabs {
     public static final java.util.function.Supplier<CreativeModeTab> TAB = TABS.register("tab", () -> CreativeModeTab.builder()
         .title(Component.translatable("itemGroup." + SurvivingTheAftermath.MOD_ID))
         .icon(() -> ModItems.NETHER_CORE.get().getDefaultInstance())
-        .displayItems((params, output) -> ModItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()))).build());
+        .displayItems((params, output) -> {
+            ModItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
+            com.pancake.surviving_the_aftermath.common.util.ModEnchantedBooks.all(params.holders())
+                    .forEach(book -> output.accept(book.stack()));
+        }).build());
 }
