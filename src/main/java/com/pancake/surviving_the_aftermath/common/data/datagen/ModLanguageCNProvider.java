@@ -16,6 +16,7 @@ public class ModLanguageCNProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        add("message.surviving_the_aftermath.nether_raid.blocked", "传送门出口被堵住，挑战已中止。请清理门口地面和通道后重新激活。");
         add(ModItems.GOLDEN_FLINT_AND_STEEL.get(), "黄金打火石");
         add(ModItems.NETHERITE_FLINT_AND_STEEL.get(), "下界合金打火石");
         add("difficulty.surviving_the_aftermath.easy", "简单");
