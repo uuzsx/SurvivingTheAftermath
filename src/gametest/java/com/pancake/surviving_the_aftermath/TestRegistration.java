@@ -90,6 +90,9 @@ public class TestRegistration {
    helper.register(SurvivingTheAftermath.asResource("endcleanstagsandpreservespreviousglow"), wrap(StabilityGameTests::endCleansTagsAndPreservesPreviousGlow));
    helper.register(SurvivingTheAftermath.asResource("offlinespectatorrecovery"), wrap(StabilityGameTests::offlineSpectatorRecovery));
    helper.register(SurvivingTheAftermath.asResource("authoredlootanddecorativebarrels"), wrap(StabilityGameTests::authoredLootAndDecorativeBarrels));
+   helper.register(SurvivingTheAftermath.asResource("citybarrelselectionsurvivesrotationandreload"), wrap(StabilityGameTests::cityBarrelSelectionSurvivesRotationAndReload));
+   helper.register(SurvivingTheAftermath.asResource("otherstructurebarrelsreceiveloot"), wrap(StabilityGameTests::otherStructureBarrelsReceiveLoot));
+   helper.register(SurvivingTheAftermath.asResource("structureloottablesactuallygenerate"), wrap(StabilityGameTests::structureLootTablesActuallyGenerate));
    helper.register(SurvivingTheAftermath.asResource("reloadreplacesmodules"), wrap(StabilityGameTests::reloadReplacesModules));
    helper.register(SurvivingTheAftermath.asResource("bossbarpacketroundtrip"), wrap(StabilityGameTests::bossBarPacketRoundTrip));
    helper.register(SurvivingTheAftermath.asResource("nethereventsondedicatedserver"), wrap(StabilityGameTests::netherEventsOnDedicatedServer));
