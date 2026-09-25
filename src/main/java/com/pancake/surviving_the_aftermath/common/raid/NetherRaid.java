@@ -49,7 +49,8 @@ public class NetherRaid extends BaseRaid {
             Codec.INT.fieldOf("totalEnemy").forGetter(BaseRaid::getTotalEnemy),
             Codec.list(ITracker.CODEC.get()).fieldOf("trackers").forGetter(NetherRaid::getTrackers),
             CodecUtils.setOf(BlockPos.CODEC).optionalFieldOf("portal_blocks", Set.of()).forGetter(NetherRaid::getPortalBlocks),
-            RaidDifficulty.CODEC.optionalFieldOf("difficulty", RaidDifficulty.NORMAL).forGetter(NetherRaid::getDifficulty)
+            RaidDifficulty.CODEC.optionalFieldOf("difficulty", RaidDifficulty.NORMAL).forGetter(NetherRaid::getDifficulty),
+            RaidEntranceState.CODEC.optionalFieldOf("entrance", RaidEntranceState.EMPTY).forGetter(NetherRaid::getEntranceState)
     ).apply(instance, NetherRaid::new));
 
     public NetherRaid(AftermathState state, BaseRaidModule module, Set<UUID> players, Float progressPercent, BlockPos startPos, Integer readyTime, Integer rewardTime,
@@ -70,6 +71,95 @@ public class NetherRaid extends BaseRaid {
                       Set<BlockPos> spawnPos, Set<UUID> enemies, Integer currentWave, Integer totalEnemy, List<ITracker> trackers, Set<BlockPos> portalBlocks, RaidDifficulty difficulty) {
         this(state, module, players, progressPercent, startPos, readyTime, rewardTime, spawnPos, enemies, currentWave, totalEnemy, trackers, portalBlocks);
         this.difficulty = difficulty;
+    }
+
+    public NetherRaid(AftermathState state, BaseRaidModule module, Set<UUID> players, Float progressPercent, BlockPos startPos, Integer readyTime, Integer rewardTime,
+                      Set<BlockPos> spawnPos, Set<UUID> enemies, Integer currentWave, Integer totalEnemy, List<ITracker> trackers, Set<BlockPos> portalBlocks, RaidDifficulty difficulty, RaidEntranceState entrance) {
+        this(state, module, players, progressPercent, startPos, readyTime, rewardTime, spawnPos, enemies, currentWave, totalEnemy, trackers, portalBlocks, difficulty);
+        pendingEntrance.addAll(entrance.pending().stream().map(net.minecraft.nbt.CompoundTag::copy).toList());
+        entranceDelay = entrance.delay(); blockedEntranceTicks = entrance.blockedTicks();
+    }
+
+    private final List<net.minecraft.nbt.CompoundTag> pendingEntrance = new ArrayList<>();
+    private int entranceDelay, blockedEntranceTicks;
+    private Mob nextEntrant;
+    private Direction releasingDirection;
+
+    public RaidEntranceState getEntranceState() { return new RaidEntranceState(pendingEntrance, entranceDelay, blockedEntranceTicks); }
+    @Override public int getPendingSpawnCount() { return pendingEntrance.size(); }
+
+    @Override public void tick() {
+        for (UUID id : List.copyOf(enemies)) {
+            if (level.getEntity(id) instanceof Mob mob) com.pancake.surviving_the_aftermath.common.util.PortalEntrance.tick(level, mob);
+        }
+        super.tick();
+    }
+
+    @Override protected void spawnWave() {
+        // Synthetic/non-portal modules retain the existing immediate-spawn API.
+        if (portalBlocks.size() <= 1) { super.spawnWave(); return; }
+        if (!enemies.isEmpty() || getPendingSpawnCount() > 0 || state != AftermathState.ONGOING || players.isEmpty()) return;
+        entranceDelay = 0; blockedEntranceTicks = 0;
+        for (var group : getModule().getWaves().get(currentWave)) {
+            group.spawnEntity(level, startPos).forEach(entry -> entry.ifPresent(entity -> {
+                if (!(entity instanceof Mob mob) || isEnd()) return;
+                if (!com.pancake.surviving_the_aftermath.common.util.PortalEntrance.usesEntrance(mob)) {
+                    setMobSpawn(level, mob); return;
+                }
+                prepareCombatMob(level, mob);
+                pendingEntrance.add(saveEntrant(mob));
+            }));
+        }
+        Collections.shuffle(pendingEntrance, new Random(level.getRandom().nextLong()));
+    }
+
+    private net.minecraft.nbt.CompoundTag saveEntrant(Mob mob) {
+        var data = new net.minecraft.nbt.CompoundTag();
+        if (!mob.save(data)) throw new IllegalStateException("Cannot save queued raid mob " + mob.getType());
+        return data;
+    }
+
+    private Mob loadEntrant(net.minecraft.nbt.CompoundTag data) {
+        var entity = net.minecraft.world.entity.EntityType.loadEntityRecursive(data, level, net.minecraft.world.entity.EntitySpawnReason.EVENT, e -> e);
+        return entity instanceof Mob mob ? mob : null;
+    }
+
+    @Override protected void tickPendingSpawns() {
+        if (state != AftermathState.ONGOING || pendingEntrance.isEmpty() || players.isEmpty()) return;
+        if (entranceDelay > 0) { entranceDelay--; return; }
+        if (nextEntrant == null) nextEntrant = loadEntrant(pendingEntrance.get(0));
+        if (nextEntrant == null) { cancelBlockedEntrance(); return; }
+        var target = randomPlayersUnderAttack();
+        if (target == null) return;
+        var direction = com.pancake.surviving_the_aftermath.common.util.PortalEntrance.place(level, nextEntrant, portalBlocks, target.position());
+        if (direction.isEmpty()) {
+            entranceDelay = 3; blockedEntranceTicks += 4;
+            if (blockedEntranceTicks >= 200) cancelBlockedEntrance();
+            return;
+        }
+        Mob mob = nextEntrant;
+        nextEntrant = null; pendingEntrance.remove(0); blockedEntranceTicks = 0; entranceDelay = 7;
+        releasingDirection = direction.get();
+        try { setMobSpawn(level, mob); } finally { releasingDirection = null; }
+    }
+
+    private void cancelBlockedEntrance() {
+        for (UUID id : players) {
+            var player = level.getPlayerByUUID(id);
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
+                serverPlayer.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.surviving_the_aftermath.nether_raid.blocked"));
+        }
+        // A broken/blocked entrance must not hang, skip a wave, or award an unearned victory.
+        end();
+    }
+
+    @Override protected boolean placeRaidMob(ServerLevel level, Mob mob) {
+        return releasingDirection != null || super.placeRaidMob(level, mob);
+    }
+
+    @Override protected void startMobMovement(ServerLevel level, Mob mob) {
+        if (releasingDirection != null) com.pancake.surviving_the_aftermath.common.util.PortalEntrance.begin(mob, releasingDirection);
+        else super.startMobMovement(level, mob);
     }
 
     private RaidDifficulty difficulty = RaidDifficulty.NORMAL;
@@ -147,6 +237,8 @@ public class NetherRaid extends BaseRaid {
     @Override
     public void end() {
         if (isEnd()) return;
+        pendingEntrance.clear(); entranceDelay = 0; blockedEntranceTicks = 0;
+        if (nextEntrant != null) { nextEntrant.discard(); nextEntrant = null; }
         // Close only this encounter's portal; keep its frame and all rewards.
         for (BlockPos pos : portalBlocks) {
             if (level.getBlockState(pos).is(Blocks.NETHER_PORTAL)) level.removeBlock(pos, false);
@@ -162,6 +254,11 @@ public class NetherRaid extends BaseRaid {
 
     @Override
     public void setMobSpawn(ServerLevel level, Mob mob) {
+        if (releasingDirection == null) prepareCombatMob(level, mob);
+        super.setMobSpawn(level, mob);
+    }
+
+    private void prepareCombatMob(ServerLevel level, Mob mob) {
         if (mob instanceof AbstractPiglin piglin) {
             piglin.setImmuneToZombification(true);
         }
@@ -169,7 +266,6 @@ public class NetherRaid extends BaseRaid {
             hoglin.setImmuneToZombification(true);
         }
         RaidCombat.prepare(level, mob, difficulty, currentWave + 1);
-        super.setMobSpawn(level, mob);
     }
 
     @Override

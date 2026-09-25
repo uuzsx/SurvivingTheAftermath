@@ -123,6 +123,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
             });
             checkNextWave();
             spawnWave();
+            tickPendingSpawns();
             EnemyTotalRatio();
             super.updateProgress();
         }
@@ -144,11 +145,15 @@ public class BaseRaid extends BaseAftermath implements IRaid {
     }
 
     private void EnemyTotalRatio(){
-        this.progressPercent = totalEnemy == 0 ? 0 : enemies.size() / (float) totalEnemy;
+        int total = totalEnemy + getPendingSpawnCount();
+        this.progressPercent = total == 0 ? 0 : (enemies.size() + getPendingSpawnCount()) / (float) total;
     }
 
+    public int getPendingSpawnCount() { return 0; }
+    protected void tickPendingSpawns() {}
+
     protected void spawnWave() {
-        if (enemies.isEmpty() && state == AftermathState.ONGOING){
+        if (enemies.isEmpty() && getPendingSpawnCount() == 0 && state == AftermathState.ONGOING){
             getModule().getWaves().get(currentWave).forEach(this::spawnEntities);
         }
     }
@@ -202,7 +207,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
     public void setMobSpawn(ServerLevel level, Mob mob) {
         Player target = randomPlayersUnderAttack();
         if (target == null) return;
-        if (!SafeSpawn.placeMob(level, mob, spawnPos, startPos, getRadius())) {
+        if (!placeRaidMob(level, mob)) {
             SurvivingTheAftermath.LOGGER.warn("No safe spawn space for {} in aftermath {}", mob.getType(), uuid);
             lose();
             return;
@@ -210,11 +215,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
         mob.setPersistenceRequired();
         mob.getBrain().setMemory(MemoryModuleType.ANGRY_AT, target.getUUID());
         mob.setTarget(target);
-        // Test escape direction at the final spawn position, using the entire body.
-        Direction dir = Direction.Plane.HORIZONTAL.stream()
-                .filter(d -> level.noCollision(mob, mob.getBoundingBox().move(d.getStepX() * 0.5, 0, d.getStepZ() * 0.5)))
-                .findFirst().orElse(null);
-        if (dir != null) mob.setDeltaMovement(dir.getStepX() * 0.5, 0, dir.getStepZ() * 0.5);
+        startMobMovement(level, mob);
         if (join(mob)) {
             insertTag(mob);
             if (!level.tryAddFreshEntityWithPassengers(mob)) {
@@ -224,6 +225,18 @@ public class BaseRaid extends BaseAftermath implements IRaid {
             }
         }
     }
+    protected boolean placeRaidMob(ServerLevel level, Mob mob) {
+        return SafeSpawn.placeMob(level, mob, spawnPos, startPos, getRadius());
+    }
+
+    protected void startMobMovement(ServerLevel level, Mob mob) {
+        // Test escape direction at the final spawn position, using the entire body.
+        Direction dir = Direction.Plane.HORIZONTAL.stream()
+                .filter(d -> level.noCollision(mob, mob.getBoundingBox().move(d.getStepX() * 0.5, 0, d.getStepZ() * 0.5)))
+                .findFirst().orElse(null);
+        if (dir != null) mob.setDeltaMovement(dir.getStepX() * 0.5, 0, dir.getStepZ() * 0.5);
+    }
+
     public Player randomPlayersUnderAttack(){
         List<Player> targets = players.stream().map(level::getPlayerByUUID)
                 .filter(Objects::nonNull).filter(player -> player.isAlive() && !player.isSpectator()).toList();
@@ -242,7 +255,7 @@ public class BaseRaid extends BaseAftermath implements IRaid {
 
 
     protected void checkNextWave(){
-        if (enemies.isEmpty()){
+        if (enemies.isEmpty() && getPendingSpawnCount() == 0){
             if(this.currentWave >= getModule().getWaves().size() - 1) {
                 AftermathEventUtil.victory(this,players,level);
             } else {
