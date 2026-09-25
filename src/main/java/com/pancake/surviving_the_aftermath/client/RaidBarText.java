@@ -19,7 +19,7 @@ public final class RaidBarText {
         Object[] args = contents.getArgs();
         Component difficulty = args[0] instanceof Component component
                 ? component : Component.literal(String.valueOf(args[0]));
-        return new Labels(difficulty, Component.translatable(WAVE, args[1], args[2]));
+        return new Labels(Component.translatable("message.surviving_the_aftermath.nether_raid.heading", difficulty), Component.translatable(WAVE, args[1], args[2]));
     }
 
     public static int difficultyColor(long milliseconds) {
