@@ -10,7 +10,7 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 劫后余生：扩展原版突袭玩法，加入下界副本、遗迹、城市与附魔。
 使用黄金、钻石、下界合金打火石分别开启简单 5 波、普通 9 波、困难 13 波挑战；每波开始时建筑逐渐下界化，胜利后获得奖励并播放音乐。
 
-当前分支 **`1.21.2`** 对应 **Minecraft 1.21.2 / NeoForge 21.2.1-beta / Java 21**，模组版本为 **0.0.4-rc.19**。
+当前分支 **`1.21.2`** 对应 **Minecraft 1.21.2 / NeoForge 21.2.1-beta / Java 21**，模组版本为 **0.0.4-rc.20**。
 每个版本都在自己的分支根目录独立构建；默认分支 `main` 为 1.20.1。
 
 ## 版本与分支
@@ -33,6 +33,8 @@ Explore ruined structures and cities, face the Nether Raid, and discover powerfu
 - 胜利音乐以建筑中心为声源，在 48 格内随距离衰减。成功重新激活，或最后一名玩家离开范围时停止；回来不会续播。
 
 ## 更新记录
+
+rc.20 猪灵和蛮兵逐只按波次权重抽取装备；普通第 8 波、困难第 9 波开始出现钻石甲，困难第 12 波开始出现下界合金甲。见 [装备权重与验证](docs/EQUIPMENT-rc.20.md)。
 
 rc.19 新增黄金和下界合金打火石，支持简单 5 波、普通 9 波、困难 13 波；困难后期包含战斗附魔和战斗增益，通关奖励分档。见 [三档挑战与验证](docs/DIFFICULTY-rc.19.md)。
 

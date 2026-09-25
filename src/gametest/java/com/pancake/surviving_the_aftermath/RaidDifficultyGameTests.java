@@ -107,6 +107,69 @@ public final class RaidDifficultyGameTests {
         h.succeed();
     }
 
+    @GameTest(template="stability_empty", timeoutTicks=400)
+    public static void weightedEquipmentProgression(GameTestHelper h) {
+        var level=h.getLevel();
+        int samples=256;
+        for (RaidDifficulty mode:RaidDifficulty.values()) {
+            double firstQuality=0;
+            for(int wave=1;wave<=mode.waves();wave++) {
+                int[] counts=new int[4];
+                var seeds=new java.util.Random(0x52414944L+mode.ordinal()*1000L+wave);
+                for(int sample=0;sample<samples;sample++) {
+                    boolean brute=(sample&1)!=0;
+                    Mob mob=(brute?EntityType.PIGLIN_BRUTE:EntityType.PIGLIN).create(level,EntitySpawnReason.EVENT);
+                    try {
+                        mob.getRandom().setSeed(seeds.nextLong());
+                        RaidCombat.prepare(level,mob,mode,wave);
+                        verify(mob,mode,wave);
+                        String helmet=BuiltInRegistries.ITEM.getKey(mob.getItemBySlot(EquipmentSlot.HEAD).getItem()).getPath();
+                        int material=List.of("golden_helmet","iron_helmet","diamond_helmet","netherite_helmet").indexOf(helmet);
+                        check(material>=0,"Missing/unknown armor: "+helmet);
+                        counts[material]++;
+                        String prefix=helmet.substring(0,helmet.indexOf('_'));
+                        String weapon=BuiltInRegistries.ITEM.getKey(mob.getMainHandItem().getItem()).getPath();
+                        check(weapon.equals(prefix+(brute?"_axe":"_sword")),"Wrong weapon for sampled kit");
+                        int pieces=0;
+                        for(var slot:List.of(EquipmentSlot.HEAD,EquipmentSlot.CHEST,EquipmentSlot.LEGS,EquipmentSlot.FEET)) {
+                            var armor=mob.getItemBySlot(slot);
+                            if(!armor.isEmpty()) {
+                                pieces++;
+                                check(BuiltInRegistries.ITEM.getKey(armor.getItem()).getPath().startsWith(prefix+"_"),"Kit changed material between slots");
+                            }
+                        }
+                        check(pieces>=1 && (wave<5 || pieces==4),"Lost armor coverage in later waves");
+                        boolean diamondAllowed=mode==RaidDifficulty.NORMAL && wave>=8 || mode==RaidDifficulty.HARD && wave>=9;
+                        check(material<2 || diamondAllowed,"Diamond appeared before late waves");
+                        check(material!=3 || mode==RaidDifficulty.HARD && wave>=12,"Premature netherite");
+                    } finally {mob.discard();}
+                }
+                check(counts[0]>0 && counts[1]>0,"Wave uses uniform material: "+mode+"/"+wave);
+                double quality=(counts[1]+2.0*counts[2]+3.0*counts[3])/samples;
+                if(wave==1) {
+                    firstQuality=quality;
+                    check(counts[0]>samples*0.65,"Opening wave is not mostly gold");
+                }
+                if(wave==mode.waves()) {
+                    check(quality>firstQuality+0.15,"Gear did not get harder across waves");
+                    if(mode==RaidDifficulty.EASY) check(counts[1]>samples*0.20 && counts[1]<samples*0.40,"Easy finale iron weight drifted");
+                    if(mode==RaidDifficulty.NORMAL) check(counts[2]>samples*0.20 && counts[2]<samples*0.40,"Normal finale diamond weight drifted");
+                    if(mode==RaidDifficulty.HARD) {
+                        check(counts[2]>samples*0.35 && counts[2]<samples*0.55,"Hard finale diamond weight drifted");
+                        check(counts[3]>samples*0.15 && counts[3]<samples*0.35,"Hard finale netherite weight drifted");
+                    }
+                }
+                System.out.println("RAID EQUIPMENT SAMPLE: "+mode+"/"+wave+" gold/iron/diamond/netherite="+Arrays.toString(counts));
+            }
+        }
+        // Legacy normal challenges had eleven waves; a saved extra wave uses the final mix safely.
+        var legacy=EntityType.PIGLIN.create(level,EntitySpawnReason.EVENT);
+        try {RaidCombat.prepare(level,legacy,RaidDifficulty.NORMAL,11);verify(legacy,RaidDifficulty.NORMAL,11);}
+        finally {legacy.discard();}
+        System.out.println("WEIGHTED EQUIPMENT CHECK: 6912 piglin/brute samples, 27 waves; mixed kits, late gates, combat buffs and legacy extra wave passed");
+        h.succeed();
+    }
+
     @GameTest(template = "stability_empty", timeoutTicks = 400)
     public static void combatBuffsAreEffectiveAndInherited(GameTestHelper h) {
         var level=h.getLevel();
@@ -144,6 +207,9 @@ public final class RaidDifficultyGameTests {
         check(enchantedDamage>plainDamage && plainDamage>0,"Sharpness did not increase actual mob damage: "+plainDamage+" -> "+enchantedDamage);
         var armored=EntityType.PIGLIN_BRUTE.create(level,EntitySpawnReason.EVENT);
         RaidCombat.prepare(level,armored,RaidDifficulty.HARD,7);armored.tick();
+        // Compare protection on identical sampled materials, not two independently randomized kits.
+        for(EquipmentSlot slot:EquipmentSlot.values()) plain.setItemSlot(slot,new ItemStack(armored.getItemBySlot(slot).getItem()));
+        plain.tick();
         before=plain.getHealth();plain.hurtServer(level,level.damageSources().mobAttack(target),10);float unenchantedLoss=before-plain.getHealth();
         before=armored.getHealth();armored.hurtServer(level,level.damageSources().mobAttack(target),10);float enchantedLoss=before-armored.getHealth();
         check(enchantedLoss<unenchantedLoss && unenchantedLoss>0,"Protection did not reduce actual damage");

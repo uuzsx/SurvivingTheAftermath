@@ -31,6 +31,57 @@ public final class RaidCombat {
     private static final Item[] SWORDS = {Items.GOLDEN_SWORD, Items.IRON_SWORD, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD};
     private static final Item[] AXES = {Items.GOLDEN_AXE, Items.IRON_AXE, Items.DIAMOND_AXE, Items.NETHERITE_AXE};
 
+    // Per-mob kit weights (%): gold, iron, diamond, netherite. Rows are one-based waves.
+    private static final int[][] EASY_WEIGHTS = {
+        {95, 5, 0, 0},
+        {90, 10, 0, 0},
+        {85, 15, 0, 0},
+        {80, 20, 0, 0},
+        {70, 30, 0, 0}
+    };
+    private static final int[][] NORMAL_WEIGHTS = {
+        {85, 15, 0, 0},
+        {80, 20, 0, 0},
+        {70, 30, 0, 0},
+        {60, 40, 0, 0},
+        {50, 50, 0, 0},
+        {40, 60, 0, 0},
+        {30, 70, 0, 0},
+        {25, 60, 15, 0},
+        {15, 55, 30, 0}
+    };
+    private static final int[][] HARD_WEIGHTS = {
+        {80, 20, 0, 0},
+        {75, 25, 0, 0},
+        {65, 35, 0, 0},
+        {60, 40, 0, 0},
+        {50, 50, 0, 0},
+        {40, 60, 0, 0},
+        {35, 65, 0, 0},
+        {25, 75, 0, 0},
+        {20, 65, 15, 0},
+        {15, 60, 25, 0},
+        {10, 50, 40, 0},
+        {5, 40, 45, 10},
+        {5, 25, 45, 25}
+    };
+
+    private static int selectMaterial(net.minecraft.util.RandomSource random, RaidDifficulty difficulty, int wave) {
+        int[][] table = switch (difficulty) {
+            case EASY -> EASY_WEIGHTS;
+            case NORMAL -> NORMAL_WEIGHTS;
+            case HARD -> HARD_WEIGHTS;
+        };
+        // Old saves/data packs can have extra waves: retain the final mix instead of indexing past it.
+        int[] weights = table[Math.max(0, Math.min(wave - 1, table.length - 1))];
+        int roll = random.nextInt(100);
+        for (int material = 0; material < weights.length; material++) {
+            if (roll < weights[material]) return material;
+            roll -= weights[material];
+        }
+        throw new IllegalStateException("Raid equipment weights must sum to 100");
+    }
+
     /** Runs once after vanilla spawn initialization, before adding the mob to the world. Wave is one-based. */
     public static void prepare(ServerLevel level, Mob mob, RaidDifficulty difficulty, int wave) {
         if (mob instanceof Piglin piglin) piglin.setBaby(false);
@@ -42,11 +93,8 @@ public final class RaidCombat {
     }
 
     private static void equip(ServerLevel level, Mob mob, RaidDifficulty difficulty, int wave) {
-        int material = switch (difficulty) {
-            case EASY -> 0;
-            case NORMAL -> wave >= 8 ? 2 : wave >= 4 ? 1 : 0;
-            case HARD -> wave >= 12 ? 3 : wave >= 7 ? 2 : wave >= 3 ? 1 : 0;
-        };
+        // One draw per enemy keeps coherent individual kits and mixes materials within a wave.
+        int material = selectMaterial(mob.getRandom(), difficulty, wave);
         int pieces = difficulty == RaidDifficulty.EASY ? (wave < 3 ? 1 : wave < 5 ? 2 : 4)
                 : difficulty == RaidDifficulty.NORMAL ? (wave < 4 ? 2 : 4) : (wave < 3 ? 2 : 4);
         boolean brute = mob instanceof PiglinBrute;
@@ -54,9 +102,7 @@ public final class RaidCombat {
         mob.setItemSlot(EquipmentSlot.MAINHAND, weapon);
         mob.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
         for (int i = 0; i < ARMOR.length; i++) {
-            // Normal finale gets diamond helmet/chest but keeps iron legs/boots.
-            int armorMaterial = difficulty == RaidDifficulty.NORMAL && material == 2 && i >= 2 ? 1 : material;
-            mob.setItemSlot(ARMOR[i], i < pieces ? new ItemStack(SETS[armorMaterial][i]) : ItemStack.EMPTY);
+            mob.setItemSlot(ARMOR[i], i < pieces ? new ItemStack(SETS[material][i]) : ItemStack.EMPTY);
         }
         if (wave < 7 || difficulty == RaidDifficulty.EASY) return;
         var random = mob.getRandom();
